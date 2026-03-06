@@ -1,0 +1,135 @@
+:root {
+  --bg-color: #0a1a14;
+  --text-color: #ffffff;
+  --nav-text-color: #b0b0b0;
+  --accent-color: #00e676;
+  --header-bg: rgba(10, 26, 20, 0.8);
+  --btn-bg: #00e676;
+  --btn-text: #0a1a14;
+}
+
+[data-theme='light'] {
+  --bg-color: #ffffff;
+  --text-color: #1a1a1a;
+  --nav-text-color: #4a4a4a;
+  --accent-color: #00c853;
+  --header-bg: rgba(245, 245, 245, 0.8);
+  --btn-bg: #00c853;
+  --btn-text: #ffffff;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  background-color: var(--header-bg);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  color: var(--accent-color);
+  font-size: 24px;
+}
+
+.logo-text {
+  color: var(--text-color);
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.nav-link {
+  color: var(--nav-text-color);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--accent-color);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.deconnexion-btn {
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.connexion-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--nav-text-color);
+  color: var(--text-color);
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    display: none; /* Simplification pour mobile */
+  }
+}
