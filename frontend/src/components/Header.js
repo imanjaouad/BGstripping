@@ -26,6 +26,7 @@ const Header = () => {
         <a href="#cumenage" className="nav-link">encasement</a>
         <a href="#transport" className="nav-link">Transport</a>
         <a href="#reports" className="nav-link">Reports</a>
+        <a href="#statistics" className="nav-link">Statistiques</a>
       </nav>
 
       <div className="header-actions">
