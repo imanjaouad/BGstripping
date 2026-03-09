@@ -220,7 +220,7 @@ export default function PoussageForm() {
 
           <div className="grid-row grid-2">
             <label className="field">
-              <span>Volume Sote</span>
+              <span>Volume Sauté</span>
               <input type="number" min="0" step="0.01" name="saute" value={formData.saute} onChange={handleChange} required />
             </label>
 
