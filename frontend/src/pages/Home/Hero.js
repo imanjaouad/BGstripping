@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import IMGHero from "../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png"
+import "../../style/Home.css"
+import IMGHero from "../../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png"
 export default function Hero() {
   return (
     <section className="hero-section position-relative overflow-hidden">

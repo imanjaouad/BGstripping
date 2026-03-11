@@ -1,8 +1,8 @@
-import Hero from "../components/Hero";
+import Hero from "./Home/Hero";
 import DefinitionSection from "../components/DefinitionSection";
 import OperationsSection from "../components/OperationsSection";
 import CTASection from "../components/CTASection";
-import Footer from "../components/Footer";
+import Footer from "./Home/Footer";
 import "../style/Home.css";
 import Header from "../components/Header";
 import PoussageForm from "../components/PoussageForm";

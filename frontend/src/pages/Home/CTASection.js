@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../style/Home.css";
+import "../../style/Home.css"
 
 export default function CTASection() {
   return (

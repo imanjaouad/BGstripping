@@ -22,7 +22,7 @@ const Header = ({ children }) => {   // ← children optionnel
       {/* Logo */}
       <div className="logo-container">
         <div className="logo-icon">
-          <img src={logo} alt="Logo" style={{ width: "95px", height: "auto" }} />
+          <img src={logo} alt="Logo" style={{ width: "50px", height: "auto" }} />
         </div>
         <span className="logo-text">BGstripping</span>
       </div>
