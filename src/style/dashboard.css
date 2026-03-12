@@ -1,0 +1,553 @@
+/* ================= ROOT COLORS ================= */
+
+:root{
+--green-main:#16a34a;
+--green-light:#4ade80;
+--green-dark:#064E3B;
+--green-pale:#dcfce7;
+--green-glow:rgba(22,163,74,0.35);
+
+--card-bg:#ffffff;
+--radius-lg:16px;
+
+--shadow-green:0 12px 35px rgba(22,163,74,0.15);
+}
+
+/* ================= HEADER ================= */
+
+.dashboard-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:30px;
+padding:18px 24px;
+
+background:linear-gradient(135deg,#f0fdf4,#ffffff);
+
+border-radius:16px;
+border:1px solid rgba(22,163,74,0.15);
+
+box-shadow:0 10px 35px rgba(22,163,74,0.08);
+
+animation:fadeSlideDown .6s ease both;
+}
+
+.dashboard-title{
+font-family:'Rajdhani',sans-serif;
+font-size:2.1rem;
+font-weight:700;
+color:#064E3B;
+letter-spacing:2px;
+}
+
+.dashboard-title span{
+color:var(--green-main);
+text-shadow:0 0 8px var(--green-glow);
+}
+
+.header-logo{
+width:70px;
+height:70px;
+
+border-radius:50%;
+
+border:3px solid var(--green-light);
+
+box-shadow:
+0 0 12px var(--green-glow),
+0 0 30px rgba(22,163,74,0.2);
+
+animation:rotateBorder 8s linear infinite;
+}
+
+/* ================= BUTTON ADD ================= */
+
+.btn-add{
+
+display:inline-flex;
+align-items:center;
+gap:8px;
+
+background:linear-gradient(135deg,var(--green-main),var(--green-light));
+
+color:white;
+
+border:none;
+
+border-radius:50px;
+
+padding:12px 26px;
+
+font-family:'Rajdhani',sans-serif;
+
+font-weight:600;
+
+letter-spacing:1px;
+
+cursor:pointer;
+
+transition:all .3s;
+
+box-shadow:0 8px 25px rgba(22,163,74,.25);
+}
+
+.btn-add:hover{
+
+transform:translateY(-3px) scale(1.04);
+
+box-shadow:
+0 12px 35px rgba(22,163,74,.35);
+
+}
+
+/* ================= FORM CARD ================= */
+
+.form-card{
+
+background:white;
+
+border-radius:18px;
+
+padding:36px;
+
+box-shadow:
+
+0 12px 40px rgba(0,0,0,0.05),
+0 8px 25px rgba(22,163,74,0.12);
+
+border:1px solid rgba(22,163,74,0.15);
+
+margin-bottom:30px;
+
+animation:scaleIn .45s ease both;
+
+position:relative;
+
+overflow:hidden;
+}
+
+.form-card::before{
+
+content:"";
+
+position:absolute;
+
+top:0;
+left:0;
+
+width:100%;
+height:4px;
+
+background:linear-gradient(90deg,
+var(--green-main),
+var(--green-light));
+
+}
+
+/* ================= LABEL ================= */
+
+.form-label{
+
+font-size:.78rem;
+
+font-weight:700;
+
+color:#374151;
+
+letter-spacing:.6px;
+
+text-transform:uppercase;
+
+margin-bottom:5px;
+
+display:block;
+}
+
+/* ================= INPUT ================= */
+
+.form-control,
+.form-select{
+
+border:2px solid #E5E7EB !important;
+
+border-radius:12px !important;
+
+padding:10px 14px !important;
+
+font-family:'Exo 2',sans-serif !important;
+
+transition:all .25s !important;
+
+font-size:.92rem !important;
+
+background:white;
+}
+
+.form-control:focus,
+.form-select:focus{
+
+border-color:var(--green-main) !important;
+
+box-shadow:
+0 0 0 3px var(--green-pale),
+0 0 10px rgba(22,163,74,0.15);
+
+}
+
+/* ================= EQUIPMENT ================= */
+
+.equip-grid{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:6px;
+
+padding:10px;
+
+border:2px solid #E5E7EB;
+
+border-radius:12px;
+
+background:#fafafa;
+
+}
+
+.equip-chip{
+
+background:white;
+
+border:2px solid #E5E7EB;
+
+border-radius:50px;
+
+padding:6px 14px;
+
+font-size:.82rem;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.equip-chip:hover{
+
+border-color:var(--green-main);
+
+}
+
+.equip-chip.selected{
+
+background:var(--green-pale);
+
+border-color:var(--green-main);
+
+font-weight:600;
+
+color:var(--green-dark);
+
+box-shadow:0 3px 12px rgba(22,163,74,.25);
+
+transform:scale(1.05);
+}
+
+/* ================= ADD EQUIPMENT ================= */
+
+.btn-add-equip{
+
+border:2px dashed var(--green-main);
+
+background:none;
+
+border-radius:50px;
+
+padding:5px 14px;
+
+font-size:.82rem;
+
+font-weight:600;
+
+cursor:pointer;
+
+color:var(--green-main);
+
+transition:.25s;
+}
+
+.btn-add-equip:hover{
+
+background:var(--green-pale);
+
+}
+
+/* ================= RENDEMENT ================= */
+
+.rendement-banner{
+
+background:linear-gradient(135deg,#064E3B,#065F46);
+
+border-radius:14px;
+
+padding:18px 26px;
+
+display:flex;
+
+align-items:center;
+
+gap:18px;
+
+margin:14px 0;
+
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+}
+
+.rendement-value{
+
+font-family:'Rajdhani',sans-serif;
+
+font-size:2.2rem;
+
+font-weight:700;
+
+color:var(--green-light);
+
+text-shadow:0 0 10px rgba(74,222,128,.4);
+
+}
+
+.rendement-label{
+
+color:rgba(240,253,244,0.7);
+
+font-size:.85rem;
+
+}
+
+/* ================= SUBMIT ================= */
+
+.btn-submit{
+
+background:linear-gradient(135deg,#064E3B,var(--green-main));
+
+color:white;
+
+border:none;
+
+border-radius:50px;
+
+padding:13px 38px;
+
+font-family:'Rajdhani',sans-serif;
+
+font-size:1.05rem;
+
+font-weight:700;
+
+letter-spacing:1.5px;
+
+cursor:pointer;
+
+transition:.3s;
+
+box-shadow:0 8px 28px rgba(22,163,74,.35);
+
+}
+
+.btn-submit:hover{
+
+transform:translateY(-3px);
+
+box-shadow:0 12px 40px rgba(22,163,74,.45);
+
+}
+
+/* ================= TABLE CARD ================= */
+
+.table-card{
+
+background:white;
+
+border-radius:18px;
+
+padding:26px;
+
+box-shadow:0 12px 35px rgba(22,163,74,.12);
+
+border:1px solid rgba(22,163,74,.1);
+
+animation:fadeSlideUp .6s ease both;
+
+}
+
+/* ================= TABLE ================= */
+
+.mine-table{
+
+width:100%;
+
+border-collapse:separate;
+
+border-spacing:0 6px;
+
+}
+
+.mine-table thead tr{
+
+background:linear-gradient(135deg,#064E3B,#065F46);
+
+}
+
+.mine-table thead th{
+
+color:rgba(240,253,244,0.9);
+
+font-family:'Rajdhani',sans-serif;
+
+font-size:.8rem;
+
+letter-spacing:1.4px;
+
+padding:14px;
+
+text-transform:uppercase;
+
+}
+
+.mine-table tbody tr{
+
+background:white;
+
+transition:.25s;
+
+}
+
+.mine-table tbody tr:hover{
+
+transform:scale(1.01);
+
+box-shadow:0 6px 18px rgba(22,163,74,.15);
+
+}
+
+.mine-table td{
+
+padding:12px 14px;
+
+font-size:.9rem;
+
+color:#374151;
+
+border-top:1px solid #F3F4F6;
+
+border-bottom:1px solid #F3F4F6;
+
+}
+
+/* ================= BADGES ================= */
+
+.badge-etat{
+
+padding:3px 12px;
+
+border-radius:50px;
+
+font-size:.75rem;
+
+font-weight:600;
+
+}
+
+.badge-marche{
+
+background:#D1FAE5;
+
+color:#065F46;
+
+}
+
+.badge-arret{
+
+background:#FEE2E2;
+
+color:#991B1B;
+
+}
+
+/* ================= BUTTON ACTIONS ================= */
+
+.btn-edit{
+
+background:#FEF3C7;
+
+color:#92400E;
+
+border:none;
+
+border-radius:8px;
+
+padding:5px 12px;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.btn-edit:hover{
+
+background:#FDE68A;
+
+transform:scale(1.05);
+
+}
+
+.btn-del{
+
+background:#FEE2E2;
+
+color:#991B1B;
+
+border:none;
+
+border-radius:8px;
+
+padding:5px 12px;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.btn-del:hover{
+
+background:#FECACA;
+
+transform:scale(1.05);
+
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes fadeSlideDown{
+from{opacity:0;transform:translateY(-20px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes fadeSlideUp{
+from{opacity:0;transform:translateY(30px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes scaleIn{
+from{opacity:0;transform:scale(.95)}
+to{opacity:1;transform:scale(1)}
+}
+
+@keyframes rotateBorder{
+from{transform:rotate(0)}
+to{transform:rotate(360deg)}
+}
