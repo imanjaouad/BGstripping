@@ -77,7 +77,7 @@ const SIDEBAR_CSS = `
     margin-bottom: 8px;
   }
   .sb-csm-logo-ring {
-    width: 40px; height: 40px; border-radius: 12px;
+    width: 70px; height: 70px; border-radius: 12px;
     border: 2px solid #bbf7d0;
     box-shadow: 0 2px 12px rgba(22,163,74,0.15);
     overflow: hidden; flex-shrink: 0;

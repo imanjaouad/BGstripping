@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import image from "../../images/image3.webp";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ACCUEIL CASEMENT ZD11 — Page d'accueil du module
+   ACCUEIL CASEMENT  — Page d'accueil du module
    Style identique au reste du module (Plus Jakarta Sans, palette verte)
 ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -192,41 +192,66 @@ const CSS = `
 `;
 
 function AccueilCasement() {
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const casements = useSelector((s) => s.casement?.list || []);
 
-  const totalVolume = casements.reduce((a,c)=>a+Number(c.volume_casse||0),0);
-  const totalCoups  = casements.reduce((a,c)=>a+Number(c.nombreCoups||0),0);
-  const totalTemps  = casements.reduce((a,c)=>a+Number(c.temps||0),0);
-  const totalOps    = casements.length;
-  const rendMoyen   = totalOps>0
-    ? (casements.reduce((a,c)=>{const v=Number(c.volume_casse||0),t=Number(c.temps||0);return a+(t>0?v/t:0);},0)/totalOps).toFixed(1)
-    : 0;
-  const enMarcheCnt = casements.filter(c=>c.etatMachine==="En marche").length;
+  const totalVolume = casements.reduce(
+    (a, c) => a + Number(c.volume_casse || 0),
+    0,
+  );
+  const totalCoups = casements.reduce(
+    (a, c) => a + Number(c.nombreCoups || 0),
+    0,
+  );
+  const totalTemps = casements.reduce((a, c) => a + Number(c.temps || 0), 0);
+  const totalOps = casements.length;
+  const rendMoyen =
+    totalOps > 0
+      ? (
+          casements.reduce((a, c) => {
+            const v = Number(c.volume_casse || 0),
+              t = Number(c.temps || 0);
+            return a + (t > 0 ? v / t : 0);
+          }, 0) / totalOps
+        ).toFixed(1)
+      : 0;
+  const enMarcheCnt = casements.filter(
+    (c) => c.etatMachine === "En marche",
+  ).length;
 
   const recentCasements = [...casements].slice(-6).reverse();
 
   const BASE = "/operations/casement";
   const navCards = [
     {
-      icon:"📝", title:"Tableau de Bord", path:`${BASE}`,
-      desc:"Saisie des opérations de cassage . Formulaire complet avec calcul automatique du rendement.",
+      icon: "📝",
+      title: "Tableau de Bord",
+      path: `${BASE}`,
+      desc: "Saisie des opérations de cassage . Formulaire complet avec calcul automatique du rendement.",
     },
     {
-      icon:"📊", title:"Statistiques", path:`${BASE}/statistique`,
-      desc:"Graphes de volume par engin et par tranchée. Analyse complète des performances.",
+      icon: "📊",
+      title: "Statistiques",
+      path: `${BASE}/statistique`,
+      desc: "Graphes de volume par engin et par tranchée. Analyse complète des performances.",
     },
     {
-      icon:"📋", title:"Historique", path:`${BASE}/historique`,
-      desc:"Tableau filtrable de toutes les opérations enregistrées. Export Excel disponible.",
+      icon: "📋",
+      title: "Historique",
+      path: `${BASE}/historique`,
+      desc: "Tableau filtrable de toutes les opérations enregistrées. Export Excel disponible.",
     },
     {
-      icon:"📄", title:"Rapport", path:`${BASE}/rapport`,
-      desc:"Synthèse mensuelle et annuelle. Génération automatique des rapports PDF/Excel.",
+      icon: "📄",
+      title: "Rapport",
+      path: `${BASE}/rapport`,
+      desc: "Synthèse mensuelle et annuelle. Génération automatique des rapports PDF/Excel.",
     },
     {
-      icon:"💰", title:"Coûts", path:`${BASE}/couts`,
-      desc:"Suivi budgétaire par coup . Calcul du coût mensuel et de la répartition annuelle.",
+      icon: "💰",
+      title: "Coûts",
+      path: `${BASE}/couts`,
+      desc: "Suivi budgétaire par coup . Calcul du coût mensuel et de la répartition annuelle.",
     },
   ];
 
@@ -234,45 +259,90 @@ function AccueilCasement() {
     <>
       <style>{CSS}</style>
       <div className="acc-root">
-        <div className="acc-bg"/><div className="acc-dots"/>
+        <div className="acc-bg" />
+        <div className="acc-dots" />
         <div className="acc-content">
-
           {/* ── HERO ─────────────────────────────────────────────────────── */}
           <div className="acc-hero">
             <div>
-              <div className="acc-hero-eyebrow">Module Casement · ZD11</div>
+              <div className="acc-hero-eyebrow">Module Casement · </div>
               <h1 className="acc-hero-title">
                 Gestion du <span>Casement</span>
               </h1>
               <p className="acc-hero-sub">
-                Suivi des opérations de cassage par  — volumes, équipements,
+                Suivi des opérations de cassage par — volumes, équipements,
                 rendements, coûts et rapports en temps réel.
               </p>
+              {/* ── Definition de casement ──────────────────────────────────────────────────────── */}
+              <div></div>
               <div className="acc-hero-actions">
-                <button className="acc-btn-primary" onClick={()=>navigate(`${BASE}/dashboard`)}>
+                <button
+                  className="acc-btn-primary"
+                  onClick={() => navigate(`${BASE}/dashboard`)}
+                >
                   📝 Nouvelle saisie
                 </button>
-                <button className="acc-btn-secondary" onClick={()=>navigate(`${BASE}/statistique`)}>
+                <button
+                  className="acc-btn-secondary"
+                  onClick={() => navigate(`${BASE}/statistique`)}
+                >
                   📊 Voir les statistiques
                 </button>
               </div>
             </div>
-            <img src={image} alt="Logo Mine" className="acc-hero-img"/>
+            <img src={image} alt="Logo Mine" className="acc-hero-img" />
           </div>
 
           {/* ── KPI ──────────────────────────────────────────────────────── */}
           <div className="acc-kpi-grid">
             {[
-              {icon:"🪨",label:"Volume Cassé",  value:totalVolume.toLocaleString(),       unit:"t",    delay:"0.10s"},
-              {icon:"🔨",label:"Coups ",     value:totalCoups.toLocaleString(),         unit:"",     delay:"0.18s"},
-              {icon:"⏱️",label:"Temps Total",   value:totalTemps.toLocaleString(),         unit:"h",    delay:"0.26s"},
-              {icon:"📈",label:"Rendement Moy.",value:rendMoyen,                           unit:"t/h",  delay:"0.34s"},
-              {icon:"✅",label:"En Marche",     value:enMarcheCnt.toLocaleString(),        unit:"",     delay:"0.50s"},
-            ].map(({icon,label,value,unit,delay})=>(
-              <div key={label} className="acc-kpi" style={{animationDelay:delay}}>
+              {
+                icon: "🪨",
+                label: "Volume Cassé",
+                value: totalVolume.toLocaleString(),
+                unit: "t",
+                delay: "0.10s",
+              },
+              {
+                icon: "🔨",
+                label: "Coups ",
+                value: totalCoups.toLocaleString(),
+                unit: "",
+                delay: "0.18s",
+              },
+              {
+                icon: "⏱️",
+                label: "Temps Total",
+                value: totalTemps.toLocaleString(),
+                unit: "h",
+                delay: "0.26s",
+              },
+              {
+                icon: "📈",
+                label: "Rendement Moy.",
+                value: rendMoyen,
+                unit: "t/h",
+                delay: "0.34s",
+              },
+              {
+                icon: "✅",
+                label: "En Marche",
+                value: enMarcheCnt.toLocaleString(),
+                unit: "",
+                delay: "0.50s",
+              },
+            ].map(({ icon, label, value, unit, delay }) => (
+              <div
+                key={label}
+                className="acc-kpi"
+                style={{ animationDelay: delay }}
+              >
                 <div className="acc-kpi-icon">{icon}</div>
                 <div className="acc-kpi-label">{label}</div>
-                <div className="acc-kpi-value">{value}<span className="acc-kpi-unit">{unit}</span></div>
+                <div className="acc-kpi-value">
+                  {value}
+                  <span className="acc-kpi-unit">{unit}</span>
+                </div>
               </div>
             ))}
           </div>
@@ -280,12 +350,12 @@ function AccueilCasement() {
           {/* ── Navigation cards ─────────────────────────────────────────── */}
           <div className="acc-section">Navigation rapide</div>
           <div className="acc-nav-grid">
-            {navCards.map(({icon,title,path,desc},i)=>(
+            {navCards.map(({ icon, title, path, desc }, i) => (
               <div
                 key={title}
                 className="acc-nav-card"
-                style={{animationDelay:`${0.12+i*0.08}s`}}
-                onClick={()=>navigate(path)}
+                style={{ animationDelay: `${0.12 + i * 0.08}s` }}
+                onClick={() => navigate(path)}
               >
                 <div className="acc-nav-card-icon">{icon}</div>
                 <div className="acc-nav-card-title">{title}</div>
@@ -296,90 +366,44 @@ function AccueilCasement() {
           </div>
 
           {/* ── Dernières opérations ─────────────────────────────────────── */}
-          <div className="acc-section">Dernières opérations enregistrées</div>
-          <div className="acc-info-card">
-            {recentCasements.length>0?(
-              <>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-                  <span style={{fontSize:13,fontWeight:700,color:"#14532d"}}>
-                    {recentCasements.length} opération{recentCasements.length!==1?"s":""} récentes
-                  </span>
-                  <button className="acc-btn-secondary"
-                    style={{fontSize:12,padding:"6px 14px"}}
-                    onClick={()=>navigate(`${BASE}/historique`)}>
-                    Voir tout l'historique →
-                  </button>
-                </div>
-                <div className="acc-table-wrap">
-                  <table className="acc-table">
-                    <thead><tr>
-                      <th>Date</th><th>Panneau</th><th>Tranchée</th><th>Type Roche</th>
-                      <th>Nb Coups</th><th>Volume (t)</th><th>Rendement</th>
-                      <th>Équipements</th><th>État</th>
-                    </tr></thead>
-                    <tbody>
-                      {recentCasements.map((c,i)=>(
-                        <tr key={i} style={{animationDelay:`${i*0.05}s`}}>
-                          <td>{c.date}</td>
-                          <td>{c.panneau}</td>
-                          <td>{c.tranchee}</td>
-                          <td>{c.type_roche||"—"}</td>
-                          <td><strong>{c.nombreCoups||0}</strong></td>
-                          <td><strong>{Number(c.volume_casse).toLocaleString()}</strong> t</td>
-                          <td>{c.temps>0?(c.volume_casse/c.temps).toFixed(2):0} t/h</td>
-                          <td style={{maxWidth:120,overflow:"hidden",textOverflow:"ellipsis"}}>
-                            {c.equipements?.join(", ")||"—"}
-                          </td>
-                          <td>
-                            <span className={c.etatMachine==="En marche"?"acc-badge-marche":"acc-badge-arret"}>
-                              {c.etatMachine}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            ):(
-              <div className="acc-empty">
-                <div style={{fontSize:40,marginBottom:12}}>🪨</div>
-                <div style={{fontWeight:700,color:"#14532d",marginBottom:6}}>Aucune opération enregistrée</div>
-                <div style={{fontSize:12,marginBottom:16}}>
-                  Commencez par saisir votre première opération de casement.
-                </div>
-                <button className="acc-btn-primary" onClick={()=>navigate(`${BASE}`)}>
-                  📝 Première saisie
-                </button>
-              </div>
-            )}
-          </div>
 
           {/* ── Info équipements ─────────────────────────────────────────── */}
           <div className="acc-section">Équipements disponibles</div>
-          <div style={{
-            background:"#fff", border:"1.5px solid #bbf7d0", borderRadius:16,
-            padding:"20px 22px", opacity:0, animation:"acc-fadeUp 0.55s ease 0.6s forwards",
-          }}>
-            <div style={{display:"flex",flexWrap:"wrap",gap:10}}>
-              {["7500M1","7500M2","P&H1","P&H2","200B1"].map(eq=>(
-                <div key={eq} style={{
-                  padding:"8px 18px", borderRadius:20,
-                  background:"linear-gradient(135deg,#dcfce7,#bbf7d0)",
-                  border:"1.5px solid #86efac",
-                  fontWeight:700, fontSize:13, color:"#14532d",
-                  fontFamily:"'DM Mono',monospace",
-                  letterSpacing:"0.05em",
-                }}>
+          <div
+            style={{
+              background: "#fff",
+              border: "1.5px solid #bbf7d0",
+              borderRadius: 16,
+              padding: "20px 22px",
+              opacity: 0,
+              animation: "acc-fadeUp 0.55s ease 0.6s forwards",
+            }}
+          >
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              {["7500M1", "7500M2", "P&H1", "P&H2", "200B1"].map((eq) => (
+                <div
+                  key={eq}
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: 20,
+                    background: "linear-gradient(135deg,#dcfce7,#bbf7d0)",
+                    border: "1.5px solid #86efac",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    color: "#14532d",
+                    fontFamily: "'DM Mono',monospace",
+                    letterSpacing: "0.05em",
+                  }}
+                >
                   {eq}
                 </div>
               ))}
             </div>
-            <p style={{marginTop:12,fontSize:12,color:"#9ca3af"}}>
-              Ces équipements sont sélectionnables lors de la saisie. D'autres peuvent être ajoutés dynamiquement.
+            <p style={{ marginTop: 12, fontSize: 12, color: "#9ca3af" }}>
+              Ces équipements sont sélectionnables lors de la saisie. D'autres
+              peuvent être ajoutés dynamiquement.
             </p>
           </div>
-
         </div>
       </div>
     </>

@@ -4,7 +4,7 @@ import { addCasement, updateCasement } from "../../features/casementSlice";
 import image from "../../images/image3.webp";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CASEMENT ZD11 — DASHBOARD FORM (Light Mode Premium)
+   CASEMENT  — DASHBOARD FORM (Light Mode Premium)
    FIXES v2:
    ✅ Removed erroneous <StatistiqueCasement/> import + render inside this page
    ✅ Cleaned up unused imports
@@ -226,7 +226,7 @@ function DashboardCasement() {
       <div className="lcsm-page">
         <header className="lcsm-header">
           <div>
-            <div className="lcsm-vol-label">Opérations Minières · ZD11</div>
+            <div className="lcsm-vol-label">Opérations Minières · </div>
             <h1 className="lcsm-title">Décapage par <em>Casement</em></h1>
           </div>
           <div className="lcsm-header-right">
@@ -245,22 +245,8 @@ function DashboardCasement() {
               <Field label="Panneau"><input type="text" className="lcsm-input" name="panneau" placeholder="ex : P-12" value={form.panneau} onChange={handleChange} /></Field>
               <Field label="Tranchée"><input type="text" className="lcsm-input" name="tranchee" placeholder="ex : T-03" value={form.tranchee} onChange={handleChange} /></Field>
               <Field label="Niveau"><input type="text" className="lcsm-input" name="niveau" placeholder="ex : −45 m" value={form.niveau} onChange={handleChange} /></Field>
-
               <SectionLabel num="02" title="Données de Production" />
               <Field label="Volume Cassé"><input type="number" className="lcsm-input" name="volume_casse" placeholder="tonnes" value={form.volume_casse} onChange={handleChange} /></Field>
-              <Field label="Granulométrie"><input type="number" className="lcsm-input" name="granulometrie" placeholder="mm" value={form.granulometrie} onChange={handleChange} /></Field>
-              <Field label="Type de Roche">
-                <select className="lcsm-select" name="type_roche" value={form.type_roche} onChange={handleChange}>
-                  <option value="">— Sélectionner —</option>
-                  <option value="Phosphate">Phosphate</option>
-                  <option value="Silex">Silex</option>
-                  <option value="Calcaire">Calcaire</option>
-                  <option value="Argile">Argile</option>
-                  <option value="Mixte">Mixte</option>
-                </select>
-              </Field>
-              <Field label="Nombre de Coups"><input type="number" className="lcsm-input" name="nombreCoups" placeholder="coups BRH" value={form.nombreCoups} onChange={handleChange} /></Field>
-
               <SectionLabel num="03" title="Temps & Planification" />
               <Field label="Heure de Début"><input type="time" className="lcsm-input" name="heureDebut" value={form.heureDebut} onChange={handleChange} /></Field>
               <Field label="Heure de Fin"><input type="time" className="lcsm-input" name="heureFin" value={form.heureFin} onChange={handleChange} /></Field>

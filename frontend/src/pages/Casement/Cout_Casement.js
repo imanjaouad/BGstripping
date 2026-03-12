@@ -67,7 +67,7 @@ function CoutCasement() {
     state.casement?.list ?? []
   );
 
-  const [coupCost,      setCoupCost]      = useState("");   // coût par coup BRH
+  const [coupCost,      setCoupCost]      = useState("");   // coût par coup 
   const [annualCost,    setAnnualCost]    = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
 
@@ -97,7 +97,7 @@ function CoutCasement() {
     return Array.from(set);
   }, [casements]);
 
-  // Total coups BRH pour le mois sélectionné
+  // Total coups  pour le mois sélectionné
   const totalCoupsForMonth = useMemo(() => {
     if (!selectedMonth) return 0;
     return casements
@@ -112,16 +112,16 @@ function CoutCasement() {
   // Calcul : (coût/coup × nb coups du mois) + quote-part annuelle
   const calculateBudget = () => {
     if (!coupCost || !annualCost || !selectedMonth) return;
-    const coutBRH  = Number(coupCost) * totalCoupsForMonth;
+    const cout  = Number(coupCost) * totalCoupsForMonth;
     const coutPart = Number(annualCost) / 12;
-    const cost     = coutBRH + coutPart;
+    const cost     = cout + coutPart;
     const newEntry = {
       month:      selectedMonth,
       cost,
       coupCost:   Number(coupCost),
       annualCost: Number(annualCost),
       totalCoups: totalCoupsForMonth,
-      coutBRH,
+      cout,
       createdAt:  new Date().toLocaleDateString("fr-MA"),
     };
     setHistory(prev => [...prev, newEntry]);
@@ -174,8 +174,8 @@ function CoutCasement() {
             return[
               ` % Budget      : ${ctx.parsed.y}%`,
               ` Coût calculé  : ${fmt(h.cost)} MAD`,
-              ` Coût/coup BRH : ${fmt(h.coupCost)} MAD`,
-              ` Coups BRH     : ${h.totalCoups}`,
+              ` Coût/coup  : ${fmt(h.coupCost)} MAD`,
+              ` Coups     : ${h.totalCoups}`,
               ` Budget annuel : ${fmt(h.annualCost)} MAD`,
             ];
           }}},
@@ -263,7 +263,7 @@ function CoutCasement() {
         )}
       </div>
 
-      {/* ── Coups BRH du mois sélectionné ───────────────────────────────── */}
+      {/* ── Coups  du mois sélectionné ───────────────────────────────── */}
       {selectedMonth&&(
         <div style={{
           background:"linear-gradient(135deg,#064E3B,#16A34A)",
@@ -274,7 +274,7 @@ function CoutCasement() {
           <span style={{fontSize:"1.8rem"}}>🪨</span>
           <div>
             <div style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"rgba(240,253,244,.7)",fontSize:".85rem",letterSpacing:1}}>
-              COUPS BRH — {selectedMonth}
+              COUPS  — {selectedMonth}
             </div>
             <div style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:800,color:"#fff",fontSize:"1.8rem"}}>
               {totalCoupsForMonth.toLocaleString()} coups
@@ -287,14 +287,14 @@ function CoutCasement() {
       <div className="form-card">
         <div className="form-section-title">
           <FaCalculator style={{color:"#16A34A",marginRight:8}}/>
-          Paramètres de Calcul BRH
+          Paramètres de Calcul 
         </div>
 
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:20}}>
 
-          {/* Coût / coup BRH */}
+          {/* Coût / coup  */}
           <div>
-            <label style={labelStyle}>Coût par Coup de BRH (MAD)</label>
+            <label style={labelStyle}>Coût par Coup de  (MAD)</label>
             <div style={{position:"relative"}}>
               <input type="number" value={coupCost} min="0" step="0.01"
                 placeholder="0.00"
@@ -456,8 +456,8 @@ function CoutCasement() {
               <thead>
                 <tr>
                   <th>#</th><th>Mois</th><th>Date</th>
-                  <th>Coût/Coup (MAD)</th><th>Coups BRH</th>
-                  <th>Coût BRH (MAD)</th><th>Budget Annuel (MAD)</th>
+                  <th>Coût/Coup (MAD)</th><th>Coups </th>
+                  <th>Coût  (MAD)</th><th>Budget Annuel (MAD)</th>
                   <th>Coût Total (MAD)</th><th>% Budget</th>
                   <th>Progression</th><th>Action</th>
                 </tr>
@@ -474,7 +474,7 @@ function CoutCasement() {
                       <td style={{fontSize:".82rem",color:"#6B7280"}}>{h.createdAt??"—"}</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.coupCost)} MAD</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#064E3B"}}>{h.totalCoups}</td>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.coutBRH)} MAD</td>
+                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.cout)} MAD</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.annualCost)} MAD</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#064E3B"}}>{fmt(h.cost)} MAD</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color}}>{pct.toFixed(1)}%</td>
