@@ -13,7 +13,7 @@ export default function CTASection() {
           Accédez à vos outils et commencez à gérer vos opérations efficacement depuis votre tableau de bord.
         </p>
         
-      </div>
-    </section>
+      </div> </section>
+   
   );
 }

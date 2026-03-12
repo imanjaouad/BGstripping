@@ -160,5 +160,4 @@ const toggleTheme = () => {
         </div>
       </div>
     </section>
-  );
-}
+  );}

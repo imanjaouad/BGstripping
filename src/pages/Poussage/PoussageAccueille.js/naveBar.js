@@ -10,5 +10,5 @@ const Navbar = ({ closeMenu }) => {
     </nav>
   );
 };
-
 export default Navbar;
+

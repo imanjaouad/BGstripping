@@ -24,8 +24,8 @@ const operations = [
   {
     images: [
       "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/storage-cumenage-ZzsNsRJNE7LE4jDf8GxtCw.webp",
-      "https://images.unsplash.com/photo-1553413077-190dd305871c?w=600&q=80",
-    ],
+      "https://images.unsplash.com/photo-1553413077-190dd305871c?w=600&q=80",  ],
+  
     title: "T2",
     description: "Identification du produit et caractéristiques techniques.",
     fiche: {

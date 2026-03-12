@@ -17,5 +17,4 @@ export default function PoussageHome() {
       <CTASection />
       <Footer />
     </div>
-  );
-}
+  );}

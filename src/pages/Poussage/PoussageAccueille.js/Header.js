@@ -22,7 +22,7 @@ const Header = () => {
       </div>*/
 
 
-      {/* Nav + Actions */}
+      
     
         {/* ← Navbar injectée uniquement depuis la page d'accueil */}
       

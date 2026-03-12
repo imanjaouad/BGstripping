@@ -145,8 +145,8 @@ const NAV_ITEMS = [
   {
     to: `${BASE}/Dashboard`,
     icon: <FaHome />,
-    label: "Gestion",
-  },
+    label: "Gestion",},
+  
 
   {
     to: `${BASE}/Statistique`,
