@@ -1,12 +1,13 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = ({ closeMenu }) => {
   return (
     <nav className="navbar">
-      <a href="#poussage"  className="nav-link" onClick={closeMenu}>Poussage</a>
-      <a href="#casement"  className="nav-link" onClick={closeMenu}>Casement</a>
-      <a href="#transport" className="nav-link" onClick={closeMenu}>Transport</a>
-      <a href="#reports"   className="nav-link" onClick={closeMenu}>Reports</a>
+      <Link to="/poussage"  className="nav-link" onClick={closeMenu}>Poussage</Link>
+      <Link to="/casement"  className="nav-link" onClick={closeMenu}>Casement</Link>
+      <Link to="/transport" className="nav-link" onClick={closeMenu}>Transport</Link>
+      <Link to="/reports"   className="nav-link" onClick={closeMenu}>Reports</Link>
     </nav>
   );
 };

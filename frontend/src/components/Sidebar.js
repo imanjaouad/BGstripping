@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { FaHome, FaCogs, FaChartBar, FaHistory } from "react-icons/fa";
-import image from "../images/image1.jpeg";
+import image from "../images/image.jpeg";
 import "../components/animations.css";
 
 function Sidebar() {

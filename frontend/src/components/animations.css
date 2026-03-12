@@ -504,3 +504,21 @@ body {
   flex: 1; padding: 32px 36px; overflow-y: auto;
   background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
 }
+.sidebar-wrapper {
+  width: 250px;
+  transition: 0.3s;
+}
+
+.sidebar-wrapper.closed {
+  width: 80px;
+}
+
+.sidebar-toggle {
+  font-size: 20px;
+  padding: 15px;
+  cursor: pointer;
+}
+
+.nav-label {
+  margin-left: 10px;
+}
