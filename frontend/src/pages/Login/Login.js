@@ -31,13 +31,16 @@ const slides = [
 ];
 
 export default function Login() {
-
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [index, setIndex] = useState(0);
-  const [formData, setFormData] = useState({ username: "", password: "", modeOpiration: "" });
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    modeOpiration: "",
+  });
 
   useEffect(() => {
     const interval = setInterval(() => setIndex((prev) => (prev + 1) % slides.length), 4000);
@@ -46,8 +49,15 @@ export default function Login() {
 
   useEffect(() => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     sessionStorage.removeItem("user");
-    setFormData({ email: "", password: "", mode: "" });
+    sessionStorage.removeItem("token");
+
+    setFormData({
+      username: "",
+      password: "",
+      modeOpiration: "",
+    });
   }, []);
 
   const particlesInit = async (engine) => await loadFull(engine);
@@ -60,30 +70,54 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await fetch("http://127.0.0.1:8000/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
         body: JSON.stringify(formData),
       });
+
       const data = await res.json();
+
       if (data.success) {
-        rememberMe
-          ? localStorage.setItem("user", JSON.stringify(data.user))
-          : sessionStorage.setItem("user", JSON.stringify(data.user));
-        if (data.user.mode !== formData.mode && data.user.role !== "admin") {
+        if (
+          data.user.modeOpiration !== formData.modeOpiration &&
+          data.user.role !== "admin"
+        ) {
           alert("Accès refusé !");
           setLoading(false);
           return;
         }
-        setFormData({ email: "", password: "", mode: "" });
-        if (data.user.mode === "poussage") navigate("/poussage");
-        else if (data.user.mode === "casement") navigate("/casement");
-        else if (data.user.mode === "transport") navigate("/transport");
-      } else alert(data.message);
-    } catch {
+
+        if (rememberMe) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("token", data.token);
+        } else {
+          sessionStorage.setItem("user", JSON.stringify(data.user));
+          sessionStorage.setItem("token", data.token);
+        }
+
+        setFormData({
+          username: "",
+          password: "",
+          modeOpiration: "",
+        });
+
+        if (data.user.modeOpiration === "poussage") navigate("/poussage");
+        else if (data.user.modeOpiration === "casement") navigate("/casement");
+        else if (data.user.modeOpiration === "transport") navigate("/transport");
+      } else {
+        alert(data.message || "Login échoué");
+      }
+    } catch (error) {
+      console.error(error);
       alert("Erreur serveur");
     }
+
     setLoading(false);
   };
 
@@ -107,7 +141,6 @@ export default function Login() {
           }}
         />
 
-        {/* LEFT — présentation textuelle animée */}
         <div className="left">
           <div className="presentation-panel">
             <h1>Optimisation du Décapage de Phosphate</h1>
@@ -133,7 +166,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* RIGHT — formulaire */}
         <div className="right">
           <div className="form-box">
             <img src={logo} alt="logo" className="logo" />
@@ -145,12 +177,12 @@ export default function Login() {
               <div className="input-box">
                 <FaEnvelope className="input-icon" />
                 <input
-                type="text"
-                name="username"
-                placeholder="Nom d'utilisateur"
-                value={formData.username}
-                onChange={handleChange}
-                required
+                  type="text"
+                  name="username"
+                  placeholder="Nom d'utilisateur"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
                 />
               </div>
 
@@ -172,7 +204,12 @@ export default function Login() {
 
               <div className="input-box">
                 <FaBriefcase className="input-icon" />
-                <select name="mode" value={formData.mode} onChange={handleChange} required>
+                <select
+                  name="modeOpiration"
+                  value={formData.modeOpiration}
+                  onChange={handleChange}
+                  required
+                >
                   <option value="">Mode opération</option>
                   <option value="poussage">Poussage</option>
                   <option value="casement">Casement</option>
