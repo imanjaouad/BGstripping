@@ -22,7 +22,7 @@ import {
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import image from "../../images/image3.webp";
+import image from "../../images/ocpLogo.png";
 
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement,
