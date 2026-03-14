@@ -1,7 +1,13 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Chart, registerables } from "chart.js";
-import { FaMoneyBillWave, FaCalculator, FaChartBar, FaCalendarAlt, FaFilter, FaTrash } from "react-icons/fa";
+// ── SVG icons ────────────────────────────────────────────────────────────────
+const IcoMoney    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
+const IcoCalc     = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>;
+const IcoChart    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>;
+const IcoCalendar = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+const IcoFilter   = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>;
+const IcoTrash    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
 import "../../components/animations.css";
 
 Chart.register(...registerables);
@@ -26,32 +32,51 @@ function getColor(pct) {
 
 // ── KPI Card (identique Poussage) ────────────────────────────────────────────
 function KpiCard({ label, value, unit, gold=false, delay="0s", icon }) {
+  const accent = gold ? "#F59E0B" : "#16A34A";
+  const bgIcon = gold ? "linear-gradient(145deg,#fffbeb,#fef3c7)" : "linear-gradient(145deg,#f0fdf4,#dcfce7)";
+  const borderIcon = gold ? "rgba(245,158,11,0.5)" : "rgba(134,239,172,0.7)";
+  const haloIcon = gold ? "rgba(245,158,11,0.15)" : "rgba(220,252,231,0.5)";
   return (
     <div
       className="kpi-card"
       style={{
         flex:1, minWidth:170, position:"relative",
         animation:`countUp .6s ${delay} ease both`,
-        borderLeft:`5px solid ${gold?"#F59E0B":"#16A34A"}`,
+        borderLeft:`4px solid ${accent}`,
         cursor:"default",
         transition:"transform .2s, box-shadow .2s",
       }}
       onMouseEnter={e=>{
-        e.currentTarget.style.transform="translateY(-3px)";
-        e.currentTarget.style.boxShadow="0 12px 36px rgba(22,163,74,0.22)";
+        e.currentTarget.style.transform="translateY(-4px)";
+        e.currentTarget.style.boxShadow=`0 14px 40px rgba(22,163,74,0.22)`;
+        const ico = e.currentTarget.querySelector(".kpi-ico-wrap");
+        if(ico){ ico.style.transform="scale(1.12) rotate(-4deg)"; ico.style.boxShadow=`0 8px 22px ${gold?"rgba(245,158,11,0.3)":"rgba(22,163,74,0.28)"}`; }
       }}
       onMouseLeave={e=>{
         e.currentTarget.style.transform="translateY(0)";
         e.currentTarget.style.boxShadow="0 8px 32px rgba(22,163,74,0.18)";
+        const ico = e.currentTarget.querySelector(".kpi-ico-wrap");
+        if(ico){ ico.style.transform="scale(1) rotate(0deg)"; ico.style.boxShadow=`0 4px 14px ${haloIcon}`; }
       }}
     >
       <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,borderRadius:"50%",
-        background:gold?"rgba(245,158,11,0.08)":"rgba(22,163,74,0.08)"}}/>
-      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-        <span style={{color:gold?"#F59E0B":"#16A34A",fontSize:"1rem"}}>{icon}</span>
+        background:gold?"rgba(245,158,11,0.06)":"rgba(22,163,74,0.06)"}}/>
+      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
+        <div className="kpi-ico-wrap" style={{
+          width:42, height:42, borderRadius:12,
+          background:bgIcon,
+          border:`1.5px solid ${borderIcon}`,
+          display:"flex", alignItems:"center", justifyContent:"center",
+          color:accent,
+          boxShadow:`0 0 0 5px ${haloIcon}, 0 4px 14px ${haloIcon}`,
+          transition:"transform .3s cubic-bezier(0.16,1,0.3,1), box-shadow .3s ease",
+          flexShrink:0,
+        }}>
+          {icon}
+        </div>
         <div className="kpi-label">{label}</div>
       </div>
-      <div className="kpi-value" style={{color:gold?"#F59E0B":"#16A34A"}}>
+      <div className="kpi-value" style={{color:accent}}>
         {value}
         {unit&&<span className="kpi-unit">{unit}</span>}
       </div>
@@ -175,7 +200,6 @@ function CoutCasement() {
               ` % Budget      : ${ctx.parsed.y}%`,
               ` Coût calculé  : ${fmt(h.cost)} MAD`,
               ` Coût/coup  : ${fmt(h.coupCost)} MAD`,
-              ` Coups     : ${h.totalCoups}`,
               ` Budget annuel : ${fmt(h.annualCost)} MAD`,
             ];
           }}},
@@ -217,15 +241,19 @@ function CoutCasement() {
           borderRadius:"50%", padding:3,
           background:"conic-gradient(from 0deg,#16A34A,#22C55E,#F59E0B,#16A34A)",
           animation:"rotateBorder 6s linear infinite",
-          boxShadow:"0 0 16px rgba(22,163,74,0.35)",
+          boxShadow:"0 0 20px rgba(22,163,74,0.4), 0 0 40px rgba(22,163,74,0.15)",
         }}>
           <div style={{
-            width:58, height:58, borderRadius:"50%",
+            width:60, height:60, borderRadius:"50%",
             background:"linear-gradient(135deg,#064E3B,#16A34A)",
             display:"flex", alignItems:"center", justifyContent:"center",
-            fontSize:"1.4rem", border:"3px solid #064E3B", color:"white",
+            border:"3px solid #064E3B", color:"white",
+            boxShadow:"inset 0 2px 0 rgba(255,255,255,0.15)",
           }}>
-            <FaMoneyBillWave/>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
           </div>
         </div>
       </div>
@@ -238,7 +266,21 @@ function CoutCasement() {
         display:"flex", alignItems:"center", gap:14,
         animation:"fadeSlideDown .4s ease both",
       }}>
-        <span style={{fontSize:"1.5rem"}}>📅</span>
+        <div style={{
+          width:44, height:44, borderRadius:12, flexShrink:0,
+          background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",
+          border:"1.5px solid rgba(134,239,172,0.7)",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          color:"#16A34A",
+          boxShadow:"0 0 0 5px rgba(220,252,231,0.45), 0 4px 14px rgba(22,163,74,0.12)",
+        }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
         <div style={{flex:1}}>
           <div style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#064E3B",fontSize:"1rem",letterSpacing:1}}>
             {availableMonths.length>0
@@ -251,43 +293,18 @@ function CoutCasement() {
               :"Les mois apparaîtront automatiquement après saisie"}
           </div>
         </div>
-        {availableMonths.length>0&&(
-          <div style={{
-            background:"rgba(22,163,74,0.08)", border:"1px solid rgba(22,163,74,0.2)",
-            borderRadius:50, padding:"4px 16px",
-            fontFamily:"'Rajdhani',sans-serif", fontWeight:700, color:"#16A34A", fontSize:".9rem",
-            whiteSpace:"nowrap",
-          }}>
-            {casements.length} enregistrement(s)
-          </div>
-        )}
+
       </div>
 
-      {/* ── Coups  du mois sélectionné ───────────────────────────────── */}
-      {selectedMonth&&(
-        <div style={{
-          background:"linear-gradient(135deg,#064E3B,#16A34A)",
-          borderRadius:14, padding:"14px 24px", marginBottom:20,
-          display:"flex", alignItems:"center", gap:16,
-          animation:"fadeSlideDown .3s ease both",
-        }}>
-          <span style={{fontSize:"1.8rem"}}>🪨</span>
-          <div>
-            <div style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"rgba(240,253,244,.7)",fontSize:".85rem",letterSpacing:1}}>
-              COUPS  — {selectedMonth}
-            </div>
-            <div style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:800,color:"#fff",fontSize:"1.8rem"}}>
-              {totalCoupsForMonth.toLocaleString()} coups
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* ── Form Card ───────────────────────────────────────────────────── */}
       <div className="form-card">
-        <div className="form-section-title">
-          <FaCalculator style={{color:"#16A34A",marginRight:8}}/>
-          Paramètres de Calcul 
+        <div className="form-section-title" style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A",boxShadow:"0 0 0 4px rgba(220,252,231,0.4)"}}>
+            <IcoCalc/>
+          </div>
+          Paramètres de Calcul
         </div>
 
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:20}}>
@@ -331,7 +348,7 @@ function CoutCasement() {
           {/* Sélecteur mois */}
           <div>
             <label style={labelStyle}>
-              <FaFilter style={{marginRight:6,color:"#16A34A"}}/> Mois
+              <span style={{color:"#16A34A",display:"inline-flex"}}><IcoFilter/></span> Mois
             </label>
             <select value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)}
               className="form-select" style={inputStyle}
@@ -349,7 +366,7 @@ function CoutCasement() {
           <button className="btn-submit" onClick={calculateBudget}
             disabled={!coupCost||!annualCost||!selectedMonth}
             style={{opacity:(!coupCost||!annualCost||!selectedMonth)?0.5:1}}>
-            <FaCalculator style={{marginRight:6}}/> Calculer
+            <span style={{display:"inline-flex"}}><IcoCalc/></span> Calculer
           </button>
           <button onClick={resetForm} style={{
             background:"linear-gradient(135deg,#6B7280,#9CA3AF)",color:"white",
@@ -373,7 +390,7 @@ function CoutCasement() {
               onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
               onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
             >
-              <FaTrash/> Vider l'historique
+              <IcoTrash/> Vider l'historique
             </button>
           )}
         </div>
@@ -382,17 +399,31 @@ function CoutCasement() {
       {/* ── KPI Row ─────────────────────────────────────────────────────── */}
       {history.length>0&&(
         <div style={{display:"flex",gap:20,marginBottom:28,flexWrap:"wrap"}}>
-          <KpiCard label="Entrées Calculées" value={history.length} icon={<FaCalendarAlt/>} delay="0s"/>
-          <KpiCard label="Coût Total Cumulé" value={fmt(totalCost)} unit=" MAD" icon={<FaMoneyBillWave/>} delay=".1s"/>
-          <KpiCard label="Coût Moyen / Mois" value={fmt(totalCost/history.length)} unit=" MAD" icon={<FaChartBar/>} gold delay=".2s"/>
-          <KpiCard label="Dernier Mois" value={history[history.length-1]?.month??"—"} icon={<FaCalendarAlt/>} delay=".3s"/>
+
+          <KpiCard label="Coût Total Cumulé" value={fmt(totalCost)} unit=" MAD" icon={<IcoMoney/>} delay=".1s"/>
+          <KpiCard label="Coût Moyen / Mois" value={fmt(totalCost/history.length)} unit=" MAD" icon={<IcoChart/>} gold delay=".2s"/>
+          <KpiCard label="Dernier Mois" value={history[history.length-1]?.month??"—"} icon={<IcoCalendar/>} delay=".3s"/>
         </div>
       )}
 
       {/* ── Rendement Banner ────────────────────────────────────────────── */}
       {history.length>0&&(
         <div className="rendement-banner" style={{marginBottom:28}}>
-          <span style={{fontSize:"2rem"}}>📊</span>
+          <div style={{
+            width:50, height:50, borderRadius:14, flexShrink:0,
+            background:"rgba(255,255,255,0.15)",
+            border:"1.5px solid rgba(255,255,255,0.25)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            color:"white",
+            boxShadow:"inset 0 1px 0 rgba(255,255,255,0.2)",
+          }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+              <line x1="2" y1="20" x2="22" y2="20"/>
+            </svg>
+          </div>
           <div style={{flex:1}}>
             <div className="rendement-label">Répartition du Budget Annuel — Casement</div>
             <div className="rendement-value">{fmt(totalCost)} MAD</div>
@@ -412,8 +443,10 @@ function CoutCasement() {
 
       {/* ── Chart Card ──────────────────────────────────────────────────── */}
       <div className="chart-card" style={{marginBottom:28}}>
-        <div className="chart-card-title">
-          <FaChartBar style={{color:"#16A34A",marginRight:8}}/>
+        <div className="chart-card-title" style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A",boxShadow:"0 0 0 4px rgba(220,252,231,0.4)"}}>
+            <IcoChart/>
+          </div>
           Répartition du Budget Annuel (%)
         </div>
         {history.length>0?(
@@ -422,7 +455,14 @@ function CoutCasement() {
           </div>
         ):(
           <div className="rapport-empty">
-            <div className="rapport-icon">📉</div>
+            <div className="rapport-icon" style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+              <div style={{width:52,height:52,borderRadius:14,background:"#f0fdf4",border:"1.5px solid #bbf7d0",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A"}}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+                </svg>
+              </div>
+            </div>
             <div style={{fontFamily:"'Rajdhani',sans-serif",letterSpacing:1}}>
               Ajoutez un calcul pour afficher le graphique
             </div>
@@ -433,7 +473,12 @@ function CoutCasement() {
       {/* ── Historique Table ────────────────────────────────────────────── */}
       <div className="table-card" style={{animation:"fadeSlideUp .55s ease both"}}>
         <div className="table-card-title" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <span><FaCalendarAlt style={{color:"#16A34A",marginRight:8}}/>Historique des Calculs</span>
+          <span style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A",boxShadow:"0 0 0 4px rgba(220,252,231,0.4)"}}>
+              <IcoCalendar/>
+            </div>
+            Historique des Calculs
+          </span>
           {history.length>0&&(
             <span style={{
               background:"rgba(22,163,74,0.08)",border:"1px solid rgba(22,163,74,0.2)",
@@ -447,7 +492,14 @@ function CoutCasement() {
 
         {history.length===0?(
           <div className="rapport-empty">
-            <div className="rapport-icon">🗂️</div>
+            <div className="rapport-icon" style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+              <div style={{width:52,height:52,borderRadius:14,background:"#f0fdf4",border:"1.5px solid #bbf7d0",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A"}}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+            </div>
             <div style={{fontFamily:"'Rajdhani',sans-serif",letterSpacing:1}}>Aucun calcul enregistré</div>
           </div>
         ):(
@@ -456,8 +508,8 @@ function CoutCasement() {
               <thead>
                 <tr>
                   <th>#</th><th>Mois</th><th>Date</th>
-                  <th>Coût/Coup (MAD)</th><th>Coups </th>
-                  <th>Coût  (MAD)</th><th>Budget Annuel (MAD)</th>
+                  <th>Coût/Coup (MAD)</th>
+                  <th>Coût (MAD)</th><th>Budget Annuel (MAD)</th>
                   <th>Coût Total (MAD)</th><th>% Budget</th>
                   <th>Progression</th><th>Action</th>
                 </tr>
@@ -473,7 +525,6 @@ function CoutCasement() {
                       <td><strong style={{fontFamily:"'Rajdhani',sans-serif"}}>{h.month}</strong></td>
                       <td style={{fontSize:".82rem",color:"#6B7280"}}>{h.createdAt??"—"}</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.coupCost)} MAD</td>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#064E3B"}}>{h.totalCoups}</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.cout)} MAD</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.annualCost)} MAD</td>
                       <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#064E3B"}}>{fmt(h.cost)} MAD</td>
@@ -487,7 +538,7 @@ function CoutCasement() {
                         </div>
                       </td>
                       <td>
-                        <button className="btn-del" onClick={()=>removeEntry(i)} title="Supprimer"><FaTrash/></button>
+                        <button className="btn-del" onClick={()=>removeEntry(i)} title="Supprimer"><IcoTrash/></button>
                       </td>
                     </tr>
                   );

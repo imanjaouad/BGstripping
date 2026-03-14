@@ -28,7 +28,7 @@ export default function Footer() {
             <h5>Opérations</h5>
             <ul>
               <li><Link to="/operations/poussage">Poussage</Link></li>
-              <li><Link to="/operations/cumenage">Cumenage</Link></li>
+              <li><Link to="/operations/casement">Casement</Link></li>
               <li><Link to="/operations/transport">Transport</Link></li>
             </ul>
           </div>
@@ -38,7 +38,7 @@ export default function Footer() {
         <div className="footer-divider"></div>
 
         <p className="footer-copy">
-          © 2026 Phosphate Management System. Tous droits réservés.
+          ©  {new Date().getFullYear()} Phosphate Management System. Tous droits réservés.
         </p>
       </div>
     </footer>

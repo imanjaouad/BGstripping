@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import "../../components/animations.css";
-import AccueilCasement    from "./Accueil_Casement";
-import DashboardCasement  from "./Dashboard_Casement";
+import DashboardCasement    from "./Dashboard_Casement";
 import SidebarCasement    from "./Sidbare_Casement";
 import { Route, Routes }  from "react-router-dom";
 import StatistiqueCasement from "./Statistique_Casement";
 import HistoriqueCasement  from "./Historique_Casement";
 import RapportCasement     from "./Rapport_Casement";
 import CoutCasement        from "./Cout_Casement";
+import Gestion from "./FormulaireCasement";
+import AccueilleCasement from "./Accueille_casement"
 
 /*
   Routes RELATIVES (casement est monté sur /operations/casement/* dans App.js)
@@ -32,11 +33,14 @@ function Casement() {
       />
       <div className="main-content">
         <Routes>
-          {/* Page d'accueil — /operations/casement */}
-          <Route index             element={<AccueilCasement />} />
+           {/* Page d'accueil — /operations/casement/dashboard */}
+          <Route index             element={<AccueilleCasement />} />
 
-          {/* Tableau de bord saisie — /operations/casement/dashboard */}
-          <Route path="dashboard"  element={<DashboardCasement />} />
+          {/* Tableau de bord — /operations/casement/dashboard */}
+          <Route path="/dashboard"             element={<DashboardCasement />} />
+
+          {/*  Page de saisie — /operations/casement/gestion */}
+          <Route path="gestion"  element={<Gestion/>} />
 
           {/* Statistiques — /operations/casement/statistique */}
           <Route path="statistique" element={<StatistiqueCasement />} />

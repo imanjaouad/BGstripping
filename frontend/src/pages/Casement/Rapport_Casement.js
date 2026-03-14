@@ -198,7 +198,6 @@ if(!map[m]) map[m]={volume:0,temps:0,coups:0,ops:0};
 map[m].volume+=Number(c.volume_casse||0);
 map[m].temps+=Number(c.temps||0);
 map[m].coups+=Number(c.nombreCoups||0);
-map[m].ops++;
 
 });
 
@@ -206,26 +205,6 @@ return map;
 
 },[casements]);
 
-/* GROUP BY ROCK */
-
-const rocheStats = useMemo(()=>{
-
-const map={};
-
-casements.forEach(c=>{
-
-const r=c.type_roche||"Inconnu";
-
-if(!map[r]) map[r]={volume:0,ops:0};
-
-map[r].volume+=Number(c.volume_casse||0);
-map[r].ops++;
-
-});
-
-return map;
-
-},[casements]);
 
 /* EXPORT EXCEL */
 
@@ -234,13 +213,12 @@ const exportRapport=()=>{
 const wb=XLSX.utils.book_new();
 
 const resume=[
-["Rapport Casement ZD11"],
+["Rapport Casement"],
 [],
 ["Indicateur","Valeur","Unité"],
-["Opérations",casements.length,"ops"],
 ["Volume Total",totalVolume,"t"],
 ["Heures Totales",totalTemps,"h"],
-["Coups BRH",totalCoups,"coups"],
+["Coups ",totalCoups,"coups"],
 ["Rendement",rendement,"t/h"],
 ["Disponibilité",txDispo,"%"]
 ];
@@ -248,7 +226,7 @@ const resume=[
 XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(resume),"Résumé");
 
 const mensuel=[
-["Mois","Opérations","Volume","Coups","Heures","Rendement"],
+["Mois","Volume","Coups","Heures","Rendement"],
 ...Object.entries(monthlyStats).map(([m,d])=>[
 m,d.ops,d.volume,d.coups,d.temps,
 d.temps>0?(d.volume/d.temps).toFixed(2):0
@@ -261,7 +239,7 @@ saveAs(
 new Blob([XLSX.write(wb,{bookType:"xlsx",type:"array"})],
 {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
 ),
-"rapport_casement_ZD11.xlsx"
+"rapport_casement.xlsx"
 );
 
 };
@@ -270,10 +248,9 @@ new Blob([XLSX.write(wb,{bookType:"xlsx",type:"array"})],
 
 const kpis=[
 
-{label:"Opérations",value:casements.length},
 {label:"Volume Total",value:totalVolume+" t"},
 {label:"Rendement Moyen",value:rendement+" t/h"},
-{label:"Coups BRH",value:totalCoups},
+{label:"Coups ",value:totalCoups},
 {label:"Heures Totales",value:totalTemps+" h"},
 {label:"Disponibilité",value:txDispo+" %"}
 
@@ -295,7 +272,7 @@ return(
 <div>
 
 <div className="casement-title">
-Rapport Casement ZD11
+Rapport Casement 
 </div>
 
 <div className="casement-sub">
@@ -390,40 +367,9 @@ Aucune donnée disponible
 
 </div>
 
-{/* ROCK */}
 
-<div className="section-title">
-Répartition Type Roche
-</div>
 
-<div className="card">
 
-{Object.entries(rocheStats).map(([r,d])=>{
-
-const pct=totalVolume>0?((d.volume/totalVolume)*100).toFixed(1):0;
-
-return(
-
-<div key={r} style={{marginBottom:14}}>
-
-<div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-
-<div><b>{r}</b></div>
-<div>{pct}%</div>
-
-</div>
-
-<div className="progress">
-<div className="progress-bar" style={{width:pct+"%"}}/>
-</div>
-
-</div>
-
-);
-
-})}
-
-</div>
 
 {casements.length===0 && (
 

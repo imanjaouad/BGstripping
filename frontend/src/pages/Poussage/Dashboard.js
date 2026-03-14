@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addPoussage, updatePoussage } from "../../features/poussageSlice";
 import image from "../../images/image3.webp";
-import "../../components/animations.css";
-
+import  "../../style/PoussageForm.css";
 function Dashboard() {
   const dispatch = useDispatch();
 
@@ -116,11 +115,11 @@ function Dashboard() {
       </div>
 
       {/* FORM */}
-      <div className="form-card">
-        <form onSubmit={handleSubmit} className="row g-3">
+      <div className="form-card d-flex gap-3" >
+        <form onSubmit={handleSubmit} className="row g-3" >
 
           {/* DATE */}
-          <div className="col-md-3">
+          <div className="col-md-3"   >
             <label className="form-label">Date</label>
             <input
               type="date"

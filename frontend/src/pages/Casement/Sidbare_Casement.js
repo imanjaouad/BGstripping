@@ -4,7 +4,6 @@ import {
   FaHome,
   FaChartBar,
   FaHistory,
-  FaBars,
   FaFileAlt,
   FaArrowLeft,
   FaMoneyBillWave,
@@ -25,18 +24,14 @@ const SIDEBAR_CSS = `
     position: fixed; top: 0; left: 0; bottom: 0;
     z-index: 100;
     display: flex; flex-direction: column;
-    background: linear-gradient(180deg,
- #169142 0%,
- #16AC4D 50%,
- #4CB069 100%
-);
+    background: linear-gradient(160deg, #15803D 0%, #16A34A 50%, #18bd54 100%);
     border-right: 1.5px solid #bbf7d0;
     transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
     overflow: hidden;
-    box-shadow: 4px 0 24px rgba(20,83,45,0.07), 2px 0 8px rgba(20,83,45,0.04);
+    box-shadow: 4px 0 30px rgba(6,78,59,0.45);
   }
   .sb-csm-wrapper.open   { width: 240px; }
-  .sb-csm-wrapper.closed { width: 68px;  }
+  .sb-csm-wrapper.closed { width: 95px;  }
 
   /* Top accent stripe */
   .sb-csm-wrapper::before {
@@ -53,7 +48,7 @@ const SIDEBAR_CSS = `
 
   /* Toggle button */
   .sb-csm-toggle {
-    position: absolute; top: 60px; right: 150px;
+    position: absolute; top: 40px; right: 10px;
     width: 28px; height: 28px; border-radius: 50%;
     background: #ffffff;
     border: 1.5px solid #bbf7d0;
@@ -70,14 +65,14 @@ const SIDEBAR_CSS = `
 
   /* Logo area */
   .sb-csm-logo-area {
-    padding: 28px 16px 20px;
+    padding: 20px 16px 20px;
     display: flex; align-items: center; gap: 12px;
     flex-shrink: 0;
     border-bottom: 1px solid rgba(187,247,208,0.6);
     margin-bottom: 8px;
   }
   .sb-csm-logo-ring {
-    width: 70px; height: 70px; border-radius: 12px;
+    width: 95px; height: 95px; border-radius: 12px;
     border: 2px solid #bbf7d0;
     box-shadow: 0 2px 12px rgba(22,163,74,0.15);
     overflow: hidden; flex-shrink: 0;
@@ -86,14 +81,10 @@ const SIDEBAR_CSS = `
   }
   .sb-csm-logo-img { width: 100%; height: 100%; object-fit: cover; }
   .sb-csm-brand { overflow: hidden; white-space: nowrap; }
-  .sb-csm-brand-title {
-    font-family: 'Epilogue', sans-serif;
-    font-size: 15px; font-weight: 700; color: #14532d; line-height: 1.1; display: block;
-  }
   .sb-csm-brand-sub {
     font-family: 'DM Mono', monospace;
     font-size: 9px; font-weight: 500; letter-spacing: 0.15em;
-    text-transform: uppercase; color: #16a34a; display: block; margin-top: 2px;
+    text-transform: uppercase; color: #0f2b19; display: block; margin-top: 2px;
   }
 
   /* Nav */
@@ -225,11 +216,23 @@ const SIDEBAR_CSS = `
 const BASE = "/operations/casement";
 
 const NAV_ITEMS = [
-  { to: BASE, end: true, icon: <FaStar />, label: "Accueil", badge: null },
+  { 
+    to: `${BASE}`, 
+    end: true,
+    icon: <FaStar />, 
+    label: "Accueil",
+    badge: null },
+
   {
     to: `${BASE}/dashboard`,
+    icon: <FaStar />,
+    label: "Tableau de bord",
+    badge: null,
+  },
+  {
+    to: `${BASE}/gestion`,
     icon: <FaHome />,
-    label: "Tableau de Bord",
+    label: "Gestion",
     badge: null,
   },
   {
@@ -249,7 +252,7 @@ const NAV_ITEMS = [
     to: `${BASE}/couts`,
     icon: <FaMoneyBillWave />,
     label: "Coûts",
-    badge: "NEW",
+    badge: null,
   },
 ];
 
@@ -260,26 +263,24 @@ function SidebarCasement({ isOpen, toggleSidebar }) {
     <>
       <style>{SIDEBAR_CSS}</style>
       <div className={isOpen ? "sb-csm-wrapper open" : "sb-csm-wrapper closed"}>
-        {/* Toggle button */}
-        <div className="sb-csm-toggle" onClick={toggleSidebar}>
-          <FaBars />
-        </div>
-
         {/* Logo / Brand */}
-        <div className="sb-csm-logo-area">
+
+        <div
+          className="sb-csm-logo-area"
+          onClick={toggleSidebar}
+          style={{ cursor: "pointer" }}
+        >
           <div className="sb-csm-logo-ring">
             <img src={image} alt="Logo Mine" className="sb-csm-logo-img" />
           </div>
+
           {isOpen && (
             <div className="sb-csm-brand">
-              <span className="sb-csm-brand-title">ZD11</span>
               <span className="sb-csm-brand-sub">Casement</span>
             </div>
           )}
         </div>
-
         {/* Nav group label */}
-        {isOpen && <span className="sb-csm-nav-group-label">Navigation</span>}
 
         {/* Navigation */}
         <ul className="sb-csm-nav">
@@ -312,15 +313,6 @@ function SidebarCasement({ isOpen, toggleSidebar }) {
           {isOpen && "Retour Accueil"}
         </button>
 
-        {/* Footer */}
-        <div className="sb-csm-footer">
-          <div className="sb-csm-footer-inner">
-            <span className="sb-csm-footer-dot" />
-            {isOpen && (
-              <span className="sb-csm-footer-text">Système actif</span>
-            )}
-          </div>
-        </div>
       </div>
     </>
   );

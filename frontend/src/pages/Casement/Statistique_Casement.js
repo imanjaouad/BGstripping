@@ -15,150 +15,99 @@ import { Bar, Line, Doughnut } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import image from "../../images/image3.webp";
-
+import "../../style/Casement.css"
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend, Filler, ArcElement
 );
 
-// ─── CSS (identique Poussage DashboardComplet) ────────────────────────────────
+// ─── CSS ─────────────────────────────────────────────────────────────────────
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* ── TOAST ALERTS ─────────────────────────────────────────────── */
+@keyframes csm-toastIn  { from { opacity:0; transform:translateX(110%); } to { opacity:1; transform:translateX(0); } }
+@keyframes csm-toastOut { from { opacity:1; transform:translateX(0);    } to { opacity:0; transform:translateX(110%); } }
+@keyframes csm-progress { from { width:100%; } to { width:0%; } }
 
-  @keyframes db-fadeUp  { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes db-shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-  @keyframes db-pulse   { 0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} 50%{box-shadow:0 0 20px 5px rgba(22,163,74,0.18)} }
-  @keyframes db-countUp { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
-  @keyframes db-rowIn   { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)} }
+.csm-toast-wrap {
+  position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.csm-toast {
+  pointer-events: all;
+  min-width: 300px; max-width: 380px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.13), 0 2px 10px rgba(0,0,0,0.07);
+  overflow: hidden;
+  animation: csm-toastIn 0.42s cubic-bezier(0.16,1,0.3,1) forwards;
+  border: 1.5px solid transparent;
+  position: relative;
+}
+.csm-toast.out { animation: csm-toastOut 0.35s cubic-bezier(0.4,0,1,1) forwards; }
+.csm-toast-inner { display: flex; align-items: flex-start; gap: 13px; padding: 16px 18px 18px; }
+.csm-toast-icon {
+  width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.csm-toast-body { flex: 1; min-width: 0; }
+.csm-toast-title { font-weight: 700; font-size: 14px; margin-bottom: 2px; line-height: 1.3; }
+.csm-toast-msg   { font-size: 12.5px; line-height: 1.45; }
+.csm-toast-close {
+  background: none; border: none; cursor: pointer; padding: 2px 4px;
+  border-radius: 6px; font-size: 16px; line-height: 1; opacity: 0.4;
+  transition: opacity .18s; align-self: flex-start; margin-top: -2px;
+}
+.csm-toast-close:hover { opacity: 0.8; }
+.csm-toast-bar {
+  height: 3px; border-radius: 0 0 16px 16px;
+  animation: csm-progress linear forwards;
+}
+.csm-toast.success { border-color: #bbf7d0; }
+.csm-toast.success .csm-toast-icon  { background: #f0fdf4; color: #16a34a; }
+.csm-toast.success .csm-toast-title { color: #14532d; }
+.csm-toast.success .csm-toast-msg   { color: #15803d; }
+.csm-toast.success .csm-toast-bar   { background: linear-gradient(90deg,#16a34a,#4ade80); }
+.csm-toast.warning { border-color: #fde68a; }
+.csm-toast.warning .csm-toast-icon  { background: #fffbeb; color: #d97706; }
+.csm-toast.warning .csm-toast-title { color: #92400e; }
+.csm-toast.warning .csm-toast-msg   { color: #b45309; }
+.csm-toast.warning .csm-toast-bar   { background: linear-gradient(90deg,#f59e0b,#fcd34d); }
+.csm-toast.danger { border-color: #fecaca; }
+.csm-toast.danger .csm-toast-icon  { background: #fef2f2; color: #dc2626; }
+.csm-toast.danger .csm-toast-title { color: #7f1d1d; }
+.csm-toast.danger .csm-toast-msg   { color: #b91c1c; }
+.csm-toast.danger .csm-toast-bar   { background: linear-gradient(90deg,#ef4444,#fca5a5); }
 
-  .db-page { font-family:'Plus Jakarta Sans',sans-serif; }
-
-  .db-tab { cursor:pointer; padding:8px 20px; border-radius:10px; font-size:13px; font-weight:600;
-    color:#6b7280; border:1.5px solid transparent; transition:all .2s; background:none; }
-  .db-tab.active { background:#16a34a; color:#fff; border-color:#15803d; box-shadow:0 4px 14px rgba(22,163,74,0.28); }
-  .db-tab:not(.active):hover { background:#f0fdf4; border-color:#bbf7d0; color:#15803d; }
-
-  .db-kpi { background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
-    padding:20px 22px; position:relative; overflow:hidden;
-    opacity:0; animation:db-fadeUp .5s ease forwards;
-    transition:transform .2s,box-shadow .2s; cursor:default; }
-  .db-kpi:hover { transform:translateY(-5px); animation:db-pulse 2s ease infinite !important; }
-  .db-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
-    background:linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
-    background-size:200%; animation:db-shimmer 2.4s linear infinite; }
-  .db-kpi-shimmer { position:absolute; inset:0;
-    background:linear-gradient(100deg,transparent 25%,rgba(255,255,255,.6) 50%,transparent 75%);
-    background-size:600px 100%; animation:db-shimmer 2.8s linear infinite; pointer-events:none; }
-  .db-kpi-icon { width:36px; height:36px; background:#dcfce7; border-radius:10px;
-    display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:12px; }
-  .db-kpi-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
-    color:#9ca3af; margin-bottom:6px; }
-  .db-kpi-value { font-size:30px; font-weight:800; color:#15803d; line-height:1;
-    animation:db-countUp .55s cubic-bezier(.34,1.56,.64,1) both; }
-  .db-kpi-unit { font-size:13px; font-weight:500; color:#9ca3af; margin-left:3px; }
-
-  .db-card { background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
-    padding:24px 22px 20px; opacity:0; animation:db-fadeUp .55s ease forwards;
-    transition:box-shadow .2s,transform .2s; }
-  .db-card:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(22,163,74,0.11); }
-  .db-card-title { font-size:14px; font-weight:700; color:#14532d; margin:0 0 3px; }
-  .db-card-sub   { font-size:11px; color:#9ca3af; margin:0 0 18px; }
-  .db-card-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:4px; }
-  .db-pill { background:#dcfce7; color:#16a34a; font-size:11px; font-weight:600;
-    padding:3px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
-
-  .db-section { font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
-    color:#16a34a; margin:28px 0 14px; display:flex; align-items:center; gap:10px; }
-  .db-section::after { content:''; flex:1; height:1px; background:#bbf7d0; }
-
-  .db-table-wrap { overflow-x:auto; border-radius:12px; border:1.5px solid #bbf7d0; }
-  .db-table { width:100%; border-collapse:collapse; font-size:12.5px; }
-  .db-table thead tr { background:#15803d; }
-  .db-table th { padding:11px 13px; text-align:left; font-size:10px; font-weight:700;
-    letter-spacing:.07em; text-transform:uppercase; color:#fff; white-space:nowrap; }
-  .db-table tbody tr { border-bottom:1px solid #f0fdf4; animation:db-rowIn .4s ease both; transition:background .15s; }
-  .db-table tbody tr:hover { background:#f0fdf4; }
-  .db-table tbody tr:last-child { border-bottom:none; }
-  .db-table td { padding:10px 13px; color:#374151; vertical-align:middle; white-space:nowrap; }
-  .db-table td:first-child { font-weight:600; color:#14532d; }
-
-  .badge-marche { background:#dcfce7; color:#15803d; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
-  .badge-arret  { background:#fef3c7; color:#92400e; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
-
-  .db-btn-primary { background:#16a34a; color:#fff; border:none; border-radius:10px;
-    padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer;
-    display:inline-flex; align-items:center; gap:6px; transition:all .18s;
-    box-shadow:0 2px 8px rgba(22,163,74,0.22); }
-  .db-btn-primary:hover { background:#15803d; transform:translateY(-1px); box-shadow:0 5px 16px rgba(22,163,74,0.28); }
-  .db-btn-secondary { background:#fff; color:#16a34a; border:1.5px solid #bbf7d0;
-    border-radius:10px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;
-    display:inline-flex; align-items:center; gap:6px; transition:all .18s; }
-  .db-btn-secondary:hover { background:#f0fdf4; border-color:#16a34a; }
-  .db-btn-excel { background:#166534; color:#fff; border:none; border-radius:10px;
-    padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;
-    display:inline-flex; align-items:center; gap:6px; transition:all .18s; }
-  .db-btn-excel:hover { background:#15803d; transform:translateY(-1px); }
-  .db-btn-edit { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;
-    border-radius:7px; padding:5px 11px; font-size:11px; font-weight:600; cursor:pointer;
-    margin-right:5px; transition:all .15s; white-space:nowrap; }
-  .db-btn-edit:hover { background:#dcfce7; border-color:#16a34a; }
-  .db-btn-del { background:#fef2f2; color:#dc2626; border:1px solid #fecaca;
-    border-radius:7px; padding:5px 11px; font-size:11px; font-weight:600; cursor:pointer;
-    transition:all .15s; white-space:nowrap; }
-  .db-btn-del:hover { background:#fee2e2; }
-
-  .db-form-card { background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
-    padding:28px 24px; margin-bottom:22px; animation:db-fadeUp .4s ease both; }
-  .db-form-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
-  .db-form-label { font-size:11px; font-weight:600; color:#374151; margin-bottom:5px;
-    display:block; text-transform:uppercase; letter-spacing:.06em; }
-  .db-form-input { width:100%; border:1.5px solid #d1fae5; border-radius:9px;
-    padding:9px 12px; font-size:13px; color:#111827; background:#fafffe;
-    outline:none; transition:border .18s,box-shadow .18s; box-sizing:border-box; }
-  .db-form-input:focus { border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,0.12); }
-  .db-form-input[readonly] { background:#f0fdf4; color:#15803d; font-weight:700; }
-  .db-form-select { width:100%; border:1.5px solid #d1fae5; border-radius:9px;
-    padding:9px 12px; font-size:13px; color:#111827; background:#fafffe;
-    outline:none; appearance:none; cursor:pointer; transition:border .18s; }
-  .db-form-select:focus { border-color:#16a34a; }
-  .db-equip-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
-  .db-equip-chip { padding:5px 14px; border-radius:20px; border:1.5px solid #bbf7d0;
-    font-size:12px; font-weight:600; color:#374151; cursor:pointer; transition:all .15s; background:#fff; }
-  .db-equip-chip:hover { background:#f0fdf4; border-color:#16a34a; }
-  .db-equip-chip.selected { background:#16a34a; color:#fff; border-color:#15803d; }
-  .db-equip-add { padding:5px 14px; border-radius:20px; border:1.5px dashed #16a34a;
-    font-size:12px; font-weight:600; color:#16a34a; cursor:pointer; background:#fff; transition:background .15s; }
-  .db-equip-add:hover { background:#f0fdf4; }
-  .db-rendement-banner { background:linear-gradient(135deg,#15803d,#22c55e);
-    border-radius:14px; padding:18px 24px; display:flex; align-items:center; gap:16px; margin-top:8px; }
-  .db-rendement-value { font-size:36px; font-weight:800; color:#fff; }
-  .db-rendement-label { font-size:14px; color:rgba(255,255,255,.8); }
-  .db-auto-badge { margin-left:6px; font-size:10px; font-weight:700; color:#16a34a;
-    background:#dcfce7; padding:2px 7px; border-radius:20px; letter-spacing:.04em; }
-  .db-empty { text-align:center; padding:48px 0; color:#9ca3af; font-size:13px; }
-  .db-grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px; }
-  .db-grid3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
-
-  .db-cost-input { width:100%; border:1.5px solid #d1fae5; border-radius:9px;
-    padding:9px 12px; font-size:13px; color:#111827; background:#fafffe;
-    outline:none; transition:border .18s,box-shadow .18s; box-sizing:border-box; }
-  .db-cost-input:focus { border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,0.12); }
-  .db-cost-label { font-size:11px; font-weight:600; color:#374151; margin-bottom:5px;
-    display:block; text-transform:uppercase; letter-spacing:.06em; }
-  .db-cost-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:20px; }
-  .db-cost-stat { background:#fff; border:1.5px solid #bbf7d0; border-radius:14px;
-    padding:18px 20px; position:relative; overflow:hidden;
-    opacity:0; animation:db-fadeUp .5s ease forwards; }
-  .db-cost-stat::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
-    background:linear-gradient(90deg,#16a34a,#4ade80); }
-  .db-cost-stat-label { font-size:10px; font-weight:700; letter-spacing:.1em;
-    text-transform:uppercase; color:#9ca3af; margin-bottom:6px; }
-  .db-cost-stat-value { font-size:22px; font-weight:800; color:#15803d; line-height:1; }
-  .db-cost-stat-unit  { font-size:12px; font-weight:500; color:#9ca3af; margin-left:3px; }
-  .db-cost-progress-wrap { background:#f0fdf4; border-radius:20px; height:10px; overflow:hidden; margin-top:8px; }
-  .db-cost-progress-bar { height:100%; border-radius:20px;
-    background:linear-gradient(90deg,#16a34a,#4ade80);
-    transition:width .8s cubic-bezier(.4,0,.2,1); }
+/* ── CONFIRM DIALOG ──────────────────────────────────────────── */
+@keyframes csm-dlgIn { from { opacity:0; transform:scale(0.93) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
+.csm-dlg-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0,0,0,0.35); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+}
+.csm-dlg {
+  background: #fff; border-radius: 20px; padding: 32px 36px; max-width: 400px; width: 90%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+  animation: csm-dlgIn 0.38s cubic-bezier(0.16,1,0.3,1) forwards;
+  text-align: center;
+}
+.csm-dlg-icon { width: 56px; height: 56px; border-radius: 16px; background: #fef2f2; color: #dc2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+.csm-dlg-title { font-size: 17px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+.csm-dlg-msg   { font-size: 13.5px; color: #6b7280; line-height: 1.55; margin-bottom: 24px; }
+.csm-dlg-btns  { display: flex; gap: 10px; justify-content: center; }
+.csm-dlg-cancel {
+  padding: 10px 24px; border-radius: 10px; border: 1.5px solid #e5e7eb;
+  background: #f9fafb; color: #374151; font-weight: 600; font-size: 14px;
+  cursor: pointer; transition: all .18s;
+}
+.csm-dlg-cancel:hover { background: #f3f4f6; border-color: #d1d5db; }
+.csm-dlg-confirm {
+  padding: 10px 28px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg,#dc2626,#ef4444); color: #fff;
+  font-weight: 700; font-size: 14px; cursor: pointer; transition: all .18s;
+  box-shadow: 0 4px 14px rgba(220,38,38,0.3);
+}
+.csm-dlg-confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.4); }
 `;
 
 // ─── Chart helpers (identiques Poussage) ─────────────────────────────────────
@@ -238,6 +187,72 @@ function calcTemps(debut,fin) {
   return mins>0?(mins/60).toFixed(2):"";
 }
 
+
+// ─── Toast & Confirm components ──────────────────────────────────────────────
+const TOAST_ICONS = {
+  success: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+  ),
+  warning: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  ),
+  danger: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
+      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      <path d="M10 11v6"/><path d="M14 11v6"/>
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+    </svg>
+  ),
+};
+
+function ToastContainer({ toasts, onClose }) {
+  return (
+    <div className="csm-toast-wrap">
+      {toasts.map(t => (
+        <div key={t.id} className={`csm-toast ${t.type}${t.out?" out":""}`}>
+          <div className="csm-toast-inner">
+            <div className="csm-toast-icon">{TOAST_ICONS[t.type]}</div>
+            <div className="csm-toast-body">
+              <div className="csm-toast-title">{t.title}</div>
+              <div className="csm-toast-msg">{t.msg}</div>
+            </div>
+            <button className="csm-toast-close" onClick={()=>onClose(t.id)}>×</button>
+          </div>
+          <div className="csm-toast-bar" style={{animationDuration:`${t.duration}ms`}}/>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ConfirmDialog({ open, title, msg, onConfirm, onCancel }) {
+  if (!open) return null;
+  return (
+    <div className="csm-dlg-overlay" onClick={onCancel}>
+      <div className="csm-dlg" onClick={e=>e.stopPropagation()}>
+        <div className="csm-dlg-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+        </div>
+        <div className="csm-dlg-title">{title}</div>
+        <div className="csm-dlg-msg">{msg}</div>
+        <div className="csm-dlg-btns">
+          <button className="csm-dlg-cancel" onClick={onCancel}>Annuler</button>
+          <button className="csm-dlg-confirm" onClick={onConfirm}>Supprimer</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 function StatistiqueCasement() {
   const dispatch  = useDispatch();
@@ -259,6 +274,23 @@ function StatistiqueCasement() {
   const [annualCost, setAnnualCost] = useState(500000);
   const [meterCost,  setMeterCost]  = useState(120);
   const [costSaved,  setCostSaved]  = useState({annualCost:500000,meterCost:120});
+
+  // ── Toast & Confirm ───────────────────────────────────────────────────────
+  const [toasts,    setToasts]    = useState([]);
+  const [confirmDlg, setConfirmDlg] = useState({open:false, index:null, label:""});
+
+  const showToast = (type, title, msg, duration=4000) => {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, {id, type, title, msg, duration, out:false}]);
+    setTimeout(()=>{
+      setToasts(prev => prev.map(t => t.id===id ? {...t,out:true} : t));
+      setTimeout(()=> setToasts(prev => prev.filter(t => t.id!==id)), 380);
+    }, duration);
+  };
+  const closeToast = (id) => {
+    setToasts(prev => prev.map(t => t.id===id ? {...t,out:true} : t));
+    setTimeout(()=> setToasts(prev => prev.filter(t => t.id!==id)), 380);
+  };
 
   const resetForm = () => setFormData(EMPTY_FORM);
 
@@ -290,21 +322,31 @@ function StatistiqueCasement() {
     if(editIndex!==null) {
       dispatch(updateCasement({index:editIndex,data:formData}));
       setEditIndex(null);
+      showToast("warning","Opération modifiée","Les données du casement ont été mises à jour avec succès.");
     } else {
       dispatch(addCasement(formData));
+      showToast("success","Opération ajoutée","Le nouveau casement a été enregistré avec succès.");
     }
     resetForm(); setShowForm(false);
   };
 
-  const handleEdit = (c,i) => {
-    setFormData({...EMPTY_FORM,...c,equipements:c.equipements||[]});
-    setEditIndex(i); setShowForm(true);
-    navigate("/operations/casement/statistique");
-    window.scrollTo({top:0,behavior:"smooth"});
+  const handleEdit = (c, i) => {
+    navigate("/operations/casement/gestion", {
+      state: { editData: c, editIndex: i },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    showToast("warning","Mode édition activé","Formulaire pré-rempli avec les données de l'opération.");
   };
 
   const handleDelete = (i) => {
-    if(window.confirm("Supprimer cette opération ?")) dispatch(deleteCasement(i));
+    const c = casements[i];
+    const label = c ? `${c.date || ""} · ${c.panneau || ""} · ${c.tranchee || ""}`.trim().replace(/^·|·$/g,"").trim() : `#${i+1}`;
+    setConfirmDlg({open:true, index:i, label});
+  };
+  const confirmDelete = () => {
+    dispatch(deleteCasement(confirmDlg.index));
+    showToast("danger","Opération supprimée",`L'enregistrement "${confirmDlg.label}" a été supprimé définitivement.`);
+    setConfirmDlg({open:false, index:null, label:""});
   };
 
   // Rendement instantané basé sur volume_casse
@@ -420,7 +462,11 @@ function StatistiqueCasement() {
           </tr>
         </thead>
         <tbody>
-          {data.map((c,i)=>(
+          {data.map((c,i)=>{
+            const realIndex = casements.findIndex(
+              (x)=>x===c||(x.date===c.date&&x.panneau===c.panneau&&x.tranchee===c.tranchee&&x.heureDebut===c.heureDebut)
+            );
+            return(
             <tr key={i} style={{animationDelay:`${i*0.04}s`}}>
               <td>{c.date}</td>
               <td>{c.panneau}</td>
@@ -446,12 +492,52 @@ function StatistiqueCasement() {
               <td style={{color:"#9ca3af",fontSize:12}}>{c.typeArret||"—"}</td>
               {showActions&&(
                 <td>
-                  <button className="db-btn-edit" onClick={()=>handleEdit(c,casements.indexOf(c))}>✏️ Modifier</button>
-                  <button className="db-btn-del"  onClick={()=>handleDelete(casements.indexOf(c))}>🗑️ Supprimer</button>
+                  <div style={{display:"flex",gap:6,justifyContent:"center"}}>
+                    <button
+                      title="Modifier"
+                      onClick={()=>handleEdit(c,realIndex)}
+                      style={{
+                        display:"inline-flex",alignItems:"center",gap:5,
+                        padding:"5px 10px",borderRadius:8,border:"1.5px solid #22c55e",
+                        background:"rgba(34,197,94,0.08)",color:"#15803d",
+                        fontSize:12,fontWeight:600,cursor:"pointer",
+                        transition:"all .18s",
+                      }}
+                      onMouseEnter={e=>{e.currentTarget.style.background="#22c55e";e.currentTarget.style.color="#fff";}}
+                      onMouseLeave={e=>{e.currentTarget.style.background="rgba(34,197,94,0.08)";e.currentTarget.style.color="#15803d";}}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{width:13,height:13}}>
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                      Modifier
+                    </button>
+                    <button
+                      title="Supprimer"
+                      onClick={()=>handleDelete(realIndex)}
+                      style={{
+                        display:"inline-flex",alignItems:"center",gap:5,
+                        padding:"5px 10px",borderRadius:8,border:"1.5px solid #fca5a5",
+                        background:"rgba(239,68,68,0.06)",color:"#dc2626",
+                        fontSize:12,fontWeight:600,cursor:"pointer",
+                        transition:"all .18s",
+                      }}
+                      onMouseEnter={e=>{e.currentTarget.style.background="#ef4444";e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#ef4444";}}
+                      onMouseLeave={e=>{e.currentTarget.style.background="rgba(239,68,68,0.06)";e.currentTarget.style.color="#dc2626";e.currentTarget.style.borderColor="#fca5a5";}}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{width:13,height:13}}>
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6"/><path d="M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                      Supprimer
+                    </button>
+                  </div>
                 </td>
               )}
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -569,6 +655,14 @@ function StatistiqueCasement() {
   return (
     <>
       <style>{CSS}</style>
+      <ToastContainer toasts={toasts} onClose={closeToast}/>
+      <ConfirmDialog
+        open={confirmDlg.open}
+        title="Confirmer la suppression"
+        msg={`Voulez-vous vraiment supprimer l'opération "${confirmDlg.label}" ? Cette action est irréversible.`}
+        onConfirm={confirmDelete}
+        onCancel={()=>setConfirmDlg({open:false,index:null,label:""})}
+      />
       <div className="db-page" style={{
         minHeight:"100vh", background:PALETTE.bg,
         padding:"28px 24px 60px", color:PALETTE.text,
@@ -588,7 +682,7 @@ function StatistiqueCasement() {
             <h1 style={{margin:0,fontSize:24,fontWeight:800,
               background:"linear-gradient(135deg,#15803d,#22c55e)",
               WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
-              Gestion Casement <span style={{WebkitTextFillColor:"#16a34a"}}>ZD11</span>
+              Gestion Casement
             </h1>
           </div>
           <img src={image} alt="logo" style={{
@@ -601,15 +695,51 @@ function StatistiqueCasement() {
           <>
             <div className="db-grid3" style={{marginBottom:24}}>
               {[
-                {icon:"🪨",label:"Volume Cassé",   value:totalVolume,         unit:"t",   accent:"#16a34a",delay:"0.08s"},
-                {icon:"⏱️",label:"Temps Total",    value:totalTemps,          unit:"h",   accent:"#15803d",delay:"0.16s"},
-                {icon:"📈",label:"Rendement Moyen",value:parseFloat(rendMoyen),unit:"t/h",accent:"#22c55e",delay:"0.24s"},
-                {icon:"🔢",label:"Opérations",     value:totalOps,            unit:"op",  accent:"#4ade80",delay:"0.32s"},
-                {icon:"✅",label:"En Marche",      value:enMarcheCnt,         unit:"",    accent:"#86efac",delay:"0.40s"},
-              ].map(({icon,label,value,unit,accent,delay})=>(
+                {
+                  icon:(
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  ),
+                  label:"Volume Cassé", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
+                },
+                {
+                  icon:(
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                  ),
+                  label:"Temps Total", value:totalTemps, unit:"h", accent:"#15803d", bg:"rgba(21,128,61,0.12)", delay:"0.16s"
+                },
+                {
+                  icon:(
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+                    </svg>
+                  ),
+                  label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", bg:"rgba(34,197,94,0.12)", delay:"0.24s"
+                },
+                {
+                  icon:(
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                  ),
+                  label:"En Marche", value:enMarcheCnt, unit:"", accent:"#86efac", bg:"rgba(134,239,172,0.18)", delay:"0.32s"
+                },
+              ].map(({icon,label,value,unit,accent,bg,delay})=>(
                 <div key={label} className="db-kpi" style={{animationDelay:delay}}>
                   <div className="db-kpi-shimmer"/>
-                  <div className="db-kpi-icon">{icon}</div>
+                  <div className="db-kpi-icon" style={{
+                    background:bg,
+                    color:accent,
+                    width:52,height:52,
+                    borderRadius:14,
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    marginBottom:12,
+                    boxShadow:`0 4px 14px ${bg}`,
+                    border:`1.5px solid ${accent}33`,
+                  }}>{icon}</div>
                   <div className="db-kpi-label">{label}</div>
                   <div className="db-kpi-value" style={{color:accent,animationDelay:delay}}>
                     <AnimCount target={value}/><span className="db-kpi-unit">{unit}</span>
@@ -651,14 +781,14 @@ function StatistiqueCasement() {
             <div className="db-card" {...anim("0.42s")}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
                 <p className="db-card-title" style={{margin:0}}>
-                  {recentCasements.length} opération{recentCasements.length!==1?"s":""} récentes
+                opération{recentCasements.length!==1?"s":""} récentes
                 </p>
                 <div style={{display:"flex",gap:8}}>
                   <button className="db-btn-secondary"
                     onClick={()=>navigate("/operations/casement/historique")}
                     style={{fontSize:12,padding:"6px 12px"}}>Voir tout →</button>
                   <button className="db-btn-primary"
-                    onClick={()=>navigate("/operations/casement")}
+                    onClick={()=>navigate("/operations/casement/gestion")}
                     style={{fontSize:12,padding:"6px 12px"}}>+ Ajouter</button>
                 </div>
               </div>
@@ -667,7 +797,7 @@ function StatistiqueCasement() {
                   <table className="db-table">
                     <thead><tr>
                       <th>Date</th><th>Panneau</th><th>Tranchée</th>
-                      <th>Volume</th><th>Rendement</th><th>État</th>
+                      <th>Volume</th><th>Rendement</th><th>État</th><th>Actions</th>
                     </tr></thead>
                     <tbody>
                       {recentCasements.map((c,i)=>(
@@ -677,6 +807,47 @@ function StatistiqueCasement() {
                           <td>{c.temps>0?(c.volume_casse/c.temps).toFixed(2):0} t/h</td>
                           <td><span className={c.etatMachine==="En marche"?"badge-marche":"badge-arret"}>
                             {c.etatMachine}</span></td>
+                          <td>
+                            <div style={{display:"flex",gap:5,justifyContent:"center"}}>
+                              <button
+                                title="Modifier"
+                                onClick={()=>handleEdit(c,casements.indexOf(c))}
+                                style={{
+                                  display:"inline-flex",alignItems:"center",gap:4,
+                                  padding:"4px 9px",borderRadius:7,border:"1.5px solid #22c55e",
+                                  background:"rgba(34,197,94,0.08)",color:"#15803d",
+                                  fontSize:11,fontWeight:600,cursor:"pointer",transition:"all .18s",
+                                }}
+                                onMouseEnter={e=>{e.currentTarget.style.background="#22c55e";e.currentTarget.style.color="#fff";}}
+                                onMouseLeave={e=>{e.currentTarget.style.background="rgba(34,197,94,0.08)";e.currentTarget.style.color="#15803d";}}
+                              >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{width:12,height:12}}>
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                                Modifier
+                              </button>
+                              <button
+                                title="Supprimer"
+                                onClick={()=>handleDelete(casements.indexOf(c))}
+                                style={{
+                                  display:"inline-flex",alignItems:"center",gap:4,
+                                  padding:"4px 9px",borderRadius:7,border:"1.5px solid #fca5a5",
+                                  background:"rgba(239,68,68,0.06)",color:"#dc2626",
+                                  fontSize:11,fontWeight:600,cursor:"pointer",transition:"all .18s",
+                                }}
+                                onMouseEnter={e=>{e.currentTarget.style.background="#ef4444";e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#ef4444";}}
+                                onMouseLeave={e=>{e.currentTarget.style.background="rgba(239,68,68,0.06)";e.currentTarget.style.color="#dc2626";e.currentTarget.style.borderColor="#fca5a5";}}
+                              >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{width:12,height:12}}>
+                                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                  <path d="M10 11v6"/><path d="M14 11v6"/>
+                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                </svg>
+                                Supprimer
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -740,13 +911,43 @@ function StatistiqueCasement() {
           <>
             <div className="db-grid3" style={{marginBottom:24}}>
               {[
-                {icon:"🪨",label:"Volume Cassé",   value:totalVolume,         unit:"t",  accent:"#16a34a",delay:"0.08s"},
-                {icon:"⏱️",label:"Temps Total",    value:totalTemps,          unit:"h",  accent:"#15803d",delay:"0.16s"},
-                {icon:"📈",label:"Rendement Moyen",value:parseFloat(rendMoyen),unit:"t/h",accent:"#22c55e",delay:"0.24s"},
-              ].map(({icon,label,value,unit,accent,delay})=>(
+                {
+                  icon:(
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  ),
+                  label:"Volume Cassé", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
+                },
+                {
+                  icon:(
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                  ),
+                  label:"Temps Total", value:totalTemps, unit:"h", accent:"#15803d", bg:"rgba(21,128,61,0.12)", delay:"0.16s"
+                },
+                {
+                  icon:(
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
+                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+                    </svg>
+                  ),
+                  label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", bg:"rgba(34,197,94,0.12)", delay:"0.24s"
+                },
+              ].map(({icon,label,value,unit,accent,bg,delay})=>(
                 <div key={label} className="db-kpi" style={{animationDelay:delay}}>
                   <div className="db-kpi-shimmer"/>
-                  <div className="db-kpi-icon">{icon}</div>
+                  <div className="db-kpi-icon" style={{
+                    background:bg,
+                    color:accent,
+                    width:52,height:52,
+                    borderRadius:14,
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    marginBottom:12,
+                    boxShadow:`0 4px 14px ${bg}`,
+                    border:`1.5px solid ${accent}33`,
+                  }}>{icon}</div>
                   <div className="db-kpi-label">{label}</div>
                   <div className="db-kpi-value" style={{color:accent,animationDelay:delay}}>
                     <AnimCount target={value}/><span className="db-kpi-unit">{unit}</span>
