@@ -1,40 +1,47 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { addPoussage, updatePoussage } from "../../features/poussageSlice";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPoussages, addPoussageAsync, updatePoussageAsync } from "../../features/poussageSlice";
 import image from "../../images/image3.webp";
 import "../../components/animations.css";
 
 function Dashboard() {
   const dispatch = useDispatch();
+  const { loading } = useSelector((s) => s.poussage);
+
+  // Load data from API on mount
+  useEffect(() => {
+    dispatch(fetchPoussages());
+  }, [dispatch]);
 
   const [editIndex, setEditIndex] = useState(null);
+  const [editId, setEditId] = useState(null);
   const [equipementOptions, setEquipementOptions] = useState([
     "T1", "T2", "T3", "T4", "T5", "T6", "T7",
   ]);
 
   const [formData, setFormData] = useState({
-  
-  date: "",
-  panneau: "",
-  tranchee: "",
-  niveau: "",
-  volume_soté: "",
-  profendeur: "",
-  equipements: [],
-  conducteur: "",
-  matricule: "",
-  heureDebut: "",
-  heureFin: "",
-  temps: "",
-  compteurDebut: "",
-  compteurFin: "",
- 
-  poste:"",
-   
-  etatMachine: "En marche",
-  typeArret: "",
-  heureDebutArret: "",
-  heureFinArret: "",
+
+    date: "",
+    panneau: "",
+    tranchee: "",
+    niveau: "",
+    volume_soté: "",
+    profendeur: "",
+    equipements: [],
+    conducteur: "",
+    matricule: "",
+    heureDebut: "",
+    heureFin: "",
+    temps: "",
+    compteurDebut: "",
+    compteurFin: "",
+
+    poste: "",
+
+    etatMachine: "En marche",
+    typeArret: "",
+    heureDebutArret: "",
+    heureFinArret: "",
 
   });
 
@@ -55,7 +62,7 @@ function Dashboard() {
     // Recalcul auto si heure debut ou fin change
     if (name === "heureDebut" || name === "heureFin") {
       const debut = name === "heureDebut" ? value : formData.heureDebut;
-      const fin   = name === "heureFin"   ? value : formData.heureFin;
+      const fin = name === "heureFin" ? value : formData.heureFin;
       updated.temps = calcTemps(debut, fin);
     }
 
@@ -88,15 +95,21 @@ function Dashboard() {
     heureDebutArret: "", heureFinArret: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editIndex !== null) {
-      dispatch(updatePoussage({ index: editIndex, data: formData }));
-      setEditIndex(null);
-    } else {
-      dispatch(addPoussage(formData));
+    try {
+      if (editIndex !== null && editId) {
+        await dispatch(updatePoussageAsync({ id: editId, data: formData })).unwrap();
+        setEditIndex(null);
+        setEditId(null);
+      } else {
+        await dispatch(addPoussageAsync(formData)).unwrap();
+      }
+      resetForm();
+    } catch (err) {
+      console.error("Erreur lors de l'enregistrement:", err);
+      alert("Erreur lors de l'enregistrement: " + (typeof err === 'string' ? err : JSON.stringify(err)));
     }
-    resetForm();
   };
 
   const rendement =
@@ -115,264 +128,264 @@ function Dashboard() {
         <img src={image} alt="logo" className="header-logo" />
       </div>
 
+      <style>{`
+        .form-card {
+          background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+          padding:24px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);
+          margin-top:20px;
+        }
+        .db-form-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 20px 16px;
+        }
+        .db-form-label {
+          display: block; font-size: 11px; font-weight: 700;
+          color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;
+          margin-bottom: 6px;
+        }
+        .db-form-input {
+          width: 100%; border: 1.5px solid #d1fae5; border-radius: 8px;
+          padding: 10px 12px; font-size: 14px; color: #1f2937;
+          background: #f8fafc; outline: none; transition: all 0.2s;
+          box-sizing: border-box;
+        }
+        .db-form-input:focus {
+          border-color: #16a34a; background: #fff;
+          box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+        .db-form-input[readOnly] {
+          background: #f0fdf4; color: #15803d; font-weight: 600; border-color: #bbf7d0;
+        }
+        .db-form-select {
+          width: 100%; border: 1.5px solid #d1fae5; border-radius: 8px;
+          padding: 10px 12px; font-size: 14px; color: #1f2937;
+          background: #f8fafc; outline: none; cursor: pointer; transition: all 0.2s;
+          box-sizing: border-box;
+        }
+        .db-form-select:focus { border-color: #16a34a; background: #fff; }
+
+        .db-select-danger {
+          border-color: rgba(217,119,6,0.4) !important;
+          background-color: #fef3c7 !important;
+          color: #92400e !important;
+        }
+        .db-select-danger:focus {
+          box-shadow: 0 0 0 3px rgba(217,119,6,0.12) !important;
+          border-color: #b45309 !important;
+        }
+
+        .db-arret-zone {
+          grid-column: span 4;
+          background: linear-gradient(135deg, #fef3c7, #fff9ec);
+          border: 1.5px solid rgba(217,119,6,0.25);
+          border-radius: 12px;
+          padding: 20px 24px;
+          position: relative;
+          box-shadow: 0 4px 20px rgba(146,64,14,0.06);
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .db-arret-zone::before {
+          content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+          background: linear-gradient(180deg, #b45309, #92400e);
+          border-radius: 12px 0 0 12px;
+        }
+        .db-arret-head {
+          display: flex; align-items: center; gap: 8px;
+          font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+          text-transform: uppercase; color: #b45309;
+        }
+        .db-arret-dot {
+          width: 8px; height: 8px; border-radius: 50%;
+          background: #b45309; box-shadow: 0 0 0 3px rgba(180,83,9,0.15);
+        }
+        .db-arret-grid {
+          display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+        .db-arret-zone .db-form-input {
+          background: #fff; border-color: rgba(217,119,6,0.2);
+        }
+        .db-arret-zone .db-form-input:focus {
+          border-color: #b45309; box-shadow: 0 0 0 3px rgba(217,119,6,0.08); color: #92400e;
+        }
+        
+        .db-badge-auto {
+          margin-left: 6px; font-size: 9px; font-weight: 800; color: #16a34a;
+          background: #dcfce7; padding: 2px 6px; border-radius: 4px; vertical-align: middle;
+        }
+
+        .db-equip-box {
+          grid-column: span 4;
+          border: 1.5px dashed #bbf7d0; border-radius: 10px; padding: 16px;
+          background: #f8fafc; display: flex; flex-direction: column; gap: 12px;
+        }
+        .db-equip-grid {
+          display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .db-equip-chip {
+          padding: 6px 16px; border-radius: 20px; border: 1.5px solid #bbf7d0;
+          font-size: 13px; font-weight: 600; color: #4b5563; background: #fff;
+          cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .db-equip-chip:hover { border-color: #16a34a; background: #f0fdf4; }
+        .db-equip-chip.selected { background: #16a34a; color: #fff; border-color: #15803d; }
+        .db-equip-add {
+          padding: 6px 16px; border-radius: 20px; border: 1.5px dashed #16a34a;
+          font-size: 13px; font-weight: 600; color: #16a34a; background: transparent;
+          cursor: pointer; transition: all 0.2s;
+        }
+        .db-equip-add:hover { background: #f0fdf4; }
+
+        .db-rendement-banner {
+          grid-column: span 2;
+          background: #064e3b; border-radius: 10px; padding: 16px 20px;
+          display: flex; align-items: center; gap: 16px; align-self: end;
+        }
+        .db-rendement-value { font-size: 32px; font-weight: 800; color: #34d399; line-height: 1; }
+        .db-rendement-label { font-size: 13px; color: #a7f3d0; font-weight: 500; }
+
+        .db-actions {
+          grid-column: span 2; display: flex; gap: 12px; align-items: end; justify-content: flex-end;
+        }
+        .db-btn-submit {
+          background: #16a34a; color: #fff; border: none; border-radius: 8px;
+          padding: 12px 24px; font-size: 15px; font-weight: 700; cursor: pointer;
+          transition: all 0.2s; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2);
+        }
+        .db-btn-submit:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 6px 8px rgba(22, 163, 74, 0.3); }
+        .db-btn-cancel {
+          background: #f3f4f6; color: #4b5563; border: none; border-radius: 8px;
+          padding: 12px 24px; font-size: 15px; font-weight: 700; cursor: pointer;
+          transition: all 0.2s;
+        }
+        .db-btn-cancel:hover { background: #e5e7eb; }
+
+        @media (max-width: 1024px) { .db-form-grid { grid-template-columns: repeat(2, 1fr); } .db-equip-box, .db-rendement-banner, .db-actions { grid-column: span 2; } }
+        @media (max-width: 600px) { .db-form-grid { grid-template-columns: 1fr; } .db-equip-box, .db-rendement-banner, .db-actions { grid-column: span 1; } .db-actions { justify-content: stretch; } .db-btn-submit, .db-btn-cancel { flex: 1; } }
+      `}</style>
+      
       {/* FORM */}
       <div className="form-card">
-        <form onSubmit={handleSubmit} className="row g-3">
+        <form onSubmit={handleSubmit} className="db-form-grid">
 
-          {/* DATE */}
-          <div className="col-md-3">
-            <label className="form-label">Date</label>
-            <input
-              type="date"
-              className="form-control"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              required
-            />
+          {/* ROW 1 */}
+          <div>
+            <label className="db-form-label">Date</label>
+            <input type="date" className="db-form-input" name="date" value={formData.date} onChange={handleChange} required />
+          </div>
+          <div>
+            <label className="db-form-label">Panneau</label>
+            <input type="text" className="db-form-input" name="panneau" value={formData.panneau} onChange={handleChange} placeholder="Ex: P1" />
+          </div>
+          <div>
+            <label className="db-form-label">Tranchée</label>
+            <input type="text" className="db-form-input" name="tranchee" value={formData.tranchee} onChange={handleChange} placeholder="Ex: TR12" />
+          </div>
+          <div>
+            <label className="db-form-label">Profondeur (m)</label>
+            <input type="number" step="0.01" className="db-form-input" name="profendeur" value={formData.profendeur} onChange={handleChange} placeholder="0.00" />
           </div>
 
-          {/* PANNEAU */}
-          <div className="col-md-3">
-            <label className="form-label">Panneau</label>
-            <input
-              type="text"
-              className="form-control"
-              name="panneau"
-              value={formData.panneau}
-              onChange={handleChange}
-            />
+          {/* ROW 2 */}
+          <div>
+            <label className="db-form-label">Heure Début</label>
+            <input type="time" className="db-form-input" name="heureDebut" value={formData.heureDebut} onChange={handleChange} />
+          </div>
+          <div>
+            <label className="db-form-label">Heure Fin</label>
+            <input type="time" className="db-form-input" name="heureFin" value={formData.heureFin} onChange={handleChange} />
           </div>
 
-          {/* TRANCHEE */}
-          <div className="col-md-3">
-            <label className="form-label">Tranchée</label>
-            <input
-              type="text"
-              className="form-control"
-              name="tranchee"
-              value={formData.tranchee}
-              onChange={handleChange}
-            />
+          <div>
+            <label className="db-form-label">Volume Souté (t)</label>
+            <input type="number" step="0.01" className="db-form-input" name="volume_soté" value={formData.volume_soté} onChange={handleChange} placeholder="0.00" />
           </div>
 
-          {/* PROFONDEUR */}
-          <div className="col-md-3">
-            <label className="form-label">Profendeur</label>
-            <input
-              type="text"
-              className="form-control"
-              name="profendeur"
-              value={formData.profendeur}
-              onChange={handleChange}
-            />
+          {/* ROW 3 */}
+          <div>
+            <label className="db-form-label">Conducteur</label>
+            <input type="text" className="db-form-input" name="conducteur" value={formData.conducteur} onChange={handleChange} placeholder="Nom" />
           </div>
-
-          {/* VOLUME */}
-          <div className="col-md-3">
-            <label className="form-label">Volume Souté</label>
-            <input
-              type="number"
-              className="form-control"
-              name="volume_soté"
-              value={formData.volume_soté}
-              onChange={handleChange}
-            />
+          <div>
+            <label className="db-form-label">Matricule</label>
+            <input type="text" className="db-form-input" name="matricule" value={formData.matricule} onChange={handleChange} placeholder="Matricule engin" />
           </div>
-         
-          {/* HEURE DEBUT */}
-          <div className="col-md-3">
-            <label className="form-label">Heure de Début</label>
-            <input
-              type="time"
-              className="form-control"
-              name="heureDebut"
-              value={formData.heureDebut}
-              onChange={handleChange}
-            />
+          <div>
+            <label className="db-form-label">Poste</label>
+            <input type="text" className="db-form-input" name="poste" value={formData.poste} onChange={handleChange} placeholder="Ex: Matin" />
           </div>
-
-          {/* HEURE FIN */}
-          <div className="col-md-3">
-            <label className="form-label">Heure de Fin</label>
-            <input
-              type="time"
-              className="form-control"
-              name="heureFin"
-              value={formData.heureFin}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* HEURES DE MARCHE — calculé automatiquement */}
-          <div className="col-md-3">
-            <label className="form-label">
-              Heures de Marche
-              <span style={{
-                marginLeft: 6,
-                fontSize: 10,
-                fontWeight: 600,
-                color: "#16a34a",
-                background: "#dcfce7",
-                padding: "2px 7px",
-                borderRadius: 20,
-                letterSpacing: ".04em",
-              }}>
-                AUTO
-              </span>
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              name="temps"
-              value={formData.temps}
-              onChange={handleChange}
-              placeholder="Calculé automatiquement"
-              style={{ background: formData.heureDebut && formData.heureFin ? "#f0fdf4" : undefined }}
-              readOnly={!!(formData.heureDebut && formData.heureFin)}
-            />
-          </div>
-
-          {/* CONDUCTEUR */}
-          <div className="col-md-3">
-            <label className="form-label">Conducteur</label>
-            <input
-              type="text"
-              className="form-control"
-              name="conducteur"
-              value={formData.conducteur}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* MATRICULE */}
-          <div className="col-md-3">
-            <label className="form-label">Matricule</label>
-            <input
-              type="text"
-              className="form-control"
-              name="matricule"
-              value={formData.matricule}
-              onChange={handleChange}
-            />
-          </div>
-            {/* Poste */}
-          <div className="col-md-3">
-            <label className="form-label">Poste</label>
-            <input
-              type="text"
-              className="form-control"
-              name="machine"
-              value={formData.poste}
-              onChange={handleChange}
-            />
-          </div>
-
-
-          {/* EQUIPMENTS */}
-          <div className="col-md-12">
-            <label className="form-label">Équipements</label>
-            <div className="equip-grid">
-              {equipementOptions.map((eq, index) => (
-                <div
-                  key={index}
-                  className={`equip-chip ${
-                    formData.equipements.includes(eq) ? "selected" : ""
-                  }`}
-                  onClick={() => handleEquipementChange(eq)}
-                >
-                  {eq}
-                </div>
-              ))}
-              <button
-                type="button"
-                className="btn-add-equip"
-                onClick={addEquipement}
-              >
-                + Ajouter
-              </button>
-            </div>
-          </div>
-
-          {/* ETAT MACHINE */}
-          <div className="col-md-3">
-            <label className="form-label">État Machine</label>
-            <select
-              className="form-select"
-              name="etatMachine"
-              value={formData.etatMachine}
-              onChange={handleChange}
-            >
-              <option>En marche</option>
-              <option>En arrêt</option>
+          <div>
+            <label className="db-form-label">État Machine</label>
+            <select className={`db-form-select ${formData.etatMachine === 'En arrêt' ? 'db-select-danger' : ''}`} name="etatMachine" value={formData.etatMachine} onChange={handleChange}>
+              <option value="En marche">En marche</option>
+              <option value="En arrêt">En arrêt</option>
             </select>
           </div>
 
-          {/* ARRET */}
-         {formData.etatMachine === "En arrêt" && (
-<>
-  {/* TYPE ARRET */}
-  <div className="col-md-3">
-    <label className="form-label">Nature d'arrêt</label>
-    <input
-      type="text"
-      className="form-control"
-      name="typeArret"
-      value={formData.typeArret}
-      onChange={handleChange}
-    />
-  </div>
+          {/* ROW ARRET (Conditional) */}
+          {formData.etatMachine === "En arrêt" && (
+            <div className="db-arret-zone">
+              <div className="db-arret-head"><div className="db-arret-dot" />Détails de l'arrêt</div>
+              <div className="db-arret-grid">
+                <div>
+                  <label className="db-form-label" style={{color: '#92400e'}}>Nature d'arrêt</label>
+                  <input type="text" className="db-form-input" name="typeArret" value={formData.typeArret} onChange={handleChange} placeholder="Cause technique..." />
+                </div>
+                <div>
+                  <label className="db-form-label" style={{color: '#92400e'}}>Heure Début Arrêt</label>
+                  <input type="time" className="db-form-input" name="heureDebutArret" value={formData.heureDebutArret} onChange={handleChange} />
+                </div>
+                <div>
+                  <label className="db-form-label" style={{color: '#92400e'}}>Heure Fin Arrêt</label>
+                  <input type="time" className="db-form-input" name="heureFinArret" value={formData.heureFinArret} onChange={handleChange} />
+                </div>
+              </div>
+            </div>
+          )}
 
-  {/* HEURE DEBUT ARRET */}
-  <div className="col-md-3">
-    <label className="form-label">Heure Début Arrêt</label>
-    <input
-      type="time"
-      className="form-control"
-      name="heureDebutArret"
-      value={formData.heureDebutArret}
-      onChange={handleChange}
-    />
-  </div>
-
-  {/* HEURE FIN ARRET */}
-  <div className="col-md-3">
-    <label className="form-label">Heure Fin Arrêt</label>
-    <input
-      type="time"
-      className="form-control"
-      name="heureFinArret"
-      value={formData.heureFinArret}
-      onChange={handleChange}
-    />
-  </div>
-</>
-)}
-           
-
-          {/* RENDEMENT */}
-          <div className="col-12">
-            <div className="rendement-banner">
-              <div className="rendement-value">{rendement}</div>
-              <div className="rendement-label">t/h — Rendement instantané</div>
+          {/* EQUIPEMENTS */}
+          <div className="db-equip-box">
+            <label className="db-form-label" style={{ marginBottom: 0 }}>Équipements mobilisés</label>
+            <div className="db-equip-grid">
+              {equipementOptions.map((eq, index) => (
+                <div key={index} className={`db-equip-chip ${formData.equipements.includes(eq) ? "selected" : ""}`} onClick={() => handleEquipementChange(eq)}>
+                  {eq}
+                </div>
+              ))}
+              <button type="button" className="db-equip-add" onClick={addEquipement}>+ Ajouter</button>
             </div>
           </div>
 
-          {/* SUBMIT */}
-          <div className="col-12">
-            <button type="submit" className="btn-submit">
-              {editIndex !== null ? "Mettre à jour" : "Enregistrer"}
-            </button>
+          {/* BANNER & BUTTONS */}
+          {/* BANNER DE CALCULS (Rendement + Heures) */}
+          <div style={{
+            gridColumn: "span 2",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "12px",
+            alignSelf: "end"
+          }}>
+            <div className="db-rendement-banner" style={{ gridColumn: "span 1", margin: 0 }}>
+              <div className="db-rendement-value">{formData.temps || 0}</div>
+              <div className="db-rendement-label">h<br/>Heures de marche</div>
+            </div>
+            <div className="db-rendement-banner" style={{ gridColumn: "span 1", margin: 0 }}>
+              <div className="db-rendement-value">{rendement}</div>
+              <div className="db-rendement-label">t/h<br/>Rendement instantané</div>
+            </div>
+          </div>
+
+          <div className="db-actions">
             {editIndex !== null && (
-              <button
-                type="button"
-                className="btn-submit"
-                style={{ marginLeft: 10, background: "#6b7280" }}
-                onClick={() => { resetForm(); setEditIndex(null); }}
-              >
+              <button type="button" className="db-btn-cancel" onClick={() => { resetForm(); setEditIndex(null); }}>
                 Annuler
               </button>
             )}
+            <button type="submit" className="db-btn-submit">
+              {editIndex !== null ? "Mettre à jour" : "Enregistrer"}
+            </button>
           </div>
 
         </form>

@@ -1,0 +1,700 @@
+/* =========================================
+   1. RESET & GLOBAL (STYLE INDUSTRIEL / TECH)
+   ========================================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  
+  /* --- FOND INDUSTRIEL --- */
+  background-color: #f0f2f5; /* Gris technique clair */
+  /* Grille technique subtile */
+  background-image: 
+      linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px; /* Grandes cases techniques */
+  background-position: center top;
+  
+  color: #2d3436;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* =========================================
+   2. HEADER & LOGO (CENTRÉ & ÉPURÉ)
+   ========================================= */
+.header {
+  position: relative;
+  height: auto;
+  padding: 40px 0 20px 0;
+  background: transparent;
+  
+  /* CENTRAGE LOGO */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  
+  margin-bottom: 40px;
+  z-index: 10;
+}
+
+.logo-container {
+  position: relative;
+  height: 130px; /* Grand logo imposant */
+  transition: transform 0.3s;
+  
+  /* Filtre pour donner du poids au logo */
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.logo-container:hover {
+  transform: scale(1.02); /* Zoom mécanique précis (pas de rebond) */
+}
+
+.logo-container img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Ligne technique sous le logo */
+.header::after {
+  content: '';
+  display: block;
+  width: 100px;
+  height: 4px;
+  background-color: #007bff;
+  margin-top: 20px;
+  border-radius: 2px;
+}
+
+/* =========================================
+   3. STRUCTURE & TITRES
+   ========================================= */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 10;
+  position: relative;
+}
+
+.section {
+  margin-bottom: 60px;
+  animation: fadeIn 0.4s ease-out; /* Animation plus rapide/sèche */
+}
+
+.section-title {
+  color: #2d3436;
+  text-transform: uppercase; /* Style industriel */
+  letter-spacing: 2px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 30px;
+  
+  /* Design "Plaque" */
+  border-left: 8px solid #007bff;
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+}
+
+/* --- BOUTON RETOUR --- */
+.back-button {
+  background: #dfe6e9;
+  border: 1px solid #b2bec3;
+  color: #636e72;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  padding: 10px 25px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  transition: all 0.2s;
+  border-radius: 4px; /* Coins peu arrondis */
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background: #b2bec3;
+  color: #2d3436;
+  border-color: #636e72;
+}
+
+/* =========================================
+   4. PAGE D'ACCUEIL (LANDING)
+   ========================================= */
+.text-section {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.title {
+  font-size: 3rem;
+  color: #2d3436;
+  display: inline-block;
+  margin: 10px 0 30px 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.underline1, .underline2 {
+  /* Style poutre métallique */
+  height: 8px;
+  background: repeating-linear-gradient(
+    45deg,
+    #007bff,
+    #007bff 10px,
+    #0056b3 10px,
+    #0056b3 20px
+  );
+  width: 150px;
+  margin: 0 auto 30px auto;
+}
+
+.start-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 20px 60px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  border-radius: 4px; /* Coins carrés */
+  cursor: pointer;
+  box-shadow: 0 4px 0 #0056b3; /* Ombre "bloc" solide */
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.start-button:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #0056b3; /* Effet enfoncé */
+  background: #0069d9;
+}
+
+.welcome-box {
+  background: #ffffff;
+  border: 1px solid #d1d8e0;
+  border-radius: 6px;
+  padding: 40px;
+  margin: 30px auto;
+  max-width: 800px;
+  text-align: center;
+  /* Ombre technique précise */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.welcome-box ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.welcome-box li {
+  padding: 15px 0;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #dfe6e9; /* Ligne fine grise */
+  color: #636e72;
+}
+
+.welcome-box li:last-child {
+  border-bottom: none;
+}
+
+/* =========================================
+   5. PAGE SÉLECTION
+   ========================================= */
+.button-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.button {
+  padding: 20px;
+  background: #fdfdfd;
+  border: 2px solid #dfe6e9;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #636e72;
+  transition: all 0.2s;
+  flex: 1 1 200px;
+  max-width: 300px;
+  text-transform: uppercase;
+}
+
+.button:hover {
+  border-color: #007bff;
+  color: #007bff;
+  background: white;
+}
+
+.button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,0.1); /* Ombre intérieure */
+}
+
+/* GRILLE FILIÈRES */
+.filiere-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.filiere-button {
+  background: white;
+  border: 1px solid #d1d8e0;
+  /* Bordure gauche épaisse de couleur pour classifier */
+  border-left: 5px solid #b2bec3; 
+  padding: 25px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.filiere-button:hover {
+  transform: translateY(-3px);
+  border-left-color: #007bff; /* Changement de couleur au survol */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.filiere-button.active-card {
+  border-left-color: #007bff;
+  background-color: #f8fbff;
+  border-top: 1px solid #007bff;
+  border-right: 1px solid #007bff;
+  border-bottom: 1px solid #007bff;
+}
+
+.filiere-button h3 {
+  margin: 0;
+  color: #2d3436;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Info Box Style "Notice Technique" */
+.info-box {
+  background: #2d3436; /* Fond sombre */
+  color: white;
+  padding: 30px;
+  border-radius: 6px;
+  margin-top: 30px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.info-box p {
+  color: #dfe6e9;
+}
+
+.continue-button {
+  background: #00b894; /* Vert technique */
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100%;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  box-shadow: 0 4px 0 #008f72;
+}
+
+.continue-button:hover {
+  background: #01a383;
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #008f72;
+}
+
+/* =========================================
+   6. PAGE MODULES (Style Cartes Techniques)
+   ========================================= */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  padding-bottom: 50px;
+}
+
+.module-card {
+  background: white;
+  border-radius: 6px;
+  padding: 0; /* On gère le padding en interne */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid #d1d8e0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.module-card:hover {
+  border-color: #007bff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.module-header {
+  background: #f7f9fa; /* Header gris clair */
+  padding: 20px;
+  border-bottom: 1px solid #ecf0f1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.module-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2d3436;
+  font-weight: 700;
+}
+
+/* Code style "matricule" */
+.module-code {
+  background: #2d3436;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: 'Consolas', 'Monaco', monospace; /* Police monospace */
+  margin-left: 10px;
+  letter-spacing: 1px;
+}
+
+/* Corps de la carte */
+.module-card > div:not(.module-header) {
+  padding: 20px;
+}
+
+.select-module-btn {
+  background: white;
+  color: #007bff;
+  border: 2px solid #007bff;
+  padding: 12px;
+  border-radius: 4px;
+  margin-top: 15px; /* Ajusté car padding géré différemment */
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  width: calc(100% - 40px);
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.module-card:hover .select-module-btn {
+  background: #007bff;
+  color: white;
+}
+
+/* =========================================
+   7. MODALE (POP-UP)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(45, 52, 54, 0.9); /* Fond sombre opaque */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 15px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: #f5f6fa;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  padding: 20px 30px;
+  background: white;
+  border-bottom: 2px solid #dcdde1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #2d3436;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.close-modal-btn {
+  background: transparent;
+  color: #636e72;
+  border: 2px solid #636e72;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-modal-btn:hover {
+  background: #c0392b;
+  border-color: #c0392b;
+  color: white;
+}
+
+.modal-body {
+  padding: 30px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* --- ONGLETS (TABS) --- */
+.tabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 2px solid #dcdde1;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  background: #dcdde1;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  color: #636e72;
+  font-size: 14px;
+  transition: all 0.2s;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: 0;
+  text-transform: uppercase;
+}
+
+.tabs button:hover {
+  background: #bdc3c7;
+  color: #2d3436;
+}
+
+.tabs button.active {
+  background: #007bff;
+  color: white;
+}
+
+.badge {
+  background: rgba(0,0,0,0.2);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  margin-left: 6px;
+  font-family: monospace;
+}
+
+.tabs button.active .badge {
+  background: rgba(255,255,255,0.3);
+  color: white;
+}
+
+/* --- LISTE CONTENU --- */
+.content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.content-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid #dcdde1;
+  padding: 20px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.content-item:hover {
+  border-left: 5px solid #007bff;
+  transform: translateX(2px);
+}
+
+.content-info h4 {
+  margin: 0 0 6px 0;
+  color: #2d3436;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.content-info small {
+  display: inline-block;
+  margin-top: 6px;
+  color: #2d3436;
+  font-size: 0.8rem;
+  background: #dfe6e9;
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.download-btn {
+  background: #2d3436;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.download-btn:hover {
+  background: #007bff;
+}
+
+.no-link {
+  font-size: 0.8rem;
+  color: #c0392b;
+  background: #fadbd8;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* =========================================
+   8. UTILITAIRES & EMPTY STATES
+   ========================================= */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 4px;
+  border: 2px dashed #b2bec3; /* Bordure pointillée technique */
+  margin: 20px auto;
+  color: #b2bec3;
+}
+
+.empty-state h3 {
+  color: #636e72;
+  text-transform: uppercase;
+}
+
+.error-message {
+  background: #c0392b;
+  color: white;
+  padding: 15px;
+  border-radius: 4px;
+  margin: 20px 0;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* =========================================
+   9. DÉCORATION (LIGNES TECHNIQUES DE FOND)
+   ========================================= */
+/* Plus de triangles flottants, mais des lignes fixes */
+.triangles-container {
+  display: none; 
+}
+
+/* On ajoute un pattern de fond subtil sur le body via CSS (déjà fait au début) */
+
+/* =========================================
+   10. ANIMATIONS
+   ========================================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* =========================================
+   11. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .logo-container { height: 100px; }
+  
+  .title { font-size: 2.2rem; }
+  .section-title { font-size: 1.3rem; }
+  
+  .content-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .download-btn {
+    margin-top: 15px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .tabs button {
+    flex: 1 1 100%; /* Onglets pleine largeur sur mobile */
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+  
+  .modal-content {
+    height: 100vh;
+    border-radius: 0;
+  }
+  
+  .button-group .button {
+    flex: 1 1 100%; 
+  }
+}

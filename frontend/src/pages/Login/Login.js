@@ -108,8 +108,8 @@ export default function Login() {
         });
 
         if (data.user.modeOpiration === "poussage") navigate("/poussage");
-        else if (data.user.modeOpiration === "casement") navigate("/casement");
-        else if (data.user.modeOpiration === "transport") navigate("/transport");
+        else if (data.user.modeOpiration === "casement") navigate("/operations/casement");
+        else if (data.user.modeOpiration === "transport") navigate("/operations/transport");
       } else {
         alert(data.message || "Login échoué");
       }

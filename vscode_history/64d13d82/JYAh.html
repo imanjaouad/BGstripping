@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Recherche Pseudo</title>
+</head>
+<body>
+  <h1>Cherche un pseudo sur les réseaux</h1>
+  <input type="text" id="pseudo" placeholder="Entre un pseudo">
+  <button onclick="search()">Rechercher</button>
+  <ul id="results"></ul>
+
+  <script>
+    async function checkUrl(url) {
+      try {
+        const res = await fetch(url, { mode: 'no-cors' });
+        return true; // On ne peut pas vraiment vérifier avec no-cors, mais on suppose que l'URL existe
+      } catch {
+        return false;
+      }
+    }
+
+    async function search() {
+      const pseudo = document.getElementById('pseudo').value.trim();
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+
+      const platforms = [
+        { name: 'Facebook', url: `https://facebook.com/${pseudo}` },
+        { name: 'Instagram', url: `https://instagram.com/${pseudo}` },
+        { name: 'TikTok', url: `https://tiktok.com/@${pseudo}` },
+        { name: 'Snapchat', url: `https://snapchat.com/add/${pseudo}` }
+      ];
+
+      for (const platform of platforms) {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${platform.url}" target="_blank">${platform.name}</a>`;
+        results.appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>

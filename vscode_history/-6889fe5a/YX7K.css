@@ -1,0 +1,472 @@
+/* ========================================
+   ETUDIA - HAUTE LISIBILITÉ & CONFORT VISUEL
+   Couleurs douces, contraste optimal
+   ======================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* =========================================
+   1. RESET & GLOBAL
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a1a; /* Noir doux pour les yeux */
+  line-height: 1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  font-size: 16px; /* Taille de base confortable */
+}
+
+/* FOND DIAGONAL DOUX (Bleu-gris très clair) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fafbfc; /* Blanc cassé */
+  z-index: -2;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e3f2fd, #f3f4f6); /* Bleu TRÈS clair + Gris TRÈS clair */
+  clip-path: polygon(0 0, 65% 0, 45% 100%, 0 100%);
+  z-index: -1;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* =========================================
+   2. HEADER TRANSPARENT
+   ========================================= */
+.header {
+  position: relative;
+  height: 120px;
+  background: transparent;
+  margin-bottom: 30px;
+}
+
+.diagonal {
+  display: none;
+}
+
+/* Logo avec fond blanc pur pour contraste maximal */
+.logo-container {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: #ffffff;
+  padding: 18px 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 10;
+  transition: transform 0.2s;
+  border: 2px solid #f0f0f0;
+}
+
+.logo-container:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.logo-container img {
+  height: 80px;
+  object-fit: contain;
+}
+
+/* =========================================
+   3. STRUCTURE & TITRES
+   ========================================= */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 10;
+  position: relative;
+}
+
+.section {
+  margin-bottom: 50px;
+  animation: fadeIn 0.6s ease-out;
+  background: #ffffff; /* Blanc pur */
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.section-title {
+  color: #111827; /* Gris très foncé, pas noir pur */
+  border-left: 5px solid #3b82f6; /* Bleu moyen */
+  padding-left: 20px;
+  margin-bottom: 30px;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* --- BOUTON RETOUR --- */
+.back-button {
+  background: #ffffff;
+  color: #374151; /* Gris foncé */
+  font-size: 15px;
+  cursor: pointer;
+  padding: 12px 24px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  transition: all 0.2s;
+  border-radius: 12px;
+  border: 1.5px solid #d1d5db;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.back-button:hover {
+  background: #f9fafb;
+  color: #111827;
+  transform: translateX(-3px);
+  border-color: #9ca3af;
+}
+
+/* =========================================
+   4. PAGE D'ACCUEIL
+   ========================================= */
+.text-section {
+  text-align: center;
+  margin-top: 20px;
+  background: #ffffff;
+  padding: 60px 50px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #111827;
+  display: inline-block;
+  margin: 10px 0 30px 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Ligne décorative avec couleur douce */
+.underline1, .underline2 {
+  height: 4px;
+  background: linear-gradient(to right, #60a5fa, #3b82f6);
+  width: 60%;
+  margin: 10px auto 0 auto;
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+.start-button {
+  background: #2563eb; /* Bleu franc mais pas trop vif */
+  color: #ffffff;
+  border: none;
+  padding: 18px 48px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s;
+  text-transform: none; /* Pas de majuscules, plus lisible */
+  letter-spacing: 0.3px;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  background: #1d4ed8;
+}
+
+/* =========================================
+   5. CARTES & MODULES
+   ========================================= */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  padding-bottom: 50px;
+}
+
+.module-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-color: #3b82f6;
+}
+
+.module-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+  color: #111827;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.module-code {
+  background: #eff6ff; /* Bleu très très clair */
+  color: #1e40af; /* Bleu foncé pour contraste */
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.select-module-btn {
+  background: #f9fafb;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.module-card:hover .select-module-btn {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* =========================================
+   6. BOUTON CONTINUER (Vert doux)
+   ========================================= */
+.continue-button {
+  background: #059669; /* Vert émeraude, pas trop vif */
+  color: white;
+  border: none;
+  padding: 16px 40px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100%;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+}
+
+.continue-button:hover {
+  background: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.35);
+}
+
+/* =========================================
+   7. MODALE (Fond clair)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Overlay plus clair */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: #ffffff;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  padding: 24px 30px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.close-modal-btn {
+  background: #ffffff;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-modal-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+  transform: rotate(90deg);
+}
+
+/* =========================================
+   8. ÉTATS SPÉCIAUX
+   ========================================= */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px dashed #d1d5db;
+  margin: 20px auto;
+  max-width: 600px;
+  color: #6b7280;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.error-message {
+  background: #fef2f2;
+  color: #991b1b;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 20px 0;
+  text-align: center;
+  border: 1px solid #fecaca;
+  font-weight: 500;
+}
+
+/* =========================================
+   9. TRIANGLES (Subtils)
+   ========================================= */
+.triangles-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 20px;
+  opacity: 0.3; /* Très subtils pour ne pas distraire */
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-bottom: 35px solid #374151;
+  display: inline-block;
+  margin: 0 5px;
+  animation: float 8s infinite ease-in-out;
+}
+
+/* =========================================
+   10. ANIMATIONS
+   ========================================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* =========================================
+   11. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  body::after {
+    clip-path: polygon(0 0, 80% 0, 60% 100%, 0 100%);
+  }
+  
+  .header { height: 90px; }
+  .logo-container { 
+    top: 15px;
+    right: 15px;
+    padding: 12px 18px;
+  }
+  .logo-container img { height: 50px; }
+  
+  .title { font-size: 2rem; }
+  .section-title { font-size: 1.4rem; }
+  
+  .modules-grid { grid-template-columns: 1fr; }
+  
+  .section { 
+    padding: 25px; 
+    margin: 15px;
+  }
+}

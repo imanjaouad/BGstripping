@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calculateur de note module</title>
+<style>
+body { font-family: Arial; display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
+h2 { color: #333; }
+label { margin: 5px; }
+input { margin: 5px; width: 80px; }
+button { margin-top: 10px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+button:hover { background-color: #45a049; }
+#result { margin-top: 20px; font-weight: bold; font-size: 18px; }
+.container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; width: 300px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>Calculateur note module</h2>
+
+<label>Nom du module:</label>
+<input type="text" id="moduleName" placeholder="ex: Math"><br>
+
+<label>Coef du module:</label>
+<input type="number" id="coef" value="1"><br>
+
+<label>Note finale souhaitée (sur 20):</label>
+<input type="number" id="noteFinale" placeholder="ex: 14"><br>
+
+<button onclick="calculer()">Calculer</button>
+
+<div id="result"></div>
+</div>
+
+<script>
+function calculer(){
+    const noteFinale = parseFloat(document.getElementById('noteFinale').value);
+    if(isNaN(noteFinale) || noteFinale < 0 || noteFinale > 20){
+        alert("Merci de saisir une note finale entre 0 et 20");
+        return;
+    }
+
+    // CC sur 20, EFM sur 40
+    // Ratio 50/50 simplifié
+    const cc = noteFinale.toFixed(2);       // CC sur 20
+    const efm = (noteFinale * 2).toFixed(2); // EFM sur 40
+
+    const moduleName = document.getElementById('moduleName').value || "Module";
+    const coef = document.getElementById('coef').value || 1;
+
+    document.getElementById('result').innerHTML = 
+        `${moduleName} (coef ${coef}) :<br>` +
+        `CC sur 20 : ${cc}<br>` +
+        `EFM sur 40 : ${efm}`;
+}
+</script>
+
+</body>
+</html>

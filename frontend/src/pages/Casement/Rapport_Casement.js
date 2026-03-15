@@ -163,284 +163,284 @@ color:#9ca3af;
 
 /* ───────── COMPONENT ───────── */
 
-function RapportCasement(){
+function RapportCasement() {
 
-const casements = useSelector(state=>state.casement?.list || []);
+  const casements = useSelector(state => state.casement?.list || []);
 
-/* KPI CALCUL */
+  /* KPI CALCUL */
 
-const totalVolume = useMemo(()=>casements.reduce((s,c)=>s+Number(c.volume_casse||0),0),[casements]);
-const totalTemps  = useMemo(()=>casements.reduce((s,c)=>s+Number(c.temps||0),0),[casements]);
-const totalCoups  = useMemo(()=>casements.reduce((s,c)=>s+Number(c.nombreCoups||0),0),[casements]);
+  const totalVolume = useMemo(() => casements.reduce((s, c) => s + Number(c.volume_casse || 0), 0), [casements]);
+  const totalTemps = useMemo(() => casements.reduce((s, c) => s + Number(c.temps || 0), 0), [casements]);
+  const totalCoups = useMemo(() => casements.reduce((s, c) => s + Number(c.nombreCoups || 0), 0), [casements]);
 
-const rendement   = totalTemps>0 ? (totalVolume/totalTemps).toFixed(2) : 0;
+  const rendement = totalTemps > 0 ? (totalVolume / totalTemps).toFixed(2) : 0;
 
-const nbMarche    = useMemo(()=>casements.filter(c=>c.etatMachine==="En marche").length,[casements]);
+  const nbMarche = useMemo(() => casements.filter(c => c.etatMachine === "En marche").length, [casements]);
 
-const txDispo = casements.length>0 ? ((nbMarche/casements.length)*100).toFixed(1) : 0;
+  const txDispo = casements.length > 0 ? ((nbMarche / casements.length) * 100).toFixed(1) : 0;
 
-/* GROUP BY MONTH */
+  /* GROUP BY MONTH */
 
-const MONTHS=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+  const MONTHS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
-const monthlyStats = useMemo(()=>{
+  const monthlyStats = useMemo(() => {
 
-const map={};
+    const map = {};
 
-casements.forEach(c=>{
+    casements.forEach(c => {
 
-if(!c.date) return;
+      if (!c.date) return;
 
-const m=MONTHS[new Date(c.date).getMonth()];
+      const m = MONTHS[new Date(c.date).getMonth()];
 
-if(!map[m]) map[m]={volume:0,temps:0,coups:0,ops:0};
+      if (!map[m]) map[m] = { volume: 0, temps: 0, coups: 0, ops: 0 };
 
-map[m].volume+=Number(c.volume_casse||0);
-map[m].temps+=Number(c.temps||0);
-map[m].coups+=Number(c.nombreCoups||0);
-map[m].ops++;
+      map[m].volume += Number(c.volume_casse || 0);
+      map[m].temps += Number(c.temps || 0);
+      map[m].coups += Number(c.nombreCoups || 0);
+      map[m].ops++;
 
-});
+    });
 
-return map;
+    return map;
 
-},[casements]);
+  }, [casements]);
 
-/* GROUP BY ROCK */
+  /* GROUP BY ROCK */
 
-const rocheStats = useMemo(()=>{
+  const rocheStats = useMemo(() => {
 
-const map={};
+    const map = {};
 
-casements.forEach(c=>{
+    casements.forEach(c => {
 
-const r=c.type_roche||"Inconnu";
+      const r = c.type_roche || "Inconnu";
 
-if(!map[r]) map[r]={volume:0,ops:0};
+      if (!map[r]) map[r] = { volume: 0, ops: 0 };
 
-map[r].volume+=Number(c.volume_casse||0);
-map[r].ops++;
+      map[r].volume += Number(c.volume_casse || 0);
+      map[r].ops++;
 
-});
+    });
 
-return map;
+    return map;
 
-},[casements]);
+  }, [casements]);
 
-/* EXPORT EXCEL */
+  /* EXPORT EXCEL */
 
-const exportRapport=()=>{
+  const exportRapport = () => {
 
-const wb=XLSX.utils.book_new();
+    const wb = XLSX.utils.book_new();
 
-const resume=[
-["Rapport Casement ZD11"],
-[],
-["Indicateur","Valeur","Unité"],
-["Opérations",casements.length,"ops"],
-["Volume Total",totalVolume,"t"],
-["Heures Totales",totalTemps,"h"],
-["Coups BRH",totalCoups,"coups"],
-["Rendement",rendement,"t/h"],
-["Disponibilité",txDispo,"%"]
-];
+    const resume = [
+      ["Rapport Casement ZD11"],
+      [],
+      ["Indicateur", "Valeur", "Unité"],
+      ["Opérations", casements.length, "ops"],
+      ["Volume Total", totalVolume, "t"],
+      ["Heures Totales", totalTemps, "h"],
+      ["Coups BRH", totalCoups, "coups"],
+      ["Rendement", rendement, "t/h"],
+      ["Disponibilité", txDispo, "%"]
+    ];
 
-XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(resume),"Résumé");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(resume), "Résumé");
 
-const mensuel=[
-["Mois","Opérations","Volume","Coups","Heures","Rendement"],
-...Object.entries(monthlyStats).map(([m,d])=>[
-m,d.ops,d.volume,d.coups,d.temps,
-d.temps>0?(d.volume/d.temps).toFixed(2):0
-])
-];
+    const mensuel = [
+      ["Mois", "Opérations", "Volume", "Coups", "Heures", "Rendement"],
+      ...Object.entries(monthlyStats).map(([m, d]) => [
+        m, d.ops, d.volume, d.coups, d.temps,
+        d.temps > 0 ? (d.volume / d.temps).toFixed(2) : 0
+      ])
+    ];
 
-XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(mensuel),"Mensuel");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(mensuel), "Mensuel");
 
-saveAs(
-new Blob([XLSX.write(wb,{bookType:"xlsx",type:"array"})],
-{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
-),
-"rapport_casement_ZD11.xlsx"
-);
+    saveAs(
+      new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })],
+        { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+      ),
+      "rapport_casement_ZD11.xlsx"
+    );
 
-};
+  };
 
-/* KPI LIST */
+  /* KPI LIST */
 
-const kpis=[
+  const kpis = [
 
-{label:"Opérations",value:casements.length},
-{label:"Volume Total",value:totalVolume+" t"},
-{label:"Rendement Moyen",value:rendement+" t/h"},
-{label:"Coups BRH",value:totalCoups},
-{label:"Heures Totales",value:totalTemps+" h"},
-{label:"Disponibilité",value:txDispo+" %"}
+    { label: "Opérations", value: casements.length },
+    { label: "Volume Total", value: totalVolume + " t" },
+    { label: "Rendement Moyen", value: rendement + " t/h" },
+    { label: "Coups BRH", value: totalCoups },
+    { label: "Heures Totales", value: totalTemps + " h" },
+    { label: "Disponibilité", value: txDispo + " %" }
 
-];
+  ];
 
-/* RENDER */
+  /* RENDER */
 
-return(
+  return (
 
-<>
-<style>{CSS}</style>
+    <>
+      <style>{CSS}</style>
 
-<div className="casement-root">
+      <div className="casement-root">
 
-{/* HEADER */}
+        {/* HEADER */}
 
-<div className="casement-header">
+        <div className="casement-header">
 
-<div>
+          <div>
 
-<div className="casement-title">
-Rapport Casement ZD11
-</div>
+            <div className="casement-title">
+              Rapport Casement ZD11
+            </div>
 
-<div className="casement-sub">
-Synthèse des opérations de casement
-</div>
+            <div className="casement-sub">
+              Synthèse des opérations de casement
+            </div>
 
-</div>
+          </div>
 
-<div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
 
-<img src={image} alt="logo" style={{height:40}}/>
+            <img src={image} alt="logo" style={{ height: 40 }} />
 
-<button className="btn-export" onClick={exportRapport}>
-Télécharger Excel
-</button>
+            <button className="btn-export" onClick={exportRapport}>
+              Télécharger Excel
+            </button>
 
-</div>
+          </div>
 
-</div>
+        </div>
 
-{/* KPI */}
+        {/* KPI */}
 
-<div className="kpi-grid">
+        <div className="kpi-grid">
 
-{kpis.map((k,i)=>(
+          {kpis.map((k, i) => (
 
-<div key={i} className="kpi-card">
+            <div key={i} className="kpi-card">
 
-<div className="kpi-label">
-{k.label}
-</div>
+              <div className="kpi-label">
+                {k.label}
+              </div>
 
-<div className="kpi-value">
-{k.value}
-</div>
+              <div className="kpi-value">
+                {k.value}
+              </div>
 
-</div>
+            </div>
 
-))}
+          ))}
 
-</div>
+        </div>
 
-{/* MONTHLY */}
+        {/* MONTHLY */}
 
-<div className="section-title">
-Rapport Mensuel
-</div>
+        <div className="section-title">
+          Rapport Mensuel
+        </div>
 
-<div className="card">
+        <div className="card">
 
-{Object.keys(monthlyStats).length>0 ? (
+          {Object.keys(monthlyStats).length > 0 ? (
 
-<table className="table">
+            <table className="table">
 
-<thead>
-<tr>
-<th>Mois</th>
-<th>Opérations</th>
-<th>Volume</th>
-<th>Coups</th>
-<th>Heures</th>
-<th>Rendement</th>
-</tr>
-</thead>
+              <thead>
+                <tr>
+                  <th>Mois</th>
+                  <th>Opérations</th>
+                  <th>Volume</th>
+                  <th>Coups</th>
+                  <th>Heures</th>
+                  <th>Rendement</th>
+                </tr>
+              </thead>
 
-<tbody>
+              <tbody>
 
-{Object.entries(monthlyStats).map(([m,d])=>(
+                {Object.entries(monthlyStats).map(([m, d]) => (
 
-<tr key={m}>
-<td><b>{m}</b></td>
-<td>{d.ops}</td>
-<td><b>{d.volume}</b> t</td>
-<td>{d.coups}</td>
-<td>{d.temps}</td>
-<td><b>{d.temps>0?(d.volume/d.temps).toFixed(2):0}</b> t/h</td>
-</tr>
+                  <tr key={m}>
+                    <td><b>{m}</b></td>
+                    <td>{d.ops}</td>
+                    <td><b>{d.volume}</b> t</td>
+                    <td>{d.coups}</td>
+                    <td>{d.temps}</td>
+                    <td><b>{d.temps > 0 ? (d.volume / d.temps).toFixed(2) : 0}</b> t/h</td>
+                  </tr>
 
-))}
+                ))}
 
-</tbody>
+              </tbody>
 
-</table>
+            </table>
 
-):(
+          ) : (
 
-<div className="empty">
-Aucune donnée disponible
-</div>
+            <div className="empty">
+              Aucune donnée disponible
+            </div>
 
-)}
+          )}
 
-</div>
+        </div>
 
-{/* ROCK */}
+        {/* ROCK */}
 
-<div className="section-title">
-Répartition Type Roche
-</div>
+        <div className="section-title">
+          Répartition Type Roche
+        </div>
 
-<div className="card">
+        <div className="card">
 
-{Object.entries(rocheStats).map(([r,d])=>{
+          {Object.entries(rocheStats).map(([r, d]) => {
 
-const pct=totalVolume>0?((d.volume/totalVolume)*100).toFixed(1):0;
+            const pct = totalVolume > 0 ? ((d.volume / totalVolume) * 100).toFixed(1) : 0;
 
-return(
+            return (
 
-<div key={r} style={{marginBottom:14}}>
+              <div key={r} style={{ marginBottom: 14 }}>
 
-<div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
 
-<div><b>{r}</b></div>
-<div>{pct}%</div>
+                  <div><b>{r}</b></div>
+                  <div>{pct}%</div>
 
-</div>
+                </div>
 
-<div className="progress">
-<div className="progress-bar" style={{width:pct+"%"}}/>
-</div>
+                <div className="progress">
+                  <div className="progress-bar" style={{ width: pct + "%" }} />
+                </div>
 
-</div>
+              </div>
 
-);
+            );
 
-})}
+          })}
 
-</div>
+        </div>
 
-{casements.length===0 && (
+        {casements.length === 0 && (
 
-<div className="empty">
+          <div className="empty">
 
-<div style={{fontSize:50}}>📋</div>
-<div>Aucune opération enregistrée</div>
+            <div style={{ fontSize: 50 }}>📋</div>
+            <div>Aucune opération enregistrée</div>
 
-</div>
+          </div>
 
-)}
+        )}
 
-</div>
+      </div>
 
-</>
+    </>
 
-);
+  );
 
 }
 

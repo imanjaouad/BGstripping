@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCasements } from "../../features/casementSlice";
 import image from "../../images/image3.webp";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -193,7 +194,13 @@ const CSS = `
 
 function AccueilCasement() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const casements = useSelector((s) => s.casement?.list || []);
+
+  // Load data from API on mount
+  useEffect(() => {
+    dispatch(fetchCasements());
+  }, [dispatch]);
 
   const totalVolume = casements.reduce(
     (a, c) => a + Number(c.volume_casse || 0),
@@ -208,12 +215,12 @@ function AccueilCasement() {
   const rendMoyen =
     totalOps > 0
       ? (
-          casements.reduce((a, c) => {
-            const v = Number(c.volume_casse || 0),
-              t = Number(c.temps || 0);
-            return a + (t > 0 ? v / t : 0);
-          }, 0) / totalOps
-        ).toFixed(1)
+        casements.reduce((a, c) => {
+          const v = Number(c.volume_casse || 0),
+            t = Number(c.temps || 0);
+          return a + (t > 0 ? v / t : 0);
+        }, 0) / totalOps
+      ).toFixed(1)
       : 0;
   const enMarcheCnt = casements.filter(
     (c) => c.etatMachine === "En marche",

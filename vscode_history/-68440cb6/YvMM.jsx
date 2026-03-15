@@ -1,0 +1,187 @@
+import React from 'react';
+
+const styles = `
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f5f5;
+  }
+
+  .container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .header {
+    position: relative;
+    background-color: #2563eb;
+    padding: 60px 32px 80px 32px;
+    text-align: center;
+  }
+
+  .wave {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: white;
+    clip-path: polygon(0 40%, 5% 35%, 10% 40%, 15% 35%, 20% 40%, 25% 35%, 30% 40%, 35% 35%, 40% 40%, 45% 35%, 50% 40%, 55% 35%, 60% 40%, 65% 35%, 70% 40%, 75% 35%, 80% 40%, 85% 35%, 90% 40%, 95% 35%, 100% 40%, 100% 100%, 0 100%);
+  }
+
+  .logo-box {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    color: white;
+    font-size: 48px;
+  }
+
+  .logo-text {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 4px;
+  }
+
+  .logo-subtitle {
+    color: #dbeafe;
+    font-style: italic;
+    font-size: 16px;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 60px 32px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .section {
+    margin-bottom: 60px;
+  }
+
+  .section-title {
+    font-size: 48px;
+    font-weight: 900;
+    color: #111827;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  .section-underline {
+    height: 6px;
+    width: 100%;
+    background-color: #2563eb;
+    margin-bottom: 40px;
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .button {
+    padding: 20px;
+    border: 3px solid #1e3a8a;
+    border-radius: 12px;
+    background-color: #dbeafe;
+    color: #2563eb;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+  }
+
+  .button:hover {
+    background-color: #bfdbfe;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  }
+
+  .button:active {
+    transform: translateY(0);
+  }
+`;
+
+export default function EtudiaSelection() {
+  const handleAnnee = (annee) => {
+    alert(`Tu as sélectionné: ${annee}`);
+  };
+
+  const handleNiveau = (niveau) => {
+    alert(`Tu as sélectionné: ${niveau}`);
+  };
+
+  return (
+    <>
+      <style>{styles}</style>
+      <div className="container">
+        {/* Header */}
+        <div className="header">
+          <div className="logo-box">
+            <span className="logo-icon">🎓</span>
+          </div>
+          <h1 className="logo-text">Etudia</h1>
+          <p className="logo-subtitle">Learn more</p>
+          <div className="wave"></div>
+        </div>
+
+        {/* Main Content */}
+        <div className="main-content">
+          {/* Section Année */}
+          <div className="section">
+            <h2 className="section-title">Tu es dans :</h2>
+            <div className="section-underline"></div>
+            <div className="button-group">
+              <button className="button" onClick={() => handleAnnee('1er Année')}>
+                1er Année
+              </button>
+              <button className="button" onClick={() => handleAnnee('2eme Année')}>
+                2eme Année
+              </button>
+              <button className="button" onClick={() => handleAnnee('3eme Année')}>
+                3eme Année
+              </button>
+            </div>
+          </div>
+
+          {/* Section Niveau */}
+          <div className="section">
+            <h2 className="section-title">Niveau :</h2>
+            <div className="section-underline"></div>
+            <div className="button-group">
+              <button className="button" onClick={() => handleNiveau('Technicien')}>
+                Technicien
+              </button>
+              <button className="button" onClick={() => handleNiveau('Technicien Spécialisé')}>
+                Technicien Spécialisé
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

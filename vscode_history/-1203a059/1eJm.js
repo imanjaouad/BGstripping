@@ -1,0 +1,34 @@
+// Import des modules :
+const express = require("express");
+const axios = require("axios");
+require("dotenv").config();
+
+// application express
+const app = express();
+
+// 3️⃣ middleware pour lire les données json :
+app.use(express.json());
+
+// confiuration de axios :
+const gitlabAPI = axios.create({
+  baseURL: "https://gitlab.com/api/v4",
+  headers: {
+    "PRIVATE-TOKEN": process.env.GITLAB_TOKEN,
+  },
+});
+
+
+app.get("/", (req, res) => {
+  res.json({ message: "API GitLab active" });
+});
+
+app.get("/projects", async (req, res) => {
+  try {
+    const response = await gitlabAPI.get("/projects?owned=true");
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({error: "Erreur lors de la récupération des projets"});
+  }
+});
+
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PC Portable</title>
+    <link href="bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="./bootstrap.bundle.min.js"></script>
+    <script src="./react.development.js"></script>
+    <script src="./react-dom.development.js"></script>
+    <script src="./babel.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+
+<script type="text/babel">
+  const listOfProducts = [
+    {image:"pictures/HP16D0195NF.jpg", name:"PC Portable Gamer HP VICTUS", prix:"7490"},
+    {image:"pictures/HP14424U3EA.jpg", name:"PC Portable Gamer HP VICTUS", prix:"2190"},
+    {image:"pictures/NXATHEF002.jpg", name:"Pc Portable Chromebook Acer", prix:"3640"},
+    {image:"pictures/HUA6901443442959.jpg", name:"PC Portable - HUAWEI", prix:"1270"}
+  ];
+
+  // Composant reutilisable:
+  var Product = function Product({image, name, prix}) {
+    return (
+      <div className="container">
+      <div className="row">
+      <div className="card m-2" style={{width: "300px",border:"5px solid black"}}>
+        <img src={image} className="card" alt={name} />
+        <div className="card-body" style={{border:"5px solid black"}}>
+          <h5 className="card-title">{name}</h5>
+          <p className="card-text">Prix: {prix} DH</p>
+        </div>
+      </div>
+      </div>
+      </div>
+
+    );
+  }
+
+  var ProductsPage =function ProductsPage() {
+    return (
+      <div className="flex" style={{display:"flex",gap:"20px",textAlign:"center",backgroundColor:"beige"}}>
+        {listOfProducts.map((el, index) => (
+          <Product key={index} image={el.image} name={el.name} prix=<b>{el.prix}</b> />
+        ))}
+      </div>
+    );
+  }
+
+  ReactDOM.render(<ProductsPage />, document.getElementById("app"));
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Test React JSX avec Babel</title>
+
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script type="text/babel">
+    const elems = ["Element1", "Element2", "Element3", "Element4", "Element5"];
+
+    function ListeElements(props) {
+        return (
+            <ul>
+                {props.elems.map((elem, index) => (
+                    <li key={index}>{elem}</li>
+                ))}
+            </ul>
+        );
+    }
+
+    
+    ReactDOM.render(
+        <div style={{ color: 'red' }}>
+            <ListeElements elems={elems} />
+        </div>,
+        document.getElementById("app")
+    );
+  </script>
+</body>
+</html>

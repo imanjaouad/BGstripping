@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div id="holiday">
+        <button onclick="afficherHolidays">Afficher Holidays</button>
+    </div>
+
+    <div id="holidays"></div>
+<script>
+    async function afficherHolidays() {
+        
+    const holidays = document.getElementById("holidays");
+
+    holidays.innerHTML = "<p>Au chargement ...</p>";
+    }
+
+    try{
+        const response = await fetch ("https://date.nager.at/api/v3/PublicHolidays/2025/MA");
+
+        const data = await response.json();
+        div.innerHTML ="";
+        data.array.forEach(jour => {
+            const el = document.createElement("p");
+            el.textContent=`${jour.date} et ${jour.localName}`;
+            div.appendChild(el);
+        });
+
+    }catch(error){
+        div.innerHTML="<p> Erreur au niveau de chargement des informations</p>";
+        
+    }
+
+
+
+
+
+
+
+    
+
+</script>
+    
+</body>
+</html>

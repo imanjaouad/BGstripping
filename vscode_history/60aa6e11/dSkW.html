@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Test React JSX avec Babel</title>
+
+  <script src="./react.development.js" ></script>
+  <script src="./react-dom.development.js" ></script>
+  <script src="./babel.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script type="text/babel">
+    
+var elems = ["Element1", "Element2", "Element3", "Element4", 
+"Element5"];
+class Element extends React.Component {
+    constructor(props) {
+        super(props);
+}
+render() {
+    return <li
+style={{color:this.props.color}}>{this.props.elem}</li>
+}
+}
+
+class ListeElements extends React.Component {
+    constructor(props) {
+        super(props);
+}
+render() {
+    return <ul>
+    {
+        this.props.elems.map((elem, index) => {
+            return <Element key={index} elem={elem}
+color={this.props.color} />
+    })
+}
+</ul>
+}
+}
+ReactDOM.render(<ListeElements elems={elems} color="red" />, 
+document.getElementById("app"));
+
+var listofprodcutcs = [
+    {image:"",name:"pc1",prix:"7000"},
+    {image:"",name:"pc2",prix:"4000"},
+    {image:"",name:"pc3",prix:"3000"},
+    {image:"",name:"pc4",prix:"2500"},
+
+]
+var ProductPage=function(){
+    return <h1>list de products</h1>
+}
+  </script>
+</body>
+</html>

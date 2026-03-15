@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div id="holiday">
+        <button id="btn1" onclick="afficherHolidays()">Afficher Holidays</button>
+    </div>
+
+    <div id="holidays"></div>
+<script>
+    
+    const but = document.getElementById("btn1");
+    const div1 = document.getElementById("holidays");
+
+    but.addEventListener("click",afficherHolidays);
+
+    async function afficherHolidays(){
+        
+    const holidays = document.getElementById("holidays");
+    
+
+    try{
+        const response = await fetch ("https://date.nager.at/api/v3/PublicHolidays/2025/MA");
+
+        const data = await response.json();
+        .innerHTML ="";
+        data.forEach(jour => {
+            const el = document.createElement("p");
+            el.textContent=`${jour.date} et ${jour.localName}`;
+            div.appendChild(el);
+        });
+
+    }catch(error){
+        div.innerHTML="<p> Erreur au niveau de chargement des informations</p>";
+        alert("Erreur au niveau des données !");
+        console.error(error);
+    }
+    }
+
+
+</script>
+    
+</body>
+</html>

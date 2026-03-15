@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🔍 Trouver un compte partout</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+}
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+h1 { text-align: center; margin-bottom: 1.5rem; }
+#input-nom {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+#btn-rechercher {
+  width: 100%;
+  padding: 12px;
+  background: #4267B2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+#btn-rechercher:hover { background: #365899; }
+#resultats { margin-top: 1.5rem; }
+.compte {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  background: #fafafa;
+}
+.compte h3 { margin-bottom: 0.5rem; }
+.compte a { color: #4267B2; text-decoration: none; }
+.compte a:hover { text-decoration: underline; }
+  </style>
+</head>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🔍 Recherche Nom → Comptes Sociaux</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Trouver les comptes d'une personne</h1>
+    <input type="text" id="input-nom" placeholder="Ex: Jean Dupont"/>
+    <button id="btn-rechercher">Rechercher</button>
+    <div id="resultats"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+  <script>
+    // === Éléments DOM ===
+const inputNom = document.getElementById("input-nom");
+const btnRechercher = document.getElementById("btn-rechercher");
+const resultats = document.getElementById("resultats");
+
+// === Générer des pseudos possibles à partir du nom ===
+function genererPseudos(nom) {
+  const mots = nom.toLowerCase().split(' ');
+  const pseudos = [
+    mots.join(''),      // "jeandupont"
+    mots.join('.'),     // "jean.dupont"
+    mots.join('_'),     // "jean_dupont"
+    mots[0] + mots[1],  // "jeandupont"
+    mots[0] + '.' + mots[1], // "jean.dupont"
+    mots[1] + mots[0],  // "dupontjean"
+  ];
+  return [...new Set(pseudos)]; // Éviter les doublons
+}
+
+// === Recherche principale ===
+btnRechercher.addEventListener("click", async () => {
+  const nom = inputNom.value.trim();
+  if (!nom) return alert("Veuillez entrer un nom !");
+  resultats.innerHTML = "<p>Recherche en cours...</p>";
+
+  const comptes = [];
+  const pseudos = genererPseudos(nom);
+
+  // 1. Recherche Google (profils publics)
+  await rechercherGoogle(nom, comptes);
+
+  // 2. Vérification directe des profils (HEAD requests)
+  for (const pseudo of pseudos) {
+    await verifierInstagram(pseudo, comptes);
+    await verifierTikTok(pseudo, comptes);
+    await verifierSnapchat(pseudo, comptes);
+    await verifierGitHub(pseudo, comptes);
+    await verifierReddit(pseudo, comptes);
+  }
+
+  // 3. Twitter (API publique sans clé)
+  await rechercherTwitter(nom, comptes);
+
+  // 4. LinkedIn (recherche publique)
+  await rechercherLinkedIn(nom, comptes);
+
+  // === Affichage des résultats ===
+  afficherResultats(comptes);
+});
+
+// === 1. Google Search (via dorks) ===
+async function rechercherGoogle(nom, comptes) {
+  const dorks = [
+    `site:facebook.com/in/ "${nom}"`,
+    `site:instagram.com "${nom}"`,
+    `site:tiktok.com "@" "${nom}"`,
+    `site:twitter.com "${nom}"`,
+    `site:linkedin.com/in/ "${nom}"`,
+    `site:github.com "${nom}"`,
+    `site:reddit.com/user/ "${nom}"`,
+  ];
+
+  for (const dork of dorks) {
+    const url = `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
+    try {
+      const html = await fetch(url).then(r => r.text());
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const links = doc.querySelectorAll('a[href]');
+      
+      links.forEach(link => {
+        const href = link.href;
+        if (href.includes('facebook.com/in/')) 
+          comptes.push({ reseau: "Facebook", pseudo: href.split("/").pop(), lien: href });
+        else if (href.includes('instagram.com/')) 
+          comptes.push({ reseau: "Instagram", pseudo: href.split("/").pop(), lien: href });
+        else if (href.includes('tiktok.com/@')) 
+          comptes.push({ reseau: "TikTok", pseudo: href.split("@")[1], lien: href });
+        else if (href.includes('twitter.com/')) 
+          comptes.push({ reseau: "Twitter", pseudo: href.split("/").pop(), lien: href });
+        else if (href.includes('linkedin.com/in/')) 
+          comptes.push({ reseau: "LinkedIn", pseudo: href.split("/").pop(), lien: href });
+        else if (href.includes('github.com/')) 
+          comptes.push({ reseau: "GitHub", pseudo: href.split("/").pop(), lien: href });
+        else if (href.includes('reddit.com/user/')) 
+          comptes.push({ reseau: "Reddit", pseudo: href.split("/").pop(), lien: href });
+      });
+    } catch (err) { console.error("Erreur Google:", err); }
+  }
+}
+
+// === 2. Vérification directe des profils ===
+async function verifierInstagram(pseudo, comptes) {
+  try {
+    const res = await fetch(`https://www.instagram.com/${pseudo}/?__a=1`, { method: "HEAD" });
+    if (res.status === 200) {
+      comptes.push({ reseau: "Instagram", pseudo, lien: `https://instagram.com/${pseudo}` });
+    }
+  } catch (err) { }
+}
+
+async function verifierTikTok(pseudo, comptes) {
+  try {
+    const res = await fetch(`https://www.tiktok.com/@${pseudo}`, { method: "HEAD" });
+    if (res.status === 200) {
+      comptes.push({ reseau: "TikTok", pseudo, lien: `https://tiktok.com/@${pseudo}` });
+    }
+  } catch (err) { }
+}
+
+async function verifierSnapchat(pseudo, comptes) {
+  try {
+    const res = await fetch(`https://www.snapchat.com/add/${pseudo}`, { method: "HEAD" });
+    if (res.status === 200) {
+      comptes.push({ reseau: "Snapchat", pseudo, lien: `https://snapchat.com/add/${pseudo}` });
+    }
+  } catch (err) { }
+}
+
+async function verifierGitHub(pseudo, comptes) {
+  try {
+    const res = await fetch(`https://api.github.com/users/${pseudo}`);
+    if (res.status === 200) {
+      comptes.push({ reseau: "GitHub", pseudo, lien: `https://github.com/${pseudo}` });
+    }
+  } catch (err) { }
+}
+
+async function verifierReddit(pseudo, comptes) {
+  try {
+    const res = await fetch(`https://www.reddit.com/user/${pseudo}/about.json`);
+    if (res.status === 200) {
+      comptes.push({ reseau: "Reddit", pseudo, lien: `https://reddit.com/user/${pseudo}` });
+    }
+  } catch (err) { }
+}
+
+// === 3. Twitter (API publique sans clé) ===
+async function rechercherTwitter(nom, comptes) {
+  try {
+    const res = await fetch(`https://twitter.com/i/api/graphql/xQy2w8Y4j1qC5r7vY9z1A/UserByScreenName?variables={"screen_name":"${nom}"}`);
+    if (res.status === 200) {
+      const data = await res.json();
+      const user = data.data.user;
+      comptes.push({ reseau: "Twitter", pseudo: user.legacy.screen_name, lien: `https://twitter.com/${user.legacy.screen_name}` });
+    }
+  } catch (err) { }
+}
+
+// === 4. LinkedIn (recherche publique) ===
+async function rechercherLinkedIn(nom, comptes) {
+  try {
+    const res = await fetch(`https://www.linkedin.com/pub/dir/?first=${nom.split(' ')[0]}&last=${nom.split(' ')[1]}`, { method: "HEAD" });
+    if (res.status === 200) {
+      comptes.push({ reseau: "LinkedIn", pseudo: nom, lien: `https://www.linkedin.com/pub/dir/?first=${nom.split(' ')[0]}&last=${nom.split(' ')[1]}` });
+    }
+  } catch (err) { }
+}
+
+// === Affichage des résultats ===
+function afficherResultats(comptes) {
+  if (comptes.length === 0) {
+    resultats.innerHTML = "<p>Aucun compte trouvé.</p>";
+  } else {
+    resultats.innerHTML = comptes.map(compte => `
+      <div class="compte">
+        <h3>${compte.reseau}</h3>
+        <a href="${compte.lien}" target="_blank">@${compte.pseudo}</a>
+      </div>
+    `).join("");
+  }
+}
+  </script>
+
+</body>
+</html>

@@ -4,8 +4,8 @@ import heroImage from "../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png";
 import logo from "../images/logo.png";
 
 const modeRoutes = {
-  poussage: "/operations/poussage",
-  encasement: "/operations/encasement",
+  poussage: "/poussage",
+  casement: "/operations/casement",
   transport: "/operations/transport",
 };
 
@@ -37,7 +37,7 @@ export default function LoginPage() {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
       });
 
       const payload = await response.json();
@@ -110,7 +110,7 @@ export default function LoginPage() {
               <select value={mode} onChange={(event) => setMode(event.target.value)} required>
                 <option value="">Selectionner un mode</option>
                 <option value="poussage">Poussage</option>
-                <option value="encasement">Encasement</option>
+                <option value="casement">Casement</option>
                 <option value="transport">Transport</option>
               </select>
             </label>
