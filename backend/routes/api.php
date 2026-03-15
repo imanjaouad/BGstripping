@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-// use App\Http\Controllers\CasementController;
+use App\Http\Controllers\CasementController;
 // use App\Http\Controllers\MachineController;
 use App\Http\Controllers\PoussageController;
 use Illuminate\Support\Facades\Route;
@@ -17,10 +17,10 @@ Route::put('/poussages/{poussage}', [PoussageController::class , 'update']);
 Route::delete('/poussages/{poussage}', [PoussageController::class , 'destroy']);
 
 // ─── Casements ────────────────────────────────────────────────────────────────
-// Route::get('/casements', [CasementController::class , 'index']);
-// Route::post('/casements', [CasementController::class , 'store']);
-// Route::put('/casements/{casement}', [CasementController::class , 'update']);
-// Route::delete('/casements/{casement}', [CasementController::class , 'destroy']);
+Route::get('/casements', [CasementController::class , 'index']);
+Route::post('/casements', [CasementController::class , 'store']);
+Route::put('/casements/{casement}', [CasementController::class , 'update']);
+Route::delete('/casements/{casement}', [CasementController::class , 'destroy']);
 
 // ─── Routes publiques ─────────────────────────────────────────────────────────
 Route::post('/login', [AuthController::class , 'login']);
