@@ -1,0 +1,22 @@
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+
+const app = express();
+app.use(express.json());
+
+const SECRET_KEY= "secret123";
+const USERS_FILE= "./users.json";
+
+if(!fs.existsSync(USERS_FILE)){
+    fs.writeFile("USERS_FILE",[]);
+}
+
+
+// inscription d'un utilisateur :
+
+app.post("/register",async(req,res)=>{
+    const {email,password} =req.body;
+})
+

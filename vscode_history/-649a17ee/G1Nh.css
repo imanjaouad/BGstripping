@@ -1,0 +1,75 @@
+/* Header.css */
+
+.header {
+  background-color: #f0f0f0; /* Light background for the header */
+  padding: 20px;
+  text-align: center;
+  position: relative; /* Needed for absolute positioning of the splash */
+  overflow: hidden; /* Prevents the splash from overflowing */
+}
+
+.header-top {
+  position: relative; /* For positioning the cloud/splash */
+  margin-bottom: 20px; /* Add some space between top and bottom sections */
+}
+
+.blue-splash {
+  position: absolute;
+  top: -20px; /* Adjust to move the splash up/down */
+  left: 50%; /* Center the splash horizontally */
+  transform: translateX(-50%); /* Correctly center the splash */
+  width: 120%; /* Make it wider than the header */
+  height: 100px; /* Adjust the height of the splash */
+  background-color: #ADD8E6; /* Light blue color */
+  border-radius: 50%; /* Make it rounded */
+  z-index: -1; /* Place it behind the text */
+  opacity: 0.7; /* Adjust transparency if needed */
+}
+
+.graduation-cap {
+  font-size: 2em; /* Adjust size as needed */
+  margin-bottom: 10px;
+}
+
+h1 {
+  margin: 0; /* Remove default margin from the heading */
+  font-size: 2.5em; /* Adjust size as needed */
+  color: #333; /* Darker color for the heading */
+}
+
+.learn-more {
+  font-size: 0.8em;
+  color: #555;
+  cursor: pointer; /* Indicate it's clickable */
+}
+
+.header-bottom {
+  margin-top: 20px;
+  padding-bottom: 20px; /* Add padding at the bottom */
+  border-bottom: 1px solid #ccc; /* Add a subtle bottom border */
+}
+
+.header-bottom p {
+  margin: 5px 0; /* Add spacing between the paragraphs */
+}
+
+.blue-mountains {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px; /* Add some space above the mountains */
+}
+
+.mountain {
+  width: 30px; /* Adjust as needed */
+  height: 20px; /* Adjust as needed */
+  background-color: #ADD8E6; /* Light blue color */
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Create a triangle shape */
+  margin: 0 5px; /* Spacing between mountains */
+}
+
+.star {
+  font-size: 1.2em; /* Adjust size as needed */
+  margin-left: 5px;
+  color: gold; /* Make the star gold */
+}

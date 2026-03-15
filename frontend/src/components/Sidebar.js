@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaHome, FaCogs, FaChartBar, FaHistory } from "react-icons/fa";
+import { FaTachometerAlt, FaPencilAlt, FaChartLine, FaHistory, FaArrowLeft, FaCoins } from "react-icons/fa";
 import image from "../images/image.jpeg";
 import "../components/animations.css";
 
@@ -43,26 +43,36 @@ function Sidebar() {
 
         <li className="sidebar-nav-item">
           <NavLink
-            to="/DashboardComplet"
-            end
-            className={({ isActive }) =>
-              isActive ? "sidebar-link active" : "sidebar-link"
-            }
+            to="/"
+            className="sidebar-link"
           >
-            <span className="nav-icon"><FaHome /></span>
-            <span className="nav-label">Tableau de Bord</span>
+            <span className="nav-icon"><FaArrowLeft /></span>
+            <span className="nav-label" style={{ fontWeight: 800, color: '#10b981' }}>Retour Accueil</span>
             <span className="nav-indicator"></span>
           </NavLink>
         </li>
          <li className="sidebar-nav-item">
           <NavLink
-            to="/"
+            to="/poussage/DashboardComplet"
             end
             className={({ isActive }) =>
               isActive ? "sidebar-link active" : "sidebar-link"
             }
           >
-            <span className="nav-icon"><FaHome /></span>
+            <span className="nav-icon"><FaTachometerAlt /></span>
+            <span className="nav-label">Tableau de Bord</span>
+            <span className="nav-indicator"></span>
+          </NavLink>
+        </li>
+        <li className="sidebar-nav-item">
+          <NavLink
+            to="/poussage"
+            end
+            className={({ isActive }) =>
+              isActive ? "sidebar-link active" : "sidebar-link"
+            }
+          >
+            <span className="nav-icon"><FaPencilAlt /></span>
             <span className="nav-label">Gestion</span>
             <span className="nav-indicator"></span>
           </NavLink>
@@ -71,12 +81,12 @@ function Sidebar() {
 
         <li className="sidebar-nav-item">
           <NavLink
-            to="/statistique"
+            to="/poussage/statistique"
             className={({ isActive }) =>
               isActive ? "sidebar-link active" : "sidebar-link"
             }
           >
-            <span className="nav-icon"><FaChartBar /></span>
+            <span className="nav-icon"><FaChartLine /></span>
             <span className="nav-label">Statistiques</span>
             <span className="nav-indicator"></span>
           </NavLink>
@@ -84,7 +94,7 @@ function Sidebar() {
 
         <li className="sidebar-nav-item">
           <NavLink
-            to="/historique"
+            to="/poussage/historique"
             className={({ isActive }) =>
               isActive ? "sidebar-link active" : "sidebar-link"
             }
@@ -96,12 +106,12 @@ function Sidebar() {
         </li>
         <li className="sidebar-nav-item">
           <NavLink
-            to="/Cout"
+            to="/poussage/Cout"
             className={({ isActive }) =>
               isActive ? "sidebar-link active" : "sidebar-link"
             }
           >
-            <span className="nav-icon"><FaHistory /></span>
+            <span className="nav-icon"><FaCoins /></span>
             <span className="nav-label">Cout</span>
             <span className="nav-indicator"></span>
           </NavLink>

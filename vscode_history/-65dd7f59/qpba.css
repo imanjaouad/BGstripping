@@ -1,0 +1,9 @@
+.App{
+  display: flex;
+  justify-content: space-evenly;
+  gap: 50px;
+}
+
+.card{
+  display: flex;
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Académie Pro – Formations Professionnelles</title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f3f5f9; color:#0b1220; }
+header { background:#004aad; color:white; padding:35px; text-align:center; }
+nav { display:flex; justify-content:center; gap:25px; background:#07315a; padding:12px; }
+nav a { color:white; text-decoration:none; font-weight:bold; }
+.section { max-width:1000px; margin:45px auto; padding:0 20px; }
+.course { background:white; padding:22px; margin-bottom:25px; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.07); }
+.btn { background:#004aad; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; cursor:pointer; }
+footer { background:#071022; color:#cbd5e1; text-align:center; padding:20px; margin-top:50px; }
+form input, form button { width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #e6e9ef; }
+#paymentDiv { background:white; padding:20px; margin-top:25px; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.07); }
+#confirmation { background:#d1fae5; border:1px solid #10b981; padding:15px; margin-top:20px; border-radius:10px; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>Académie Pro – Formations Certifiantes</h1>
+<p>Ingénierie des Compétences • Développement Personnel • Communication Efficace</p>
+</header>
+
+<nav>
+<a href="#competences">Ingénierie des Compétences</a>
+<a href="#developpement">Développement Personnel</a>
+<a href="#communication">Communication Efficace</a>
+<a href="#contact">Paiement</a>
+</nav>
+
+<section id="competences" class="section">
+<div class="course">
+<h3>Ingénierie des Compétences — 600 DH</h3>
+<p>Analyse des besoins, construction des référentiels, ingénierie pédagogique.</p>
+<button class="btn" onclick="selectCourse('Ingénierie des Compétences', 600)">Choisir ce cours</button>
+</div>
+</section>
+
+<section id="developpement" class="section">
+<div class="course">
+<h3>Développement Personnel — 400 DH</h3>
+<p>Gestion du temps, confiance en soi, techniques de motivation.</p>
+<button class="btn" onclick="selectCourse('Développement Personnel', 400)">Choisir ce cours</button>
+</div>
+</section>
+
+<section id="communication" class="section">
+<div class="course">
+<h3>Communication Efficace — 500 DH</h3>
+<p>Communication professionnelle, prise de parole, écoute active.</p>
+<button class="btn" onclick="selectCourse('Communication Efficace', 500)">Choisir ce cours</button>
+</div>
+</section>
+
+<section id="contact" class="section">
+<h2>Paiement</h2>
+<div id="paymentPlaceholder"><p>Veuillez choisir un cours pour afficher le prix et procéder au paiement.</p></div>
+
+<div id="paymentDiv" style="display:none;">
+<h3 id="courseTitle"></h3>
+<p id="price"></p>
+<p><strong>RIB : 007607000081830040239160</strong></p>
+<form id="paymentForm">
+<input type="text" placeholder="Nom complet" required>
+<input type="email" placeholder="Email" required>
+<input type="file" accept="image/*,application/pdf" required>
+<button type="submit" class="btn">Envoyer la preuve de paiement</button>
+</form>
+<div id="confirmation" style="display:none;">
+<p>Merci ! Votre accès sera activé après vérification.</p>
+</div>
+</div>
+</section>
+
+<footer>
+© 2025 Académie Pro – Tous droits réservés.
+</footer>
+
+<script>
+  
+    function
+// متغيرات عامة
+let selectedCourse = '';
+let selectedPrice = 0;
+
+// دالة اختيار الكورس
+function selectCourse(course, price) {
+  selectedCourse = course;
+  selectedPrice = price;
+
+  // اظهار المعلومات والفورم
+  document.getElementById('paymentPlaceholder').style.display = 'none';
+  const paymentDiv = document.getElementById('paymentDiv');
+  paymentDiv.style.display = 'block';
+  document.getElementById('courseTitle').innerText = course;
+  document.getElementById('price').innerText = `Prix : ${price} DH`;
+}
+
+// ارسال الفورم
+document.getElementById('paymentForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  if(selectedCourse === '') {
+    alert('Veuillez choisir un cours avant de payer.');
+    return;
+  }
+  document.getElementById('confirmation').style.display = 'block';
+});
+</script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { addCasement, updateCasement } from "../../features/casementSlice";
+import { fetchCasements, addCasementAsync, updateCasementAsync } from "../../features/casementSlice";
 import image from "../../images/image3.webp";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -160,7 +160,7 @@ function RendementRing({ value, max = 200 }) {
   return (
     <div className="lcsm-ring-wrap">
       <svg viewBox="0 0 90 90">
-        <circle className="lcsm-ring-track"    cx="45" cy="45" r="39" />
+        <circle className="lcsm-ring-track" cx="45" cy="45" r="39" />
         <circle className="lcsm-ring-progress" cx="45" cy="45" r="39"
           style={{ strokeDashoffset: C * (1 - pct) }} />
       </svg>
@@ -175,7 +175,13 @@ function RendementRing({ value, max = 200 }) {
 function DashboardCasement() {
   const dispatch = useDispatch();
   const [editIndex, setEditIndex] = useState(null);
+  const [editId, setEditId] = useState(null);
   const [equipOpts, setEquipOpts] = useState(["7500M1", "7500M2", "P&H1", "P&H2", "200B1"]);
+
+  // Load data from API on mount
+  useEffect(() => {
+    dispatch(fetchCasements());
+  }, [dispatch]);
 
   const emptyForm = {
     date: "", panneau: "", tranchee: "", niveau: "",
@@ -209,8 +215,13 @@ function DashboardCasement() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editIndex !== null) dispatch(updateCasement({ index: editIndex, data: form }));
-    else dispatch(addCasement(form));
+    if (editIndex !== null && editId) {
+      dispatch(updateCasementAsync({ id: editId, data: form }));
+      setEditIndex(null);
+      setEditId(null);
+    } else {
+      dispatch(addCasementAsync(form));
+    }
     reset();
   };
 

@@ -11,7 +11,7 @@ class AuthController extends Controller
 {
     /**
      * POST /api/login
-     * Body: { email, password, mode }
+     * Body: { username, password, modeOpiration }
      */
    public function login(Request $request)
 {
@@ -55,4 +55,35 @@ class AuthController extends Controller
         ],
     ]);
 }
+
+    /**
+     * POST /api/logout
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Déconnexion réussie.',
+        ]);
+    }
+
+    /**
+     * GET /api/me
+     */
+    public function me(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'success' => true,
+            'user'    => [
+                'id'            => $user->id,
+                'username'      => $user->username,
+                'role'          => $user->role,
+                'modeOpiration' => $user->modeOpiration,
+            ],
+        ]);
+    }
 }

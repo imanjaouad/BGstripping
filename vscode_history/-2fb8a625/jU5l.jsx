@@ -1,0 +1,28 @@
+import styled from "styled-components";
+
+const dv = styled.div`
+background-color:"grey";
+border-radius:13px;
+border: 2px solid blue
+`
+const tx = styled.h1`
+color : black;
+font-size :20px;
+
+`
+const pp = styled.p`
+color : red;
+font-size :15px;
+`
+
+export default function Card(props){
+    
+    return (
+        <div className="card">
+            <dv className="card1"></dv>
+            <h1>le titre :{props.title}</h1>
+            <p>le prix : {props.prix}</p>
+            <button>shop</button>
+        </div>
+    )
+}

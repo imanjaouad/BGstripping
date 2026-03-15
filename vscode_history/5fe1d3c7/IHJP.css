@@ -1,0 +1,27 @@
+body{
+    background-color: grey;
+    border: dashed 2px 5px Black;
+    font-size: large;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+
+div1{
+    border: solid 4px 2px Black;
+    width: 100%;
+}
+
+p{
+    color: red;
+    font-style: oblique;
+    border: solid 2px 4px Black;
+    font-size: 36px;
+    margin: 8px;
+    opacity: 0.9;
+    align-items: baseline;
+    font-weight: 800;
+    text-decoration: overline;
+    border-radius: 12px;
+    
+}
+

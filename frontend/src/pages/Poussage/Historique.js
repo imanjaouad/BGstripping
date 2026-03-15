@@ -1,12 +1,19 @@
-import React, { useState, useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useMemo, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchPoussages } from "../../features/poussageSlice";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import image from "../../images/image3.webp";
 import "../../components/animations.css";
 
 function Historique() {
+  const dispatch = useDispatch();
   const poussages = useSelector((state) => state.poussage?.list || []);
+
+  // Load data from API on mount
+  useEffect(() => {
+    dispatch(fetchPoussages());
+  }, [dispatch]);
 
   // Filter state
   const [filterPanneau, setFilterPanneau] = useState("");
@@ -59,7 +66,7 @@ function Historique() {
       Conducteur: p.conducteur,
       Matricule: p.matricule,
       Volume: p.volume_soté,
-     
+
       Temps: p.temps,
       Rendement: p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0,
     }));
@@ -185,7 +192,7 @@ function Historique() {
               <th>Conducteur</th>
               <th>Matricule</th>
               <th>Volume</th>
-           
+
               <th>Heures</th>
               <th>Rendement</th>
             </tr>
@@ -203,7 +210,7 @@ function Historique() {
                   <td>{p.conducteur}</td>
                   <td>{p.matricule}</td>
                   <td>{p.volume_soté}</td>
-            
+
                   <td>{p.temps}</td>
                   <td>
                     {p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0} t/h

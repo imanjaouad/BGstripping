@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useMemo, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCasements } from "../../features/casementSlice";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import image from "../../images/image3.webp";
@@ -161,311 +162,317 @@ opacity:0.6;
 
 function HistoriqueCasement() {
 
-const casements = useSelector((state)=>state.casement?.list || []);
+  const dispatch = useDispatch();
+  const casements = useSelector((state) => state.casement?.list || []);
 
-/* FILTERS */
+  // Load data from API on mount
+  useEffect(() => {
+    dispatch(fetchCasements());
+  }, [dispatch]);
 
-const [filterPanneau,setFilterPanneau]=useState("");
-const [filterTranchee,setFilterTranchee]=useState("");
-const [filterTypeRoche,setFilterTypeRoche]=useState("");
-const [filterDateDebut,setFilterDateDebut]=useState("");
-const [filterDateFin,setFilterDateFin]=useState("");
+  /* FILTERS */
 
-/* UNIQUE VALUES */
+  const [filterPanneau, setFilterPanneau] = useState("");
+  const [filterTranchee, setFilterTranchee] = useState("");
+  const [filterTypeRoche, setFilterTypeRoche] = useState("");
+  const [filterDateDebut, setFilterDateDebut] = useState("");
+  const [filterDateFin, setFilterDateFin] = useState("");
 
-const uniquePanneaux=useMemo(
-()=>[...new Set(casements.map(c=>c.panneau).filter(Boolean))],
-[casements]
-);
+  /* UNIQUE VALUES */
 
-const uniqueTranchees=useMemo(
-()=>[...new Set(casements.map(c=>c.tranchee).filter(Boolean))],
-[casements]
-);
+  const uniquePanneaux = useMemo(
+    () => [...new Set(casements.map(c => c.panneau).filter(Boolean))],
+    [casements]
+  );
 
-const uniqueTypesRoche=useMemo(
-()=>[...new Set(casements.map(c=>c.type_roche).filter(Boolean))],
-[casements]
-);
+  const uniqueTranchees = useMemo(
+    () => [...new Set(casements.map(c => c.tranchee).filter(Boolean))],
+    [casements]
+  );
 
-/* FILTER LOGIC */
+  const uniqueTypesRoche = useMemo(
+    () => [...new Set(casements.map(c => c.type_roche).filter(Boolean))],
+    [casements]
+  );
 
-const filteredCasements=useMemo(()=>{
+  /* FILTER LOGIC */
 
-return casements.filter(c=>{
+  const filteredCasements = useMemo(() => {
 
-const matchPanneau=filterPanneau ? c.panneau===filterPanneau : true;
-const matchTranchee=filterTranchee ? c.tranchee===filterTranchee : true;
-const matchTypeRoche=filterTypeRoche ? c.type_roche===filterTypeRoche : true;
+    return casements.filter(c => {
 
-let matchDate=true;
+      const matchPanneau = filterPanneau ? c.panneau === filterPanneau : true;
+      const matchTranchee = filterTranchee ? c.tranchee === filterTranchee : true;
+      const matchTypeRoche = filterTypeRoche ? c.type_roche === filterTypeRoche : true;
 
-if(filterDateDebut||filterDateFin){
+      let matchDate = true;
 
-const recordDate=new Date(c.date);
+      if (filterDateDebut || filterDateFin) {
 
-if(filterDateDebut && new Date(filterDateDebut)>recordDate) matchDate=false;
-if(filterDateFin && new Date(filterDateFin)<recordDate) matchDate=false;
+        const recordDate = new Date(c.date);
 
-}
+        if (filterDateDebut && new Date(filterDateDebut) > recordDate) matchDate = false;
+        if (filterDateFin && new Date(filterDateFin) < recordDate) matchDate = false;
 
-return matchPanneau && matchTranchee && matchTypeRoche && matchDate;
+      }
 
-});
+      return matchPanneau && matchTranchee && matchTypeRoche && matchDate;
 
-},[casements,filterPanneau,filterTranchee,filterTypeRoche,filterDateDebut,filterDateFin]);
+    });
 
-/* RESET */
+  }, [casements, filterPanneau, filterTranchee, filterTypeRoche, filterDateDebut, filterDateFin]);
 
-const resetFilters=()=>{
-setFilterPanneau("");
-setFilterTranchee("");
-setFilterTypeRoche("");
-setFilterDateDebut("");
-setFilterDateFin("");
-};
+  /* RESET */
 
-/* EXPORT */
+  const resetFilters = () => {
+    setFilterPanneau("");
+    setFilterTranchee("");
+    setFilterTypeRoche("");
+    setFilterDateDebut("");
+    setFilterDateFin("");
+  };
 
-const exportExcel=()=>{
+  /* EXPORT */
 
-const data=filteredCasements.map(c=>({
+  const exportExcel = () => {
 
-Date:c.date,
-Panneau:c.panneau,
-Tranchee:c.tranchee,
-Niveau:c.niveau,
-TypeRoche:c.type_roche,
-Granulometrie:c.granulometrie,
-Coups:c.nombreCoups,
-Equipements:c.equipements?.join(", "),
-Conducteur:c.conducteur,
-Matricule:c.matricule,
-Volume:c.volume_casse,
-Heures:c.temps,
-Rendement:c.temps>0?(c.volume_casse/c.temps).toFixed(2):0
+    const data = filteredCasements.map(c => ({
 
-}));
+      Date: c.date,
+      Panneau: c.panneau,
+      Tranchee: c.tranchee,
+      Niveau: c.niveau,
+      TypeRoche: c.type_roche,
+      Granulometrie: c.granulometrie,
+      Coups: c.nombreCoups,
+      Equipements: c.equipements?.join(", "),
+      Conducteur: c.conducteur,
+      Matricule: c.matricule,
+      Volume: c.volume_casse,
+      Heures: c.temps,
+      Rendement: c.temps > 0 ? (c.volume_casse / c.temps).toFixed(2) : 0
 
-const ws=XLSX.utils.json_to_sheet(data);
-const wb=XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb,ws,"Historique");
+    }));
 
-const buffer=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Historique");
 
-const blob=new Blob([buffer],{
-type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-});
+    const buffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
 
-saveAs(blob,"historique_casement.xlsx");
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
 
-};
+    saveAs(blob, "historique_casement.xlsx");
 
-const hasActiveFilters=
-filterPanneau||filterTranchee||filterTypeRoche||filterDateDebut||filterDateFin;
-
-/* ───────── RENDER ───────── */
-
-return(
-
-<>
-<style>{CSS}</style>
-
-<div className="casement-root">
-
-{/* HEADER */}
-
-<div className="casement-header">
-
-<div>
-
-<div className="casement-title">
-Historique Casement
-</div>
-
-<div style={{fontSize:13,color:"#6b7280"}}>
-{filteredCasements.length} opérations
-</div>
-
-</div>
-
-<img src={image} alt="logo" style={{height:40}}/>
-
-</div>
-
-{/* FILTER CARD */}
-
-<div className="casement-card">
-
-<div style={{display:"flex",justifyContent:"space-between",marginBottom:15}}>
-
-<div className="casement-card-title">
-Filtres
-</div>
+  };
+
+  const hasActiveFilters =
+    filterPanneau || filterTranchee || filterTypeRoche || filterDateDebut || filterDateFin;
 
-{hasActiveFilters && (
-<button className="btn-reset" onClick={resetFilters}>
-Réinitialiser
-</button>
-)}
-
-</div>
-
-<div className="filter-grid">
-
-<div className="filter-group">
-<label className="filter-label">Panneau</label>
-<select className="filter-select"
-value={filterPanneau}
-onChange={e=>setFilterPanneau(e.target.value)}
->
-<option value="">Tous</option>
-{uniquePanneaux.map(p=>
-<option key={p} value={p}>{p}</option>
-)}
-</select>
-</div>
-
-<div className="filter-group">
-<label className="filter-label">Tranchée</label>
-<select className="filter-select"
-value={filterTranchee}
-onChange={e=>setFilterTranchee(e.target.value)}
->
-<option value="">Toutes</option>
-{uniqueTranchees.map(t=>
-<option key={t} value={t}>{t}</option>
-)}
-</select>
-</div>
-
-<div className="filter-group">
-<label className="filter-label">Type Roche</label>
-<select className="filter-select"
-value={filterTypeRoche}
-onChange={e=>setFilterTypeRoche(e.target.value)}
->
-<option value="">Tous</option>
-{uniqueTypesRoche.map(r=>
-<option key={r} value={r}>{r}</option>
-)}
-</select>
-</div>
-
-<div className="filter-group">
-<label className="filter-label">Date début</label>
-<input
-type="date"
-className="filter-input"
-value={filterDateDebut}
-onChange={e=>setFilterDateDebut(e.target.value)}
-/>
-</div>
-
-<div className="filter-group">
-<label className="filter-label">Date fin</label>
-<input
-type="date"
-className="filter-input"
-value={filterDateFin}
-onChange={e=>setFilterDateFin(e.target.value)}
-/>
-</div>
-
-</div>
-
-<div className="filter-info">
-{filteredCasements.length} résultat(s)
-{hasActiveFilters && ` sur ${casements.length}`}
-</div>
-
-</div>
-
-{/* TABLE */}
-
-<div className="casement-card">
-
-<div style={{display:"flex",justifyContent:"space-between",marginBottom:15}}>
-
-<div className="casement-card-title">
-Liste Historique
-</div>
-
-<button className="btn-excel" onClick={exportExcel}>
-Télécharger Excel
-</button>
-
-</div>
-
-<div className="table-wrap">
-
-<table className="mine-table">
-
-<thead>
-<tr>
-<th>Date</th>
-<th>Panneau</th>
-<th>Tranchée</th>
-<th>Niveau</th>
-<th>Type Roche</th>
-<th>Granulo</th>
-<th>Coups</th>
-<th>Équipements</th>
-<th>Conducteur</th>
-<th>Matricule</th>
-<th>Volume</th>
-<th>Heures</th>
-<th>Rendement</th>
-</tr>
-</thead>
-
-<tbody>
-
-{filteredCasements.length>0 ? (
-
-filteredCasements.map((c,i)=>(
-
-<tr key={i}>
-<td>{c.date}</td>
-<td>{c.panneau}</td>
-<td>{c.tranchee}</td>
-<td>{c.niveau}</td>
-<td>{c.type_roche}</td>
-<td>{c.granulometrie}</td>
-<td>{c.nombreCoups}</td>
-<td>{c.equipements?.join(", ")}</td>
-<td>{c.conducteur}</td>
-<td>{c.matricule}</td>
-<td>{c.volume_casse}</td>
-<td>{c.temps}</td>
-<td>{c.temps>0?(c.volume_casse/c.temps).toFixed(2):0} t/h</td>
-</tr>
-
-))
-
-):(
-
-<tr>
-<td colSpan="13" className="empty-row">
-Aucun résultat trouvé
-</td>
-</tr>
-
-)}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</>
-
-);
+  /* ───────── RENDER ───────── */
+
+  return (
+
+    <>
+      <style>{CSS}</style>
+
+      <div className="casement-root">
+
+        {/* HEADER */}
+
+        <div className="casement-header">
+
+          <div>
+
+            <div className="casement-title">
+              Historique Casement
+            </div>
+
+            <div style={{ fontSize: 13, color: "#6b7280" }}>
+              {filteredCasements.length} opérations
+            </div>
+
+          </div>
+
+          <img src={image} alt="logo" style={{ height: 40 }} />
+
+        </div>
+
+        {/* FILTER CARD */}
+
+        <div className="casement-card">
+
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 15 }}>
+
+            <div className="casement-card-title">
+              Filtres
+            </div>
+
+            {hasActiveFilters && (
+              <button className="btn-reset" onClick={resetFilters}>
+                Réinitialiser
+              </button>
+            )}
+
+          </div>
+
+          <div className="filter-grid">
+
+            <div className="filter-group">
+              <label className="filter-label">Panneau</label>
+              <select className="filter-select"
+                value={filterPanneau}
+                onChange={e => setFilterPanneau(e.target.value)}
+              >
+                <option value="">Tous</option>
+                {uniquePanneaux.map(p =>
+                  <option key={p} value={p}>{p}</option>
+                )}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label className="filter-label">Tranchée</label>
+              <select className="filter-select"
+                value={filterTranchee}
+                onChange={e => setFilterTranchee(e.target.value)}
+              >
+                <option value="">Toutes</option>
+                {uniqueTranchees.map(t =>
+                  <option key={t} value={t}>{t}</option>
+                )}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label className="filter-label">Type Roche</label>
+              <select className="filter-select"
+                value={filterTypeRoche}
+                onChange={e => setFilterTypeRoche(e.target.value)}
+              >
+                <option value="">Tous</option>
+                {uniqueTypesRoche.map(r =>
+                  <option key={r} value={r}>{r}</option>
+                )}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label className="filter-label">Date début</label>
+              <input
+                type="date"
+                className="filter-input"
+                value={filterDateDebut}
+                onChange={e => setFilterDateDebut(e.target.value)}
+              />
+            </div>
+
+            <div className="filter-group">
+              <label className="filter-label">Date fin</label>
+              <input
+                type="date"
+                className="filter-input"
+                value={filterDateFin}
+                onChange={e => setFilterDateFin(e.target.value)}
+              />
+            </div>
+
+          </div>
+
+          <div className="filter-info">
+            {filteredCasements.length} résultat(s)
+            {hasActiveFilters && ` sur ${casements.length}`}
+          </div>
+
+        </div>
+
+        {/* TABLE */}
+
+        <div className="casement-card">
+
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 15 }}>
+
+            <div className="casement-card-title">
+              Liste Historique
+            </div>
+
+            <button className="btn-excel" onClick={exportExcel}>
+              Télécharger Excel
+            </button>
+
+          </div>
+
+          <div className="table-wrap">
+
+            <table className="mine-table">
+
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Panneau</th>
+                  <th>Tranchée</th>
+                  <th>Niveau</th>
+                  <th>Type Roche</th>
+                  <th>Granulo</th>
+                  <th>Coups</th>
+                  <th>Équipements</th>
+                  <th>Conducteur</th>
+                  <th>Matricule</th>
+                  <th>Volume</th>
+                  <th>Heures</th>
+                  <th>Rendement</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {filteredCasements.length > 0 ? (
+
+                  filteredCasements.map((c, i) => (
+
+                    <tr key={i}>
+                      <td>{c.date}</td>
+                      <td>{c.panneau}</td>
+                      <td>{c.tranchee}</td>
+                      <td>{c.niveau}</td>
+                      <td>{c.type_roche}</td>
+                      <td>{c.granulometrie}</td>
+                      <td>{c.nombreCoups}</td>
+                      <td>{c.equipements?.join(", ")}</td>
+                      <td>{c.conducteur}</td>
+                      <td>{c.matricule}</td>
+                      <td>{c.volume_casse}</td>
+                      <td>{c.temps}</td>
+                      <td>{c.temps > 0 ? (c.volume_casse / c.temps).toFixed(2) : 0} t/h</td>
+                    </tr>
+
+                  ))
+
+                ) : (
+
+                  <tr>
+                    <td colSpan="13" className="empty-row">
+                      Aucun résultat trouvé
+                    </td>
+                  </tr>
+
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </>
+
+  );
 
 }
 

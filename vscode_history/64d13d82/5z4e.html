@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche de profils sur les réseaux sociaux</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #username {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+        }
+
+        #search-button {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #search-button:hover {
+            background-color: #3e8e41;
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-body {
+            font-size: 16px;
+        }
+
+        #loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Recherche de profils sur les réseaux sociaux</h1>
+        <input type="text" id="username" placeholder="Entrez un nom d'utilisateur">
+        <button id="search-button">Rechercher</button>
+        <div id="results"></div>
+        <div id="loader" style="display: none;">Chargement...</div>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById('username');
+        const searchButton = document.getElementById('search-button');
+        const resultsDiv = document.getElementById('results');
+        const loaderDiv = document.getElementById('loader');
+
+        const platforms = [
+            { name: 'Facebook', url: 'https://www.facebook.com/' },
+            { name: 'Instagram', url: 'https://www.instagram.com/' },
+            { name: 'Twitter', url: 'https://twitter.com/' },
+            { name: 'TikTok', url: 'https://www.tiktok.com/' },
+            { name: 'YouTube', url: 'https://www.youtube.com/' },
+            { name: 'LinkedIn', url: 'https://www.linkedin.com/' },
+            { name: 'GitHub', url: 'https://github.com/' },
+            { name: 'Snapchat', url: 'https://www.snapchat.com/' },
+            { name: 'Reddit', url: 'https://www.reddit.com/' },
+            { name: 'Pinterest', url: 'https://www.pinterest.com/' },
+            { name: 'Twitch', url: 'https://www.twitch.tv/' },
+        ];
+
+        searchButton.addEventListener('click', async () => {
+            const username = usernameInput.value.trim();
+            if (!username) return alert('Veuillez entrer un nom d\'utilisateur');
+
+            loaderDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+
+            const results = [];
+
+            for (const platform of platforms) {
+                try {
+                    const response = await fetch(`${platform.url}${username}`);
+                    const exists = response.ok;
+                    const link = `${platform.url}${username}`;
+
+                    results.push({ platform: platform.name, exists, link });
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            results.forEach((result) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+
+                const cardHeader = document.createElement('div');
+                cardHeader.classList.add('card-header');
+                cardHeader.textContent = result.platform;
+
+                const cardBody = document.createElement('div');
+                cardBody.classList.add('card-body');
+
+                const status = result.exists ? '✅' : '❌';
+                cardBody.innerHTML = `Statut : ${status} <br> Lien : <a href="${result.link}" target="_blank">${result.link}</a>`;
+
+                card.appendChild(cardHeader);
+                card.appendChild(cardBody);
+
+                resultsDiv.appendChild(card);
+            });
+
+            loaderDiv.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الجذاذة التربوية الإلكترونية</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        font-family: "Tajawal", sans-serif;
+      }
+
+      .print-area {
+        font-family: "Amiri", serif;
+      }
+
+      @media print {
+        @page {
+          size: A4;
+          margin: 3mm;
+        }
+
+        body * {
+          visibility: hidden;
+        }
+        .print-area,
+        .print-area * {
+          visibility: visible;
+        }
+        .print-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          padding: 0;
+          font-size: 11px;
+        }
+        .no-print {
+          display: none !important;
+        }
+
+        .fiche-table {
+          width: 100% !important;
+        }
+
+        .fiche-table th,
+        .fiche-table td {
+          padding: 4px 6px !important;
+          font-size: 11px !important;
+        }
+
+        .fiche-table th {
+          font-size: 12px !important;
+        }
+      }
+
+      .fiche-table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      .fiche-table th,
+      .fiche-table td {
+        border: 1.5px solid #1e3a5f;
+        padding: 4px 6px;
+        text-align: right;
+        font-size: 11px;
+        line-height: 1.3;
+      }
+
+      .fiche-table th {
+        background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+        color: white;
+        font-weight: bold;
+        font-size: 10px;
+      }
+
+      .fiche-table .header-cell {
+        background: #f0f4f8;
+        font-weight: bold;
+        color: #1e3a5f;
+        width: 15%;
+      }
+
+      .fiche-table .phase-cell {
+        background: #fff3e0;
+        font-weight: bold;
+        text-align: center;
+        font-size: 9px;
+        width: 8%;
+      }
+
+      textarea {
+        resize: vertical;
+      }
+
+      .tab-btn.active {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-slate-100 to-blue-100 min-h-screen">
+    <!-- Header -->
+    <header
+      class="bg-gradient-to-r from-blue-900 to-indigo-900 shadow-xl py-4 px-6 no-print"
+    >
+      <div
+        class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4"
+      >
+        <h1
+          class="text-2xl md:text-3xl font-bold text-white flex items-center gap-3"
+        >
+          <span class="text-4xl">📋</span>
+          الجذاذة التربوية الإلكترونية
+        </h1>
+        <div class="flex items-center gap-3">
+          <button
+            onclick="saveData()"
+            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2"
+          >
+            💾 حفظ
+          </button>
+          <button
+            onclick="printFiche()"
+            class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2"
+          >
+            🖨️ طباعة
+          </button>
+          <button
+            onclick="resetAll()"
+            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2"
+          >
+            🔄 جديد
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-6">
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-6 no-print overflow-x-auto">
+        <button
+          onclick="showTab('input')"
+          id="tab-input"
+          class="tab-btn active px-6 py-3 rounded-xl font-bold transition shadow-lg"
+        >
+          ✏️ إدخال البيانات
+        </button>
+        <button
+          onclick="showTab('preview')"
+          id="tab-preview"
+          class="tab-btn bg-white px-6 py-3 rounded-xl font-bold transition shadow-lg"
+        >
+          👁️ معاينة الجذاذة
+        </button>
+      </div>
+
+      <!-- Input Section -->
+      <div id="input-section" class="space-y-6">
+        <!-- Basic Info -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <h2
+            class="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2"
+          >
+            <span class="text-2xl">📝</span>
+            المعلومات الأساسية
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >المؤسسة</label
+              >
+              <input
+                type="text"
+                id="school"
+                placeholder="اسم المؤسسة..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >الأستاذ(ة)</label
+              >
+              <input
+                type="text"
+                id="teacher"
+                placeholder="اسم الأستاذ..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >المستوى الدراسي</label
+              >
+              <select
+                id="level"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">اختر المستوى...</option>
+                <option value="الأول ابتدائي">الأول ابتدائي</option>
+                <option value="الثاني ابتدائي">الثاني ابتدائي</option>
+                <option value="الثالث ابتدائي">الثالث ابتدائي</option>
+                <option value="الرابع ابتدائي">الرابع ابتدائي</option>
+                <option value="الخامس ابتدائي">الخامس ابتدائي</option>
+                <option value="السادس ابتدائي">السادس ابتدائي</option>
+                <option value="الأولى إعدادي">الأولى إعدادي</option>
+                <option value="الثانية إعدادي">الثانية إعدادي</option>
+                <option value="الثالثة إعدادي">الثالثة إعدادي</option>
+                <option value="جذع مشترك">جذع مشترك</option>
+                <option value="الأولى باكالوريا">الأولى باكالوريا</option>
+                <option value="الثانية باكالوريا">الثانية باكالوريا</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium">المادة</label>
+              <input
+                type="text"
+                id="subject"
+                placeholder="اسم المادة..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium">الوحدة</label>
+              <input
+                type="text"
+                id="unit"
+                placeholder="رقم أو عنوان الوحدة..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >عنوان الدرس</label
+              >
+              <input
+                type="text"
+                id="lesson"
+                placeholder="عنوان الدرس..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >رقم الحصة</label
+              >
+              <input
+                type="text"
+                id="session"
+                placeholder="الحصة رقم..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >المدة الزمنية</label
+              >
+              <input
+                type="text"
+                id="duration"
+                placeholder="مثال: 45 دقيقة"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >التاريخ</label
+              >
+              <input
+                type="date"
+                id="date"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >الأسبوع</label
+              >
+              <input
+                type="text"
+                id="week"
+                placeholder="رقم الأسبوع..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Objectives & Competencies -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <h2
+            class="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2"
+          >
+            <span class="text-2xl">🎯</span>
+            الكفايات والأهداف
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >الكفاية الأساسية</label
+              >
+              <textarea
+                id="competency"
+                rows="2"
+                placeholder="الكفاية المستهدفة..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              ></textarea>
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >الأهداف التعلمية</label
+              >
+              <textarea
+                id="objectives"
+                rows="2"
+                placeholder="- الهدف الأول&#10;- الهدف الثاني"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              ></textarea>
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >المكتسبات السابقة</label
+              >
+              <textarea
+                id="prerequisites"
+                rows="2"
+                placeholder="المعارف والمهارات السابقة..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              ></textarea>
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-2 font-medium"
+                >الوسائل التعليمية</label
+              >
+              <textarea
+                id="materials"
+                rows="2"
+                placeholder="الكتاب المدرسي، السبورة..."
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lesson Phases -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <h2
+            class="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2"
+          >
+            <span class="text-2xl">📚</span>
+            مراحل الدرس
+          </h2>
+
+          <!-- All Phases in compact form -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Phase 1: Opening -->
+            <div class="border-2 border-orange-200 rounded-xl overflow-hidden">
+              <div
+                class="bg-orange-100 px-3 py-2 font-bold text-orange-800 text-sm flex items-center gap-2"
+              >
+                <span>🌅</span> التمهيد والتهيئة
+                <input
+                  type="text"
+                  id="phase1_duration"
+                  placeholder="المدة"
+                  class="mr-auto w-20 px-2 py-1 rounded border text-xs"
+                />
+              </div>
+              <div class="p-3 space-y-2">
+                <textarea
+                  id="phase1_teacher"
+                  rows="2"
+                  placeholder="أنشطة الأستاذ..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-orange-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase1_students"
+                  rows="2"
+                  placeholder="أنشطة المتعلمين..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-orange-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase1_content"
+                  rows="1"
+                  placeholder="المحتوى / التقويم..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-orange-400 focus:outline-none"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Phase 2: Building -->
+            <div class="border-2 border-green-200 rounded-xl overflow-hidden">
+              <div
+                class="bg-green-100 px-3 py-2 font-bold text-green-800 text-sm flex items-center gap-2"
+              >
+                <span>🏗️</span> بناء التعلمات
+                <input
+                  type="text"
+                  id="phase2_duration"
+                  placeholder="المدة"
+                  class="mr-auto w-20 px-2 py-1 rounded border text-xs"
+                />
+              </div>
+              <div class="p-3 space-y-2">
+                <textarea
+                  id="phase2_teacher"
+                  rows="2"
+                  placeholder="أنشطة الأستاذ..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-green-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase2_students"
+                  rows="2"
+                  placeholder="أنشطة المتعلمين..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-green-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase2_content"
+                  rows="1"
+                  placeholder="المحتوى المعرفي..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-green-400 focus:outline-none"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Phase 3: Practice -->
+            <div class="border-2 border-blue-200 rounded-xl overflow-hidden">
+              <div
+                class="bg-blue-100 px-3 py-2 font-bold text-blue-800 text-sm flex items-center gap-2"
+              >
+                <span>✍️</span> التطبيق والممارسة
+                <input
+                  type="text"
+                  id="phase3_duration"
+                  placeholder="المدة"
+                  class="mr-auto w-20 px-2 py-1 rounded border text-xs"
+                />
+              </div>
+              <div class="p-3 space-y-2">
+                <textarea
+                  id="phase3_teacher"
+                  rows="2"
+                  placeholder="أنشطة الأستاذ..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-blue-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase3_students"
+                  rows="2"
+                  placeholder="أنشطة المتعلمين..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-blue-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase3_content"
+                  rows="1"
+                  placeholder="التمارين والأنشطة..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-blue-400 focus:outline-none"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Phase 4: Evaluation -->
+            <div class="border-2 border-purple-200 rounded-xl overflow-hidden">
+              <div
+                class="bg-purple-100 px-3 py-2 font-bold text-purple-800 text-sm flex items-center gap-2"
+              >
+                <span>📊</span> التقويم والدعم
+                <input
+                  type="text"
+                  id="phase4_duration"
+                  placeholder="المدة"
+                  class="mr-auto w-20 px-2 py-1 rounded border text-xs"
+                />
+              </div>
+              <div class="p-3 space-y-2">
+                <textarea
+                  id="phase4_teacher"
+                  rows="2"
+                  placeholder="أنشطة الأستاذ..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-purple-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase4_students"
+                  rows="2"
+                  placeholder="أنشطة المتعلمين..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-purple-400 focus:outline-none"
+                ></textarea>
+                <textarea
+                  id="phase4_content"
+                  rows="1"
+                  placeholder="التقويم النهائي / الخلاصة..."
+                  class="w-full px-3 py-2 rounded-lg border text-sm focus:border-purple-400 focus:outline-none"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="mt-4">
+            <label class="block text-gray-700 mb-2 font-medium"
+              >📌 ملاحظات</label
+            >
+            <textarea
+              id="notes"
+              rows="2"
+              placeholder="ملاحظات إضافية..."
+              class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-gray-400 focus:outline-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Preview Button -->
+        <div class="text-center">
+          <button
+            onclick="showTab('preview')"
+            class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-xl"
+          >
+            👁️ معاينة الجذاذة
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Section - Single Page -->
+      <div id="preview-section" class="hidden">
+        <div class="print-area bg-white rounded-2xl shadow-xl p-2" id="fiche">
+          <!-- Single Unified Table -->
+          <table class="fiche-table">
+            <!-- Header Row -->
+            <tr>
+              <th colspan="6" class="text-center text-lg py-2">
+                الجذاذة التربوية
+              </th>
+            </tr>
+            <!-- Basic Info -->
+            <tr>
+              <td class="header-cell">المؤسسة</td>
+              <td id="p_school"></td>
+              <td class="header-cell">الأستاذ(ة)</td>
+              <td id="p_teacher"></td>
+              <td class="header-cell">المستوى</td>
+              <td id="p_level"></td>
+            </tr>
+            <tr>
+              <td class="header-cell">المادة</td>
+              <td id="p_subject"></td>
+              <td class="header-cell">الوحدة</td>
+              <td id="p_unit"></td>
+              <td class="header-cell">الأسبوع</td>
+              <td id="p_week"></td>
+            </tr>
+            <tr>
+              <td class="header-cell">الدرس</td>
+              <td colspan="3" id="p_lesson"></td>
+              <td class="header-cell">الحصة</td>
+              <td id="p_session"></td>
+            </tr>
+            <tr>
+              <td class="header-cell">التاريخ</td>
+              <td id="p_date"></td>
+              <td class="header-cell">المدة</td>
+              <td id="p_duration"></td>
+              <td class="header-cell">المرجع</td>
+              <td>الكتاب المدرسي</td>
+            </tr>
+            <!-- Competencies -->
+            <tr>
+              <td class="header-cell">الكفاية</td>
+              <td
+                colspan="2"
+                id="p_competency"
+                class="whitespace-pre-line"
+              ></td>
+              <td class="header-cell">الأهداف</td>
+              <td
+                colspan="2"
+                id="p_objectives"
+                class="whitespace-pre-line"
+              ></td>
+            </tr>
+            <tr>
+              <td class="header-cell">المكتسبات</td>
+              <td
+                colspan="2"
+                id="p_prerequisites"
+                class="whitespace-pre-line"
+              ></td>
+              <td class="header-cell">الوسائل</td>
+              <td colspan="2" id="p_materials" class="whitespace-pre-line"></td>
+            </tr>
+            <!-- Phases Header -->
+            <tr>
+              <th
+                colspan="6"
+                class="text-center bg-gradient-to-r from-blue-800 to-indigo-800"
+              >
+                مراحل الدرس
+              </th>
+            </tr>
+          </table>
+
+          <!-- Phases Table -->
+          <table class="fiche-table" style="border-top: none">
+            <tr>
+              <th style="width: 10%">المرحلة</th>
+              <th style="width: 28%">أنشطة الأستاذ</th>
+              <th style="width: 28%">أنشطة المتعلمين</th>
+              <th style="width: 26%">المحتوى / التقويم</th>
+              <th style="width: 8%">المدة</th>
+            </tr>
+            <tr>
+              <td
+                class="phase-cell"
+                style="background: #fff3e0; color: #9a3412"
+              >
+                التمهيد
+              </td>
+              <td id="p_phase1_teacher" class="whitespace-pre-line"></td>
+              <td id="p_phase1_students" class="whitespace-pre-line"></td>
+              <td id="p_phase1_content" class="whitespace-pre-line"></td>
+              <td id="p_phase1_duration" class="text-center"></td>
+            </tr>
+            <tr>
+              <td
+                class="phase-cell"
+                style="background: #dcfce7; color: #166534"
+              >
+                البناء
+              </td>
+              <td id="p_phase2_teacher" class="whitespace-pre-line"></td>
+              <td id="p_phase2_students" class="whitespace-pre-line"></td>
+              <td id="p_phase2_content" class="whitespace-pre-line"></td>
+              <td id="p_phase2_duration" class="text-center"></td>
+            </tr>
+            <tr>
+              <td
+                class="phase-cell"
+                style="background: #dbeafe; color: #1e40af"
+              >
+                التطبيق
+              </td>
+              <td id="p_phase3_teacher" class="whitespace-pre-line"></td>
+              <td id="p_phase3_students" class="whitespace-pre-line"></td>
+              <td id="p_phase3_content" class="whitespace-pre-line"></td>
+              <td id="p_phase3_duration" class="text-center"></td>
+            </tr>
+            <tr>
+              <td
+                class="phase-cell"
+                style="background: #f3e8ff; color: #7e22ce"
+              >
+                التقويم
+              </td>
+              <td id="p_phase4_teacher" class="whitespace-pre-line"></td>
+              <td id="p_phase4_students" class="whitespace-pre-line"></td>
+              <td id="p_phase4_content" class="whitespace-pre-line"></td>
+              <td id="p_phase4_duration" class="text-center"></td>
+            </tr>
+            <!-- Notes Row -->
+            <tr id="notes-row" class="hidden">
+              <td class="header-cell">ملاحظات</td>
+              <td colspan="4" id="p_notes" class="whitespace-pre-line"></td>
+            </tr>
+            <!-- Signature Row -->
+            <tr>
+              <td colspan="5" class="p-0">
+                <div class="flex justify-between items-center py-3 px-4">
+                  <div class="text-center flex-1">
+                    <p class="font-bold text-xs mb-4">توقيع الأستاذ(ة)</p>
+                    <div class="border-b-2 border-gray-400 w-28 mx-auto"></div>
+                  </div>
+                  <div class="text-center flex-1">
+                    <p class="font-bold text-xs mb-4">ملاحظات المفتش(ة)</p>
+                    <div class="border-b-2 border-gray-400 w-28 mx-auto"></div>
+                  </div>
+                  <div class="text-center flex-1">
+                    <p class="font-bold text-xs mb-4">توقيع المدير(ة)</p>
+                    <div class="border-b-2 border-gray-400 w-28 mx-auto"></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Back to Edit Button -->
+        <div class="text-center mt-6 no-print">
+          <button
+            onclick="showTab('input')"
+            class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-xl"
+          >
+            ✏️ العودة للتعديل
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white text-center py-4 mt-8 no-print">
+      <p>الجذاذة التربوية الإلكترونية © 2024</p>
+    </footer>
+
+    <script>
+      // Field IDs for easy iteration
+      const fields = [
+        "school",
+        "teacher",
+        "level",
+        "subject",
+        "unit",
+        "lesson",
+        "session",
+        "duration",
+        "date",
+        "week",
+        "competency",
+        "objectives",
+        "prerequisites",
+        "materials",
+        "phase1_teacher",
+        "phase1_students",
+        "phase1_content",
+        "phase1_duration",
+        "phase2_teacher",
+        "phase2_students",
+        "phase2_content",
+        "phase2_duration",
+        "phase3_teacher",
+        "phase3_students",
+        "phase3_content",
+        "phase3_duration",
+        "phase4_teacher",
+        "phase4_students",
+        "phase4_content",
+        "phase4_duration",
+        "notes",
+      ];
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("date").valueAsDate = new Date();
+        loadData();
+
+        // Auto-save on input change
+        fields.forEach((field) => {
+          const el = document.getElementById(field);
+          if (el) {
+            el.addEventListener("input", saveData);
+          }
+        });
+      });
+
+      function showTab(tab) {
+        const inputSection = document.getElementById("input-section");
+        const previewSection = document.getElementById("preview-section");
+        const tabInput = document.getElementById("tab-input");
+        const tabPreview = document.getElementById("tab-preview");
+
+        if (tab === "input") {
+          inputSection.classList.remove("hidden");
+          previewSection.classList.add("hidden");
+          tabInput.classList.add("active");
+          tabPreview.classList.remove("active");
+          tabPreview.classList.add("bg-white");
+        } else {
+          inputSection.classList.add("hidden");
+          previewSection.classList.remove("hidden");
+          tabPreview.classList.add("active");
+          tabInput.classList.remove("active");
+          tabInput.classList.add("bg-white");
+          updatePreview();
+        }
+      }
+
+      function updatePreview() {
+        fields.forEach((field) => {
+          const input = document.getElementById(field);
+          const preview = document.getElementById("p_" + field);
+          if (input && preview) {
+            let value = input.value;
+            if (field === "date" && value) {
+              const date = new Date(value);
+              value = date.toLocaleDateString("ar-MA");
+            }
+            preview.textContent = value || "---";
+          }
+        });
+
+        // Show/hide notes row
+        const notes = document.getElementById("notes").value;
+        const notesRow = document.getElementById("notes-row");
+        if (notes.trim()) {
+          notesRow.classList.remove("hidden");
+        } else {
+          notesRow.classList.add("hidden");
+        }
+      }
+
+      function saveData() {
+        const data = {};
+        fields.forEach((field) => {
+          const el = document.getElementById(field);
+          if (el) {
+            data[field] = el.value;
+          }
+        });
+        localStorage.setItem("ficheData", JSON.stringify(data));
+        showNotification("تم الحفظ تلقائياً");
+      }
+
+      function loadData() {
+        const saved = localStorage.getItem("ficheData");
+        if (saved) {
+          const data = JSON.parse(saved);
+          fields.forEach((field) => {
+            const el = document.getElementById(field);
+            if (el && data[field]) {
+              el.value = data[field];
+            }
+          });
+        }
+      }
+
+      function resetAll() {
+        if (
+          confirm("هل أنت متأكد من إنشاء جذاذة جديدة؟ سيتم مسح جميع البيانات.")
+        ) {
+          fields.forEach((field) => {
+            const el = document.getElementById(field);
+            if (el) {
+              el.value = "";
+            }
+          });
+          document.getElementById("date").valueAsDate = new Date();
+          localStorage.removeItem("ficheData");
+          showNotification("تم إنشاء جذاذة جديدة");
+        }
+      }
+
+      function printFiche() {
+        updatePreview();
+        showTab("preview");
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      }
+
+      function showNotification(message) {
+        let notification = document.getElementById("notification");
+        if (!notification) {
+          notification = document.createElement("div");
+          notification.id = "notification";
+          notification.className =
+            "fixed bottom-4 left-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 opacity-0 z-50";
+          document.body.appendChild(notification);
+        }
+
+        notification.textContent = message;
+        notification.classList.remove("opacity-0");
+        notification.classList.add("opacity-100");
+
+        setTimeout(() => {
+          notification.classList.remove("opacity-100");
+          notification.classList.add("opacity-0");
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>

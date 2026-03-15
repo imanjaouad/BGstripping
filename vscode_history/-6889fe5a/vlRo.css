@@ -1,0 +1,435 @@
+/* ========================================
+   ETUDIA - FOND DIAGONAL BLEU/BLANC TOTAL
+   ======================================== */
+
+/* =========================================
+   1. RESET & GLOBAL
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* FOND DIAGONAL POUR TOUT LE SITE */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: -2;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  clip-path: polygon(0 0, 65% 0, 45% 100%, 0 100%);
+  z-index: -1;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* =========================================
+   2. HEADER TRANSPARENT (Pour voir le fond)
+   ========================================= */
+.header {
+  position: relative;
+  height: 120px;
+  background: transparent; /* Transparent pour voir le fond diagonal */
+  margin-bottom: 30px;
+}
+
+/* On enlève le diagonal du header car il est maintenant sur le body */
+.diagonal {
+  display: none;
+}
+
+/* Logo avec fond blanc pour qu'il ressorte */
+.logo-container {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: white;
+  padding: 15px 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 10;
+  transition: transform 0.3s;
+}
+
+.logo-container:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.logo-container img {
+  height: 80px;
+  object-fit: contain;
+}
+
+/* =========================================
+   3. STRUCTURE & TITRES
+   ========================================= */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 10;
+  position: relative;
+}
+
+.section {
+  margin-bottom: 50px;
+  animation: fadeIn 0.6s ease-out;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.section-title {
+  color: #0056b3;
+  border-left: 6px solid #007bff;
+  padding-left: 20px;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* --- BOUTON RETOUR --- */
+.back-button {
+  background: white;
+  color: #007bff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 12px 25px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-radius: 50px;
+  border: 2px solid #007bff;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0,123,255,0.2);
+}
+
+.back-button:hover {
+  background: #007bff;
+  color: white;
+  transform: translateX(-5px);
+  box-shadow: 0 8px 25px rgba(0,123,255,0.3);
+}
+
+/* =========================================
+   4. PAGE D'ACCUEIL (LANDING)
+   ========================================= */
+.text-section {
+  text-align: center;
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 50px;
+  border-radius: 30px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.title {
+  font-size: 2.8rem;
+  color: #007bff;
+  display: inline-block;
+  position: relative;
+  margin: 10px 0 30px 0;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0,123,255,0.2);
+}
+
+.underline1, .underline2 {
+  height: 5px;
+  background: linear-gradient(to right, #00c6ff, #007bff);
+  width: 60%;
+  margin: 10px auto 0 auto;
+  border-radius: 5px;
+}
+
+.start-button {
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  border: none;
+  padding: 18px 50px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.start-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 123, 255, 0.5);
+  background: linear-gradient(135deg, #0056b3, #0099cc);
+}
+
+/* =========================================
+   5. CARTES & MODULES (Fond blanc pour lisibilité)
+   ========================================= */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  padding-bottom: 50px;
+}
+
+.module-card {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.module-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+  border-color: #007bff;
+}
+
+.module-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.module-code {
+  background: #e3f2fd;
+  color: #007bff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.select-module-btn {
+  background: #f8f9fa;
+  color: #007bff;
+  border: 1px solid #dee2e6;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.module-card:hover .select-module-btn {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* =========================================
+   6. BOUTONS & ÉLÉMENTS SPÉCIAUX
+   ========================================= */
+.continue-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100%;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.continue-button:hover {
+  background: #218838;
+  transform: scale(1.02);
+}
+
+/* Info box avec fond blanc */
+.info-box {
+  background: rgba(255, 255, 255, 0.98);
+  padding: 30px;
+  border-radius: 15px;
+  margin-top: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  text-align: center;
+  border: 1px solid #eef2f5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+  margin: 20px auto;
+  max-width: 600px;
+  color: #718096;
+}
+
+/* =========================================
+   7. MODALE
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+  padding: 15px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* =========================================
+   8. TRIANGLES (Adaptés au nouveau fond)
+   ========================================= */
+.triangles-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 20px;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 40px solid rgba(255, 255, 255, 0.3);
+  display: inline-block;
+  margin: 0 5px;
+  position: relative;
+  bottom: -10px;
+  animation: float 6s infinite ease-in-out;
+}
+
+.triangle:nth-child(even) {
+  border-bottom-color: rgba(255, 255, 255, 0.4);
+  transform: scale(0.7);
+  animation-duration: 8s;
+  animation-delay: 1s;
+}
+
+.triangle:nth-child(3n) {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+  animation-duration: 5s;
+  animation-delay: 2s;
+}
+
+/* =========================================
+   9. ANIMATIONS
+   ========================================= */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* =========================================
+   10. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  body::after {
+    clip-path: polygon(0 0, 80% 0, 60% 100%, 0 100%);
+  }
+  
+  .header { height: 90px; }
+  .logo-container { 
+    height: 60px; 
+    top: 15px;
+    right: 15px;
+    padding: 10px 15px;
+  }
+  .logo-container img { height: 40px; }
+  
+  .title { font-size: 2rem; }
+  .section-title { font-size: 1.5rem; }
+  
+  .modules-grid { grid-template-columns: 1fr; }
+  
+  .section { 
+    padding: 20px; 
+    margin: 10px;
+  }
+}

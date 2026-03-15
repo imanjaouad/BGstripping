@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recherche Pseudo Social</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { padding: 10px; margin: 5px; }
+    .result { margin-top: 20px; }
+    .network { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>Cherche un pseudo sur les réseaux</h1>
+  <input type="text" id="pseudoInput" placeholder="Entrez un pseudo" />
+  <button onclick="searchPseudo()">Rechercher</button>
+
+  <div class="result" id="results"></div>
+
+  <script>
+    async function searchPseudo() {
+      const pseudo = document.getElementById('pseudoInput').value;
+      if (!pseudo) return alert("Veuillez entrer un pseudo.");
+
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = "Recherche en cours...";
+
+      // Simule une recherche (fausse pour l'exemple)
+      setTimeout(() => {
+        const mockResults = {
+          TikTok: Math.random() > 0.5 ? `https://tiktok.com/@${pseudo}` : "Non trouvé",
+          Instagram: Math.random() > 0.5 ? `https://instagram.com/${pseudo}` : "Non trouvé",
+          Facebook: "Non trouvé (API restreinte)",
+          Snapchat: "Non trouvé (pas d'API)"
+        };
+
+        let html = '';
+        for (const [site, link] of Object.entries(mockResults)) {
+          html += `<div class="network"><strong>${site}:</strong> `;
+          if (link && !link.includes("Non trouvé")) {
+            html += `<a href="${link}" target="_blank">${link}</a>`;
+          } else {
+            html += link;
+          }
+          html += '</div>';
+        }
+        resultsDiv.innerHTML = html;
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
