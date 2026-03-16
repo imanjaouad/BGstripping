@@ -46,16 +46,12 @@ justify-content:center;
 cursor:pointer;
 box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
-.logo-ring {
-  border-radius: 50%;
-  width:80px;
-  padding: 4px;
-  background: conic-gradient(from 0deg, #16A34A, #22C55E, #F59E0B, #16A34A);
-  animation: rotateBorder 5s linear infinite;
-  box-shadow: 0 0 22px var(--green-glow);
-}
+
 .sb-logo{
-width: 80px; height: 80px; border-radius: 50%;
+width: 80px; height: 80px; border-radius: 10%;
+margin-bottom:20px;
+margin-left:10px;
+margin-top:10px;
 text-align:center;
   object-fit: cover; display: block;
   border: 3px solid #feffff;
@@ -187,9 +183,9 @@ function Sidebar({ isOpen, toggleSidebar }) {
 
         {/* Logo */}
          <div className="sb-csm-logo-area "  >
-          <div className="logo-ring">
+         
             <img src={image} alt="Logo Mine" className="sb-logo" />
-          </div> </div>
+        </div>
 
         {/* Navigation */}
         <ul className="sb-nav">
