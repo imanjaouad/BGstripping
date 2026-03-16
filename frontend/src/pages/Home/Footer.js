@@ -38,7 +38,7 @@ export default function Footer() {
         <div className="footer-divider"></div>
 
         <p className="footer-copy">
-          © 2026 Phosphate Management System. Tous droits réservés.
+          ©  {new Date().getFullYear()} Phosphate Management System. Tous droits réservés.
         </p>
       </div>
     </footer>

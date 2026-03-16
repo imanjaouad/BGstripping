@@ -1,11 +1,33 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchCasements } from "../../features/casementSlice";
+import React, { useState, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import image from "../../images/image3.webp";
 
-/* ───────── STYLE PREMIUM ───────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   HistoriqueCasement
+   ──────────────────────────────────────────────────────────────────────────
+   Page d'historique des opérations de décapage par Casement.
+
+   Responsabilités :
+     1. Lire la liste des opérations depuis le store Redux (state.casement.list)
+     2. Permettre le filtrage par Panneau, Tranchée, Poste et plage de dates
+     3. Afficher les résultats dans un tableau
+     4. Exporter les données filtrées vers un fichier Excel (.xlsx)
+
+   Changements appliqués :
+     ✅ Supprimé  : filtres type_roche, granulometrie, nombreCoups (champs supprimés)
+     ✅ Remplacé  : filtre "Type Roche" → filtre "Poste"
+     ✅ Remplacé  : colonnes niveau, type_roche, granulometrie, nombreCoups, volume_casse
+                    → profondeur, poste, volume_saute (alignés sur le nouveau formulaire)
+     ✅ Corrigé   : export Excel mis à jour avec les nouveaux noms de champs
+     ✅ Conservé  : CSS inline identique à l'original (const CSS)
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STYLES — CSS inline injecté via <style>{CSS}</style>
+   Conservé tel quel pour garder le même rendu visuel que l'original.
+══════════════════════════════════════════════════════════════════════════ */
 
 const CSS = `
 
@@ -147,7 +169,8 @@ border-bottom:1px solid #f0fdf4;
 }
 
 .mine-table tr:hover{
-background:#f0fdf4;
+background: #f0fdf4;
+
 }
 
 .empty-row{
@@ -156,29 +179,48 @@ padding:30px;
 opacity:0.6;
 }
 
+.btn-edit{
+background:#f0fdf4;
+color:#15803d;
+border:1.5px solid #bbf7d0;
+padding:5px 14px;
+border-radius:8px;
+font-weight:600;
+font-size:12px;
+cursor:pointer;
+transition:0.2s;
+white-space:nowrap;
+}
+
+.btn-edit:hover{
+background:#dcfce7;
+border-color:#16a34a;
+}
+
 `;
 
-/* ───────── COMPONENT ───────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   COMPOSANT PRINCIPAL
+══════════════════════════════════════════════════════════════════════════ */
 
 function HistoriqueCasement() {
 
-  const dispatch = useDispatch();
   const casements = useSelector((state) => state.casement?.list || []);
+  const navigate  = useNavigate();
 
-  // Load data from API on mount
-  useEffect(() => {
-    dispatch(fetchCasements());
-  }, [dispatch]);
+  const handleEdit = (c, filteredIndex) => {
+    // Retrouver l'index réel dans la liste Redux (pas l'index filtré)
+    const realIndex = casements.indexOf(c);
+    navigate("/operations/casement/gestion", {
+      state: { editData: c, editIndex: realIndex },
+    });
+  };
 
-  /* FILTERS */
-
-  const [filterPanneau, setFilterPanneau] = useState("");
-  const [filterTranchee, setFilterTranchee] = useState("");
-  const [filterTypeRoche, setFilterTypeRoche] = useState("");
+  const [filterPanneau,   setFilterPanneau]   = useState("");
+  const [filterTranchee,  setFilterTranchee]  = useState("");
+  const [filterPoste,     setFilterPoste]     = useState("");
   const [filterDateDebut, setFilterDateDebut] = useState("");
-  const [filterDateFin, setFilterDateFin] = useState("");
-
-  /* UNIQUE VALUES */
+  const [filterDateFin,   setFilterDateFin]   = useState("");
 
   const uniquePanneaux = useMemo(
     () => [...new Set(casements.map(c => c.panneau).filter(Boolean))],
@@ -190,67 +232,50 @@ function HistoriqueCasement() {
     [casements]
   );
 
-  const uniqueTypesRoche = useMemo(
-    () => [...new Set(casements.map(c => c.type_roche).filter(Boolean))],
+  const uniquePostes = useMemo(
+    () => [...new Set(casements.map(c => c.poste).filter(Boolean))],
     [casements]
   );
 
-  /* FILTER LOGIC */
-
   const filteredCasements = useMemo(() => {
-
     return casements.filter(c => {
-
-      const matchPanneau = filterPanneau ? c.panneau === filterPanneau : true;
+      const matchPanneau  = filterPanneau  ? c.panneau  === filterPanneau  : true;
       const matchTranchee = filterTranchee ? c.tranchee === filterTranchee : true;
-      const matchTypeRoche = filterTypeRoche ? c.type_roche === filterTypeRoche : true;
-
+      const matchPoste    = filterPoste    ? c.poste    === filterPoste    : true;
       let matchDate = true;
-
       if (filterDateDebut || filterDateFin) {
-
         const recordDate = new Date(c.date);
-
         if (filterDateDebut && new Date(filterDateDebut) > recordDate) matchDate = false;
-        if (filterDateFin && new Date(filterDateFin) < recordDate) matchDate = false;
-
+        if (filterDateFin   && new Date(filterDateFin)   < recordDate) matchDate = false;
       }
-
-      return matchPanneau && matchTranchee && matchTypeRoche && matchDate;
-
+      return matchPanneau && matchTranchee && matchPoste && matchDate;
     });
-
-  }, [casements, filterPanneau, filterTranchee, filterTypeRoche, filterDateDebut, filterDateFin]);
-
-  /* RESET */
+  }, [casements, filterPanneau, filterTranchee, filterPoste, filterDateDebut, filterDateFin]);
 
   const resetFilters = () => {
     setFilterPanneau("");
     setFilterTranchee("");
-    setFilterTypeRoche("");
+    setFilterPoste("");
     setFilterDateDebut("");
     setFilterDateFin("");
   };
-
-  /* EXPORT */
 
   const exportExcel = () => {
 
     const data = filteredCasements.map(c => ({
 
-      Date: c.date,
-      Panneau: c.panneau,
-      Tranchee: c.tranchee,
-      Niveau: c.niveau,
-      TypeRoche: c.type_roche,
-      Granulometrie: c.granulometrie,
-      Coups: c.nombreCoups,
-      Equipements: c.equipements?.join(", "),
-      Conducteur: c.conducteur,
-      Matricule: c.matricule,
-      Volume: c.volume_casse,
-      Heures: c.temps,
-      Rendement: c.temps > 0 ? (c.volume_casse / c.temps).toFixed(2) : 0
+      Date:               c.date,
+      Panneau:            c.panneau,
+      Tranchee:           c.tranchee,
+      Profondeur:         c.profondeur,                          // ex: Niveau
+      Poste:              c.poste,                               // ex: TypeRoche
+      Equipements:        c.equipements?.join(", "),
+      Conducteur:         c.conducteur,
+      Matricule:          c.matricule,
+      "Volume Saute":     c.volume_saute,                        // ex: volume_casse
+      Heures:             c.temps,
+      Rendement:          c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : 0,
+      "Etat Machine":     c.etatMachine === "arret" ? "En arrêt" : "En marche",
 
     }));
 
@@ -268,211 +293,214 @@ function HistoriqueCasement() {
 
   };
 
+  /* ────────────────────────────────────────────────────────────────────────
+     HELPER — Vrai si au moins un filtre est actif.
+     Contrôle l'affichage du bouton "Réinitialiser" et le texte "sur X total".
+  ──────────────────────────────────────────────────────────────────────── */
   const hasActiveFilters =
-    filterPanneau || filterTranchee || filterTypeRoche || filterDateDebut || filterDateFin;
+    filterPanneau || filterTranchee || filterPoste || filterDateDebut || filterDateFin;
 
-  /* ───────── RENDER ───────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   RENDU
+══════════════════════════════════════════════════════════════════════════ */
 
-  return (
+return (
 
-    <>
-      <style>{CSS}</style>
+<>
+<style>{CSS}</style>
 
-      <div className="casement-root">
+<div className="casement-root">
 
-        {/* HEADER */}
+  {/* ── HEADER ── */}
 
-        <div className="casement-header">
+  <div className="casement-header">
+    <div>
+      <div className="casement-title">Historique Casement</div>
+    </div>
+  </div>
 
-          <div>
+  {/* ── CARTE FILTRES ── */}
 
-            <div className="casement-title">
-              Historique Casement
-            </div>
+  <div className="casement-card">
 
-            <div style={{ fontSize: 13, color: "#6b7280" }}>
-              {filteredCasements.length} opérations
-            </div>
+    <div style={{display:"flex", justifyContent:"space-between", marginBottom:15}}>
 
-          </div>
+      <div className="casement-card-title">Filtres</div>
 
-          <img src={image} alt="logo" style={{ height: 40 }} />
+      {/* Bouton Réinitialiser — visible uniquement si un filtre est actif */}
+      {hasActiveFilters && (
+        <button className="btn-reset" onClick={resetFilters}>
+          Réinitialiser
+        </button>
+      )}
 
-        </div>
+    </div>
 
-        {/* FILTER CARD */}
+    <div className="filter-grid">
 
-        <div className="casement-card">
-
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 15 }}>
-
-            <div className="casement-card-title">
-              Filtres
-            </div>
-
-            {hasActiveFilters && (
-              <button className="btn-reset" onClick={resetFilters}>
-                Réinitialiser
-              </button>
-            )}
-
-          </div>
-
-          <div className="filter-grid">
-
-            <div className="filter-group">
-              <label className="filter-label">Panneau</label>
-              <select className="filter-select"
-                value={filterPanneau}
-                onChange={e => setFilterPanneau(e.target.value)}
-              >
-                <option value="">Tous</option>
-                {uniquePanneaux.map(p =>
-                  <option key={p} value={p}>{p}</option>
-                )}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label className="filter-label">Tranchée</label>
-              <select className="filter-select"
-                value={filterTranchee}
-                onChange={e => setFilterTranchee(e.target.value)}
-              >
-                <option value="">Toutes</option>
-                {uniqueTranchees.map(t =>
-                  <option key={t} value={t}>{t}</option>
-                )}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label className="filter-label">Type Roche</label>
-              <select className="filter-select"
-                value={filterTypeRoche}
-                onChange={e => setFilterTypeRoche(e.target.value)}
-              >
-                <option value="">Tous</option>
-                {uniqueTypesRoche.map(r =>
-                  <option key={r} value={r}>{r}</option>
-                )}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label className="filter-label">Date début</label>
-              <input
-                type="date"
-                className="filter-input"
-                value={filterDateDebut}
-                onChange={e => setFilterDateDebut(e.target.value)}
-              />
-            </div>
-
-            <div className="filter-group">
-              <label className="filter-label">Date fin</label>
-              <input
-                type="date"
-                className="filter-input"
-                value={filterDateFin}
-                onChange={e => setFilterDateFin(e.target.value)}
-              />
-            </div>
-
-          </div>
-
-          <div className="filter-info">
-            {filteredCasements.length} résultat(s)
-            {hasActiveFilters && ` sur ${casements.length}`}
-          </div>
-
-        </div>
-
-        {/* TABLE */}
-
-        <div className="casement-card">
-
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 15 }}>
-
-            <div className="casement-card-title">
-              Liste Historique
-            </div>
-
-            <button className="btn-excel" onClick={exportExcel}>
-              Télécharger Excel
-            </button>
-
-          </div>
-
-          <div className="table-wrap">
-
-            <table className="mine-table">
-
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Panneau</th>
-                  <th>Tranchée</th>
-                  <th>Niveau</th>
-                  <th>Type Roche</th>
-                  <th>Granulo</th>
-                  <th>Coups</th>
-                  <th>Équipements</th>
-                  <th>Conducteur</th>
-                  <th>Matricule</th>
-                  <th>Volume</th>
-                  <th>Heures</th>
-                  <th>Rendement</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {filteredCasements.length > 0 ? (
-
-                  filteredCasements.map((c, i) => (
-
-                    <tr key={i}>
-                      <td>{c.date}</td>
-                      <td>{c.panneau}</td>
-                      <td>{c.tranchee}</td>
-                      <td>{c.niveau}</td>
-                      <td>{c.type_roche}</td>
-                      <td>{c.granulometrie}</td>
-                      <td>{c.nombreCoups}</td>
-                      <td>{c.equipements?.join(", ")}</td>
-                      <td>{c.conducteur}</td>
-                      <td>{c.matricule}</td>
-                      <td>{c.volume_casse}</td>
-                      <td>{c.temps}</td>
-                      <td>{c.temps > 0 ? (c.volume_casse / c.temps).toFixed(2) : 0} t/h</td>
-                    </tr>
-
-                  ))
-
-                ) : (
-
-                  <tr>
-                    <td colSpan="13" className="empty-row">
-                      Aucun résultat trouvé
-                    </td>
-                  </tr>
-
-                )}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
+      {/* Filtre Panneau */}
+      <div className="filter-group">
+        <label className="filter-label">Panneau</label>
+        <select className="filter-select"
+          value={filterPanneau}
+          onChange={e => setFilterPanneau(e.target.value)}
+        >
+          <option value="">Tous</option>
+          {uniquePanneaux.map(p =>
+            <option key={p} value={p}>{p}</option>
+          )}
+        </select>
       </div>
 
-    </>
+      {/* Filtre Tranchée */}
+      <div className="filter-group">
+        <label className="filter-label">Tranchée</label>
+        <select className="filter-select"
+          value={filterTranchee}
+          onChange={e => setFilterTranchee(e.target.value)}
+        >
+          <option value="">Toutes</option>
+          {uniqueTranchees.map(t =>
+            <option key={t} value={t}>{t}</option>
+          )}
+        </select>
+      </div>
 
-  );
+      {/* Filtre Poste (remplace Type Roche supprimé) */}
+      <div className="filter-group">
+        <label className="filter-label">Poste</label>
+        <select className="filter-select"
+          value={filterPoste}
+          onChange={e => setFilterPoste(e.target.value)}
+        >
+          <option value="">Tous</option>
+          {uniquePostes.map(p =>
+            <option key={p} value={p}>{p}</option>
+          )}
+        </select>
+      </div>
+
+      {/* Filtre Date de début */}
+      <div className="filter-group">
+        <label className="filter-label">Date début</label>
+        <input
+          type="date"
+          className="filter-input"
+          value={filterDateDebut}
+          onChange={e => setFilterDateDebut(e.target.value)}
+        />
+      </div>
+
+      {/* Filtre Date de fin */}
+      <div className="filter-group">
+        <label className="filter-label">Date fin</label>
+        <input
+          type="date"
+          className="filter-input"
+          value={filterDateFin}
+          onChange={e => setFilterDateFin(e.target.value)}
+        />
+      </div>
+
+    </div>
+
+    {/* Résumé : X résultat(s) sur Y total si filtres actifs */}
+    <div className="filter-info">
+      {filteredCasements.length} résultat(s)
+      {hasActiveFilters && ` sur ${casements.length}`}
+    </div>
+
+  </div>
+
+  {/* ── CARTE TABLEAU ── */}
+
+  <div className="casement-card">
+
+    <div style={{display:"flex", justifyContent:"space-between", marginBottom:15}}>
+
+      <div className="casement-card-title">Liste Historique</div>
+
+      {/* Export Excel — exporte uniquement les lignes filtrées */}
+      <button className="btn-excel" onClick={exportExcel}>
+        Télécharger Excel
+      </button>
+
+    </div>
+
+    <div className="table-wrap">
+
+      <table className="mine-table">
+
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Panneau</th>
+            <th>Tranchée</th>
+            <th>Profondeur</th>
+            <th>Poste</th>
+            <th>Équipements</th>
+            <th>Conducteur</th>
+            <th>Matricule</th>
+            <th>Volume Sauté</th>
+            <th>Heures</th>
+            <th>Rendement</th>
+            <th>État Machine</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {filteredCasements.length > 0 ? (
+
+            filteredCasements.map((c, i) => (
+
+              <tr key={i}>
+                <td>{c.date}</td>
+                <td>{c.panneau}</td>
+                <td>{c.tranchee}</td>
+                <td>{c.profondeur}</td>
+                <td>{c.poste}</td>
+                <td>{c.equipements?.join(", ")}</td>
+                <td>{c.conducteur}</td>
+                <td>{c.matricule}</td>
+                <td>{c.volume_saute}</td>
+                <td>{c.temps}</td>
+                <td>{c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : 0} t/h</td>
+                <td>{c.etatMachine === "arret" ? "En arrêt" : "En marche"}</td>
+                <td>
+                  <button className="btn-edit" onClick={() => handleEdit(c, i)}>
+                    ✏️ Modifier
+                  </button>
+                </td>
+              </tr>
+
+            ))
+
+          ) : (
+
+            /* Ligne affichée si aucun résultat ne correspond aux filtres */
+            <tr>
+              <td colSpan="13" className="empty-row">
+                Aucun résultat trouvé
+              </td>
+            </tr>
+
+          )}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+</>
+
+);
 
 }
 

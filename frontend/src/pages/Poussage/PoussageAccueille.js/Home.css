@@ -25,8 +25,8 @@
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);}
+
 
 * {
   margin: 0;
@@ -162,14 +162,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-section {
-  height: 100vh;
+  height:10px;
   position: relative;
   overflow: hidden;
 }
 
 .hero-image {
   width: 100%;
-  height: 100%;
+  height: 20%;
   object-fit: cover;
   transform: scale(1.2);
   animation: hero-zoom 10s ease-out forwards;
@@ -188,8 +188,8 @@ h1, h2, h3, h4, h5, h6 {
   inset: 0;
   background: linear-gradient(
     120deg,
-    rgba(0,0,0,0.7),
-    rgba(0,0,0,0.4),
+    rgba(2, 122, 48, 0.7),
+    rgba(29, 105, 5, 0.4),
     rgba(22,163,74,0.2)
   );
   backdrop-filter: blur(2px);
@@ -447,7 +447,7 @@ h1, h2, h3, h4, h5, h6 {
   --green-light: #dcfce7;
   --green-mid: #f0fdf4;
   --text-dark: #111827;
-  --text-mutedOPS: #0e0f11;
+  --text-muted: #6b7280;
 }
 /* ============================================
    DARK MODE — OPERATIONS SECTION
@@ -558,7 +558,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .ops-subtitle {
   font-size: 17px;
-  color: var(--text-mutedOPS);
+  color: var(--text-muted);
   max-width: 480px;
   margin: 0 auto;
   line-height: 1.7;
@@ -726,7 +726,7 @@ h1, h2, h3, h4, h5, h6 {
 .ops-card-desc {
   margin: 0 0 auto 0;
   font-size: 13.5px;
-  color: var(--text-mutedOPS);
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
