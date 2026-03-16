@@ -45,7 +45,7 @@
 }
 
 .users-form button {
-  background: #2e7d32;
+  background: #1a6ae2;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -77,8 +77,8 @@
 }
 
 .btn-edit {
-  background: #43a047;
-  color: white;
+  background: #ddd201;
+  color: rgb(255, 255, 255);
   border: none;
   padding: 5px 8px;
   border-radius: 5px;

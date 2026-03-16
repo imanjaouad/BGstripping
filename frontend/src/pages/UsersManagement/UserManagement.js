@@ -161,7 +161,7 @@ const UserManagement = () => {
           >
             <option value="">Tous les rôles</option>
             <option value="admin">Admin</option>
-            <option value="superviseur">Superviseur</option>
+            <option value="superviseur">Superviseur(e)</option>
           </select>
 
           <select
@@ -181,7 +181,7 @@ const UserManagement = () => {
 
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Nom d'utilisateur"
             value={form.username}
             onChange={(e)=>setForm({...form, username:e.target.value})}
             required
@@ -189,7 +189,7 @@ const UserManagement = () => {
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Mot de passe"
             value={form.password}
             onChange={(e)=>setForm({...form, password:e.target.value})}
             required={!editingId}
@@ -209,7 +209,7 @@ const UserManagement = () => {
             onChange={(e)=>setForm({...form, role:e.target.value})}
           >
             <option value="admin">Admin</option>
-            <option value="superviseur">Superviseur</option>
+            <option value="superviseur">Superviseur(e)</option>
           </select>
 
           <button type="submit">
@@ -223,7 +223,7 @@ const UserManagement = () => {
 
           <thead>
             <tr>
-              <th>Username</th>
+              <th>Nom d'utilisateur</th>
               <th>Mode</th>
               <th>Role</th>
               <th>Actions</th>
@@ -241,14 +241,14 @@ const UserManagement = () => {
                     className="btn-edit"
                     onClick={()=>handleEdit(u)}
                   >
-                    Edit
+                    Modifier
                   </button>
 
                   <button
                     className="btn-delete"
                     onClick={()=>handleDelete(u.id)}
                   >
-                    Delete
+                    Supprimer
                   </button>
                 </td>
               </tr>
