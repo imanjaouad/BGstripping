@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPoussages, addPoussageAsync, updatePoussageAsync } from "../../features/poussageSlice";
 import image from "../../images/image3.webp";
-import "../../components/animations.css";
-
+import  "../../style/PoussageForm.css";
 function Dashboard() {
   const dispatch = useDispatch();
   const { loading } = useSelector((s) => s.poussage);

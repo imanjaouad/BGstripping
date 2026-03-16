@@ -55,8 +55,10 @@ const CSS = `
     opacity:0; animation:db-fadeUp .5s ease forwards;
     transition:transform .2s,box-shadow .2s; cursor:default;
   }
-  .db-kpi:hover { transform:translateY(-5px); animation:db-pulse 2s ease infinite !important; }
-  .db-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
+.db-kpi:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(22,163,74,0.25);
+}  .db-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
     background:linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
     background-size:200%;animation:db-shimmer 2.4s linear infinite; }
   .db-kpi-shimmer { position:absolute;inset:0;
@@ -291,8 +293,8 @@ function calcTemps(debut, fin) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-function DashboardComplet() {
-  const dispatch = useDispatch();
+function Statistique() {
+  const dispatch  = useDispatch();
   const poussages = useSelector((s) => s.poussage?.list || []);
 
   const location = useLocation();
@@ -1223,4 +1225,4 @@ function DashboardComplet() {
   );
 }
 
-export default DashboardComplet;
+export default Statistique;

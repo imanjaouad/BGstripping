@@ -22,7 +22,7 @@ import {
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import image from "../../images/ocpLogo.png";
+import image from "../../images/image3.webp";
 
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement,
@@ -38,6 +38,8 @@ const CSS = `
   @keyframes db-pulse    { 0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} 50%{box-shadow:0 0 20px 5px rgba(22,163,74,0.18)} }
   @keyframes db-countUp  { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
   @keyframes db-rowIn    { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes db-slideRight { from{width:0} to{width:var(--bar-w)} }
+  @keyframes db-trendPop  { 0%{opacity:0;transform:scale(0.5) translateY(6px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
 
   .db-page { font-family:'Plus Jakarta Sans',sans-serif; }
 
@@ -53,8 +55,10 @@ const CSS = `
     opacity:0; animation:db-fadeUp .5s ease forwards;
     transition:transform .2s,box-shadow .2s; cursor:default;
   }
-  .db-kpi:hover { transform:translateY(-5px); animation:db-pulse 2s ease infinite !important; }
-  .db-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
+.db-kpi:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(22,163,74,0.25);
+}  .db-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
     background:linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
     background-size:200%;animation:db-shimmer 2.4s linear infinite; }
   .db-kpi-shimmer { position:absolute;inset:0;
@@ -184,6 +188,70 @@ const CSS = `
   .db-cost-progress-bar { height:100%;border-radius:20px;
     background:linear-gradient(90deg,#16a34a,#4ade80);
     transition:width .8s cubic-bezier(.4,0,.2,1); }
+
+  /* ── Nouveau : Bloc Évolution des Coûts ── */
+  .db-cost-evo-card {
+    background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
+    padding:24px 22px 20px; opacity:0; animation:db-fadeUp .6s ease forwards;
+    transition:box-shadow .2s,transform .2s; margin-bottom:20px;
+  }
+  .db-cost-evo-card:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(22,163,74,0.11); }
+
+  .db-cost-month-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px; border-radius:10px; margin-bottom:8px;
+    background:#f8fffe; border:1px solid #e6faf0;
+    transition:background .15s;
+  }
+  .db-cost-month-row:hover { background:#f0fdf4; }
+
+  .db-cost-month-name { font-size:13px; font-weight:700; color:#14532d; min-width:90px; }
+  .db-cost-month-val  { font-size:13px; font-weight:600; color:#374151; min-width:110px; text-align:right; }
+  .db-cost-bar-wrap   { flex:1; height:8px; background:#f0fdf4; border-radius:20px; overflow:hidden; margin:0 14px; }
+  .db-cost-bar-fill   {
+    height:100%; border-radius:20px;
+    background:linear-gradient(90deg,#16a34a,#4ade80);
+    animation:db-slideRight .8s cubic-bezier(.4,0,.2,1) both;
+  }
+
+  .db-trend-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700;
+    animation:db-trendPop .4s ease both;
+    white-space:nowrap;
+  }
+  .db-trend-up   { background:#fef2f2; color:#dc2626; }
+  .db-trend-down { background:#f0fdf4; color:#16a34a; }
+  .db-trend-same { background:#f3f4f6; color:#6b7280; }
+
+  .db-cost-evo-summary {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px; margin-bottom:20px;
+  }
+  .db-cost-evo-mini {
+    background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+    border:1px solid #bbf7d0; border-radius:12px; padding:14px 16px;
+    text-align:center; opacity:0; animation:db-fadeUp .5s ease forwards;
+  }
+  .db-cost-evo-mini-val  { font-size:20px; font-weight:800; color:#15803d; line-height:1.1; }
+  .db-cost-evo-mini-label{ font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.1em; color:#9ca3af; margin-top:4px; }
+
+  .db-cost-evo-empty { text-align:center; padding:36px 0; color:#9ca3af; font-size:13px; }
+
+  .db-cost-last-compare {
+    background:linear-gradient(135deg,#15803d,#22c55e);
+    border-radius:14px; padding:16px 20px;
+    display:flex; align-items:center; gap:16px; margin-bottom:20px;
+    animation:db-fadeUp .5s ease both;
+  }
+  .db-cost-last-compare-icon { font-size:28px; flex-shrink:0; }
+  .db-cost-last-compare-label { font-size:11px; color:rgba(255,255,255,.7);
+    text-transform:uppercase; letter-spacing:.1em; font-weight:600; }
+  .db-cost-last-compare-val   { font-size:20px; font-weight:800; color:#fff; line-height:1.2; }
+  .db-cost-diff-pos { color:#fde68a; font-size:13px; font-weight:700; }
+  .db-cost-diff-neg { color:#a7f3d0; font-size:13px; font-weight:700; }
+  .db-cost-diff-neu { color:rgba(255,255,255,.6); font-size:13px; font-weight:700; }
 `;
 
 // ─── Chart config ─────────────────────────────────────────────────────────────
@@ -248,6 +316,392 @@ function AnimCount({ target, duration = 1100 }) {
     return () => cancelAnimationFrame(raf.current);
   }, [target, duration]);
   return val.toLocaleString();
+}
+
+// ─── Format number MAD ────────────────────────────────────────────────────────
+function fmtMAD(n) {
+  return Number(n).toLocaleString("fr-MA", {
+    minimumFractionDigits: 2, maximumFractionDigits: 2,
+  });
+}
+
+// ─── CostEvolution Component ──────────────────────────────────────────────────
+function CostEvolution() {
+  const chartRef      = useRef(null);
+  const chartInstance = useRef(null);
+
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem("cout-history");
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  useEffect(() => {
+    const onStorage = () => {
+      try {
+        const saved = localStorage.getItem("cout-history");
+        setHistory(saved ? JSON.parse(saved) : []);
+      } catch { setHistory([]); }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // ── Regrouper par mois ──
+  const byMonth = {};
+  history.forEach(h => {
+    if (!byMonth[h.month]) byMonth[h.month] = [];
+    byMonth[h.month].push(h);
+  });
+  const monthKeys = Object.keys(byMonth);
+
+  const monthSummary = monthKeys.map(m => {
+    const entries   = byMonth[m];
+    const totalM    = entries.reduce((s, e) => s + e.cost, 0);
+    const avgMeter  = entries.reduce((s, e) => s + e.meterCost, 0) / entries.length;
+    const avgAnnual = entries.reduce((s, e) => s + e.annualCost, 0) / entries.length;
+    return { month: m, total: totalM, avgMeter, avgAnnual, count: entries.length };
+  });
+
+  const totalCost = monthSummary.reduce((s, m) => s + m.total, 0);
+  const maxCost   = monthSummary.length > 0 ? Math.max(...monthSummary.map(m => m.total)) : 0;
+
+  // ── % budget annuel de chaque mois ──
+  const percents = monthSummary.map(ms =>
+    totalCost > 0 ? parseFloat(((ms.total / totalCost) * 100).toFixed(2)) : 0
+  );
+
+  // ── Couleur selon % ──
+  function pctColor(p) {
+    if (p > 40) return { bg:"rgba(239,68,68,0.75)",  border:"#EF4444" };
+    if (p > 20) return { bg:"rgba(245,158,11,0.75)", border:"#F59E0B" };
+    return            { bg:"rgba(22,163,74,0.75)",   border:"#16A34A" };
+  }
+
+  // ── Chart.js ──
+  useEffect(() => {
+    if (!chartRef.current || monthSummary.length === 0) return;
+    if (chartInstance.current) { chartInstance.current.destroy(); chartInstance.current = null; }
+
+    const ctx    = chartRef.current.getContext("2d");
+    const colors = percents.map(p => pctColor(p));
+
+    chartInstance.current = new ChartJS(ctx, {
+      type: "bar",
+      data: {
+        labels: monthSummary.map(ms => ms.month),
+        datasets: [
+          {
+            type: "bar",
+            label: "% du Budget Annuel",
+            data: percents,
+            backgroundColor: colors.map(c => c.bg),
+            borderColor:     colors.map(c => c.border),
+            borderWidth: 2, borderRadius: 10, borderSkipped: false,
+            yAxisID: "yPct",
+          },
+          {
+            type: "line",
+            label: "Coût MAD",
+            data: monthSummary.map(ms => ms.total),
+            borderColor: "#15803d",
+            backgroundColor: "rgba(22,163,74,0.10)",
+            borderWidth: 2.5,
+            pointBackgroundColor: "#16a34a",
+            pointRadius: 5, pointHoverRadius: 7,
+            tension: 0.4, fill: true,
+            yAxisID: "yCost",
+          },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 900, easing: "easeOutQuart" },
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: {
+            position: "top",
+            labels: {
+              color: "#374151", padding: 16,
+              font: { family:"'Plus Jakarta Sans',sans-serif", size: 12 },
+              usePointStyle: true, pointStyleWidth: 8,
+            },
+          },
+          tooltip: {
+            backgroundColor: "#fff",
+            borderColor: "#bbf7d0", borderWidth: 1.5,
+            titleColor: "#14532d", bodyColor: "#6b7280",
+            padding: 12, cornerRadius: 10,
+            callbacks: {
+              label: (ctx) => {
+                if (ctx.dataset.yAxisID === "yPct")
+                  return ` Répartition : ${ctx.parsed.y}%`;
+                return ` Coût : ${fmtMAD(ctx.parsed.y)} MAD`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false }, border: { display: false },
+            ticks: { color:"#9ca3af", font:{ family:"'Plus Jakarta Sans',sans-serif", size:11 } },
+          },
+          yPct: {
+            type: "linear", position: "left",
+            grid: { color:"rgba(22,163,74,0.07)" }, border: { display:false },
+            ticks: {
+              callback: v => v + "%", color:"#9ca3af",
+              font:{ family:"'Plus Jakarta Sans',sans-serif", size:11 },
+            },
+            title: { display:true, text:"% Budget", color:"#9ca3af", font:{size:10} },
+          },
+          yCost: {
+            type: "linear", position: "right",
+            grid: { display:false }, border: { display:false },
+            ticks: {
+              callback: v => fmtMAD(v) + " MAD", color:"#9ca3af",
+              font:{ family:"'Plus Jakarta Sans',sans-serif", size:10 },
+            },
+            title: { display:true, text:"Coût (MAD)", color:"#9ca3af", font:{size:10} },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (chartInstance.current) { chartInstance.current.destroy(); chartInstance.current = null; }
+    };
+  }, [history]);
+
+  // ── Comparaison dernier vs avant-dernier ──
+  const last = monthSummary[monthSummary.length - 1];
+  const prev = monthSummary.length >= 2 ? monthSummary[monthSummary.length - 2] : null;
+  let diffAbs = 0, diffPct = 0, trendDir = "same";
+  if (prev && last) {
+    diffAbs  = last.total - prev.total;
+    diffPct  = prev.total > 0 ? ((diffAbs / prev.total) * 100) : 0;
+    trendDir = diffAbs > 0 ? "up" : diffAbs < 0 ? "down" : "same";
+  }
+  const trendIcon      = trendDir === "up" ? "📈" : trendDir === "down" ? "📉" : "➡️";
+  const trendDiffClass = trendDir === "up" ? "db-cost-diff-pos" : trendDir === "down" ? "db-cost-diff-neg" : "db-cost-diff-neu";
+
+  if (history.length === 0) {
+    return (
+      <div className="db-cost-evo-card" style={{ animationDelay:"0.44s" }}>
+        <div className="db-card-header" style={{ marginBottom:8 }}>
+          <div>
+            <p className="db-card-title">💰 Répartition du Budget Annuel & Comparaison Mensuelle</p>
+            <p className="db-card-sub">Données depuis Gestion des Coûts</p>
+          </div>
+        </div>
+        <div className="db-cost-evo-empty">
+          📊 Aucun calcul enregistré — rendez-vous dans <strong>Gestion des Coûts</strong> pour saisir les paramètres
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="db-cost-evo-card" style={{ animationDelay:"0.44s" }}>
+
+      {/* ── Titre ── */}
+      <div className="db-card-header" style={{ marginBottom:16 }}>
+        <div>
+          <p className="db-card-title">💰 Répartition du Budget Annuel & Comparaison Mensuelle</p>
+          <p className="db-card-sub">% consommé par mois · évolution des coûts · hausse / baisse</p>
+        </div>
+        <span className="db-pill">{monthSummary.length} mois</span>
+      </div>
+
+      {/* ── Mini KPIs ── */}
+      <div className="db-cost-evo-summary" style={{ marginBottom:18 }}>
+        {[
+          { val: fmtMAD(totalCost),                          label:"Coût Total MAD",      delay:"0.46s" },
+          { val: fmtMAD(totalCost / (monthSummary.length||1)), label:"Moyenne / Mois MAD", delay:"0.52s" },
+          { val: fmtMAD(maxCost),                             label:"Pic Mensuel MAD",     delay:"0.58s" },
+          { val: (Math.max(...percents)).toFixed(1) + "%",   label:"% Max d'un mois",     delay:"0.64s" },
+        ].map(({ val, label, delay }) => (
+          <div className="db-cost-evo-mini" key={label} style={{ animationDelay:delay }}>
+            <div className="db-cost-evo-mini-val">{val}</div>
+            <div className="db-cost-evo-mini-label">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Bandeau comparaison dernier vs précédent ── */}
+      {prev && last && (
+        <div className="db-cost-last-compare" style={{ marginBottom:20 }}>
+          <div className="db-cost-last-compare-icon">{trendIcon}</div>
+          <div style={{ flex:1 }}>
+            <div className="db-cost-last-compare-label">{last.month} vs {prev.month}</div>
+            <div className="db-cost-last-compare-val">{fmtMAD(last.total)} MAD</div>
+            <div className={trendDiffClass}>
+              {diffAbs >= 0 ? "+" : ""}{fmtMAD(diffAbs)} MAD
+              &nbsp;({diffPct >= 0 ? "+" : ""}{diffPct.toFixed(1)}%)
+              &nbsp;par rapport à {prev.month}
+            </div>
+          </div>
+          <div style={{
+            background: trendDir==="up"?"rgba(220,38,38,0.18)": trendDir==="down"?"rgba(22,163,74,0.18)":"rgba(107,114,128,0.15)",
+            color: trendDir==="up"?"#fde68a": trendDir==="down"?"#a7f3d0":"rgba(255,255,255,.7)",
+            borderRadius:20, padding:"6px 16px",
+            fontWeight:700, fontSize:13, whiteSpace:"nowrap",
+          }}>
+            {trendDir === "up" ? "⬆ Hausse" : trendDir === "down" ? "⬇ Baisse" : "— Stable"}
+          </div>
+        </div>
+      )}
+
+      {/* ── Graphique mixte Barres (%) + Ligne (MAD) ── */}
+      <div style={{ position:"relative", height:300, marginBottom:24 }}>
+        <canvas ref={chartRef} />
+      </div>
+
+      {/* ── Barres visuelles horizontales avec % budget ── */}
+      <div style={{ marginBottom:22 }}>
+        <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
+          letterSpacing:".12em", color:"#9ca3af", marginBottom:10 }}>
+          Répartition visuelle du budget annuel
+        </div>
+        {monthSummary.map((ms, idx) => {
+          const pct     = totalCost > 0 ? (ms.total / totalCost) * 100 : 0;
+          const col     = pctColor(pct);
+          const prevMs  = idx > 0 ? monthSummary[idx - 1] : null;
+          const mDiff   = prevMs ? ms.total - prevMs.total : 0;
+          const mTrend  = prevMs ? (mDiff > 0 ? "up" : mDiff < 0 ? "down" : "same") : "ref";
+          const mIcon   = mTrend === "up" ? "▲" : mTrend === "down" ? "▼" : mTrend === "ref" ? "◎" : "—";
+          const mColor  = mTrend === "up" ? "#ef4444" : mTrend === "down" ? "#16a34a" : "#9ca3af";
+
+          return (
+            <div key={ms.month} className="db-cost-month-row"
+              style={{ animationDelay:`${0.48 + idx * 0.06}s`, marginBottom:6 }}>
+              {/* Mois */}
+              <span className="db-cost-month-name">{ms.month}</span>
+
+              {/* Barre % */}
+              <div style={{ flex:1, margin:"0 12px" }}>
+                <div style={{ display:"flex", justifyContent:"space-between",
+                  fontSize:10, color:"#9ca3af", marginBottom:3 }}>
+                  <span>% Budget annuel</span>
+                  <span style={{ fontWeight:700, color: col.border }}>{pct.toFixed(1)}%</span>
+                </div>
+                <div className="db-cost-bar-wrap">
+                  <div className="db-cost-bar-fill"
+                    style={{ width:`${pct}%`,
+                      background:`linear-gradient(90deg,${col.border},${col.bg})`,
+                      animationDelay:`${0.5 + idx * 0.07}s` }}/>
+                </div>
+              </div>
+
+              {/* Valeur */}
+              <span className="db-cost-month-val" style={{ minWidth:130 }}>
+                {fmtMAD(ms.total)} MAD
+              </span>
+
+              {/* Badge tendance vs mois précédent */}
+              <span style={{
+                minWidth:90, textAlign:"right", fontWeight:700, fontSize:12, color:mColor,
+                animation:`db-trendPop .4s ${0.52 + idx * 0.06}s ease both`,
+                display:"inline-block",
+              }}>
+                {mIcon} {prevMs
+                  ? `${mDiff >= 0 ? "+" : ""}${fmtMAD(mDiff)}`
+                  : "Référence"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Tableau comparaison détaillé ── */}
+      <div style={{ marginBottom:6 }}>
+        <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
+          letterSpacing:".12em", color:"#9ca3af", marginBottom:10 }}>
+          Tableau comparatif mois par mois
+        </div>
+        <div className="db-table-wrap">
+          <table className="db-table">
+            <thead>
+              <tr>
+                <th>Mois</th>
+                <th>Coût (MAD)</th>
+                <th>% Budget Annuel</th>
+                <th>Coût / m²</th>
+                <th>Nb Calculs</th>
+                <th>vs Mois Préc.</th>
+                <th>Évolution %</th>
+                <th>Tendance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {monthSummary.map((ms, idx) => {
+                const pct     = totalCost > 0 ? (ms.total / totalCost) * 100 : 0;
+                const col     = pctColor(pct);
+                const prevMs  = idx > 0 ? monthSummary[idx - 1] : null;
+                const mDiff   = prevMs ? ms.total - prevMs.total : null;
+                const mDiffPct= prevMs && prevMs.total > 0 ? (mDiff / prevMs.total) * 100 : null;
+                const mTrend  = mDiff === null ? "ref" : mDiff > 0 ? "up" : mDiff < 0 ? "down" : "same";
+                const arrowColor = mTrend === "up" ? "#ef4444" : mTrend === "down" ? "#16a34a" : "#9ca3af";
+
+                return (
+                  <tr key={ms.month} style={{ animationDelay:`${idx * 0.04}s` }}>
+                    <td style={{ fontWeight:700, color:"#14532d" }}>{ms.month}</td>
+                    <td style={{ fontWeight:700 }}>{fmtMAD(ms.total)} MAD</td>
+                    <td>
+                      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                        <div style={{ width:60, height:7, background:"#f0fdf4",
+                          borderRadius:20, overflow:"hidden", flexShrink:0 }}>
+                          <div style={{ height:"100%", width:`${pct}%`,
+                            background:col.border, borderRadius:20,
+                            transition:"width .7s ease" }}/>
+                        </div>
+                        <span style={{ fontWeight:700, color:col.border, fontSize:12 }}>
+                          {pct.toFixed(1)}%
+                        </span>
+                      </div>
+                    </td>
+                    <td>{fmtMAD(ms.avgMeter)} MAD/m²</td>
+                    <td style={{ textAlign:"center" }}>{ms.count}</td>
+                    <td style={{ color: arrowColor, fontWeight:700 }}>
+                      {mDiff !== null
+                        ? `${mDiff >= 0 ? "+" : ""}${fmtMAD(mDiff)} MAD`
+                        : <span style={{ color:"#9ca3af", fontWeight:400 }}>—</span>}
+                    </td>
+                    <td style={{ color: arrowColor, fontWeight:700 }}>
+                      {mDiffPct !== null
+                        ? `${mDiffPct >= 0 ? "+" : ""}${mDiffPct.toFixed(1)}%`
+                        : <span style={{ color:"#9ca3af", fontWeight:400 }}>Référence</span>}
+                    </td>
+                    <td>
+                      {mTrend === "up"   && <span style={{ background:"#fef2f2", color:"#dc2626", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>⬆ Hausse</span>}
+                      {mTrend === "down" && <span style={{ background:"#f0fdf4", color:"#16a34a", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>⬇ Baisse</span>}
+                      {mTrend === "same" && <span style={{ background:"#f3f4f6", color:"#6b7280", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>— Stable</span>}
+                      {mTrend === "ref"  && <span style={{ background:"#eff6ff", color:"#3b82f6", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>◎ Réf.</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── Légende couleurs ── */}
+      <div style={{ marginTop:14, display:"flex", flexWrap:"wrap", gap:10,
+        padding:"10px 14px", background:"#f8fffe",
+        borderRadius:10, border:"1px solid #e6faf0", fontSize:11, color:"#9ca3af" }}>
+        <span>🎨 Couleurs % budget :</span>
+        <span style={{ color:"#16a34a", fontWeight:700 }}>● vert ≤ 20%</span>
+        <span style={{ color:"#f59e0b", fontWeight:700 }}>● ambre 20–40%</span>
+        <span style={{ color:"#ef4444", fontWeight:700 }}>● rouge &gt; 40%</span>
+        <span style={{ marginLeft:"auto" }}>
+          💡 Données depuis <strong style={{ color:"#16a34a" }}>Gestion des Coûts</strong>
+        </span>
+      </div>
+
+    </div>
+  );
 }
 
 // ─── Initial form state ───────────────────────────────────────────────────────
@@ -346,7 +800,7 @@ function DashboardComplet() {
   const totalOps    = poussages.length;
   const totalTemps  = poussages.reduce((a, p) => a + Number(p.temps || 0), 0);
   const enMarcheCnt = poussages.filter(p => p.etatMachine === "En marche").length;
-
+ const enArret = poussages.filter(p => p.etatMachine === "En arrêt").length;
   const rendMoyen = totalOps > 0
     ? (poussages.reduce((a, p) => {
         const v = Number(p.volume_soté || 0), t = Number(p.temps || 0);
@@ -536,14 +990,14 @@ function DashboardComplet() {
                 { icon:"⛏️", label:"Volume Total",    value:totalVolume,           unit:"t",   accent:"#16a34a", delay:"0.08s" },
                 { icon:"⏱️", label:"Temps Total",     value:totalTemps,            unit:"h",   accent:"#15803d", delay:"0.16s" },
                 { icon:"📈", label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", delay:"0.24s" },
-                { icon:"🔢", label:"Opérations",      value:totalOps,              unit:"op",  accent:"#4ade80", delay:"0.32s" },
+                { icon:"🔢", label:"En arret",      value:enArret,              unit:"op",  accent:"#4ade80", delay:"0.32s" },
                 { icon:"✅", label:"En Marche",       value:enMarcheCnt,           unit:"",    accent:"#86efac", delay:"0.40s" },
               ].map(({ icon, label, value, unit, accent, delay }) => (
                 <div key={label} className="db-kpi" style={{ animationDelay:delay }}>
                   <div className="db-kpi-shimmer"/>
                   <div className="db-kpi-icon">{icon}</div>
                   <div className="db-kpi-label">{label}</div>
-                  <div className="db-kpi-value" style={{ color:accent, animationDelay:delay }}>
+                  <div className="db-kpi-value" style={{ color:accent}}>
                     <AnimCount target={value}/>
                     <span className="db-kpi-unit">{unit}</span>
                   </div>
@@ -589,6 +1043,10 @@ function DashboardComplet() {
                 <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
               </div>
             )}
+
+            {/* ══ NOUVELLE SECTION : Évolution des Coûts ══ */}
+            <div className="db-section">Évolution des Coûts</div>
+            <CostEvolution />
 
             {/* Dernières opérations */}
             <div className="db-section">Dernières opérations</div>
@@ -662,8 +1120,8 @@ function DashboardComplet() {
                 <div className="db-empty">Aucune opération enregistrée</div>
               )}
             </div>
-          </>
-        )}
+          </>  )}
+      
 
       </div>
     </>
