@@ -1,0 +1,87 @@
+/* App.css */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f8;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* Le bouton */
+.btn-load {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-load:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+.btn-load:active {
+  transform: translateY(0);
+}
+
+.btn-load:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Messages d'erreur */
+.error-msg {
+  color: #e74c3c;
+  margin-top: 20px;
+  background: #fadbd8;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* La liste des posts */
+.post-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.post-item {
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-left: 5px solid #3498db; /* Une petite barre bleue à gauche */
+  transition: transform 0.2s;
+}
+
+.post-item:hover {
+  transform: translateX(5px); /* Animation au survol */
+}
+
+.post-item strong {
+  display: block;
+  font-size: 1.1em;
+  text-transform: capitalize; /* Met la première lettre de chaque mot en majuscule */
+  color: #2c3e50;
+}

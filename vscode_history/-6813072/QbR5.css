@@ -1,0 +1,82 @@
+/* Reset بسيط */
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* container principal */
+div {
+  display: flex;
+  flex-direction: column; /* pour que le titre, formulaire et liste s'empilent */
+  align-items: center;
+  margin-top: 30px;
+}
+
+/* form */
+form {
+  background: #ffffff;
+  padding: 20px;
+  width: 280px; /* largeur réduite pour un formulaire compact */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* labels et champs */
+form div {
+  margin-bottom: 12px; /* espace entre chaque champ */
+  display: flex;
+  flex-direction: column; /* label au-dessus de l'input */
+}
+
+form div input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+}
+
+form div input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* buttons */
+form div button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+form div button:hover {
+  background: #3730a3;
+}
+
+/* Liste des livres : aucun style, juste ul et li par défaut */
+ul {
+  margin-top: 15px;
+  width: 280px;
+}
+
+/* Liste simple */
+ul {
+  margin-top: 15px;
+  width: 280px; /* même largeur que le formulaire */
+  padding-left: 20px; /* petit padding pour les puces */
+}
+
+ul li {
+  margin-bottom: 6px; /* espace entre les livres */
+  font-size: 14px;     /* un peu plus lisible */
+  line-height: 1.4;    /* espace entre les lignes */
+}
+

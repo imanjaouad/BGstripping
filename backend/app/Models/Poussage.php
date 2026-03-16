@@ -14,12 +14,18 @@ class Poussage extends Model
         'niveau',
         'saute',
         'profondeur',
+        'volume_sote',
         'equipement',
+        'equipements_json',
         'machine_id',
         'conducteur',
         'matricule',
         'compteur_debut',
         'compteur_fin',
+        'heure_debut',
+        'heure_fin',
+        'temps',
+        'poste',
         'etat_machine',
         'type_arret',
         'arret_heure_debut',
@@ -27,9 +33,12 @@ class Poussage extends Model
     ];
 
     protected $casts = [
-        'operation_date' => 'date',
-        'saute' => 'decimal:2',
-        'profondeur' => 'decimal:2',
+        'operation_date'  => 'date',
+        'saute'           => 'decimal:2',
+        'profondeur'      => 'decimal:2',
+        'volume_sote'     => 'decimal:2',
+        'temps'           => 'decimal:2',
+        'equipements_json' => 'array',
     ];
 
     public function machine(): BelongsTo

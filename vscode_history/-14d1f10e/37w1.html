@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calculateur de notes par module</title>
+</head>
+<body>
+
+<h2>Calculateur de notes par module (avec coef)</h2>
+
+<p>Note finale souhaitée (%): <input type="number" id="noteFinale" placeholder="ex: 60"></p>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Coef</th>
+      <th>Note obtenue (%)</th>
+    </tr>
+  </thead>
+  <tbody id="modulesTable">
+    <!-- Les modules seront générés par JS -->
+  </tbody>
+</table>
+
+<button onclick="calculer()">Calculer notes nécessaires</button>
+
+<h3>Résultat:</h3>
+<div id="result"></div>
+
+<script>
+// Générer 8 modules automatiquement
+const modulesTable = document.getElementById('modulesTable');
+for(let i=1;i<=8;i++){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>Module ${i}</td>
+    <td><input type="number" class="coef" value="1"></td>
+    <td><input type="number" class="note" placeholder="laisser vide si pas encore"></td>
+  `;
+  modulesTable.appendChild(tr);
+}
+
+// Fonction de calcul
+function calculer(){
+  const noteFinale = parseFloat(document.getElementById('noteFinale').value);
+  const lignes = document.querySelectorAll('#modulesTable tr');
+  let totalCoef = 0;
+  let totalPondere = 0;
+  let modulesRestants = [];
+
+  lignes.forEach(ligne=>{
+    const coef = parseFloat(ligne.querySelector('.coef').value) || 0;
+    const note = ligne.querySelector('.note').value;
+
+    totalCoef += coef;
+
+    if(note === ''){
+      modulesRestants.push({coef: coef, name: ligne.cells[0].innerText});
+    } else {
+      totalPondere += (parseFloat(note)/100) * coef;
+    }
+  });
+
+  const cible = (noteFinale/100) * totalCoef;
+  const reste = cible - totalPondere;
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = '';
+
+  if(modulesRestants.length === 0){
+    if(reste <= 0) resultDiv.innerHTML = "Bravo ! Note finale atteinte.";
+    else resultDiv.innerHTML = "Impossible d'atteindre la note finale.";
+    return;
+  }
+
+  // Calculer la note nécessaire dans chaque module proportionnel au coef
+  modulesRestants.forEach(m=>{
+    const noteNecessaire = (reste / m.coef) * 100;
+    resultDiv.innerHTML += `${m.name} (coef ${m.coef}) : il te faut environ <b>${noteNecessaire.toFixed(2)}%</b><br>`;
+  });
+}
+</script>
+
+</body>
+</html>

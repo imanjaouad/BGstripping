@@ -785,7 +785,7 @@ function DashboardComplet() {
     setFormData({ ...EMPTY_FORM, ...p, equipements: p.equipements || [] });
     setEditIndex(i);
     setShowForm(true);
-    navigate("/");
+    navigate("/poussage");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1058,12 +1058,12 @@ function DashboardComplet() {
                 </p>
                 <div style={{ display:"flex", gap:8 }}>
                   <button className="db-btn-secondary"
-                    onClick={() => navigate("/historique")}
+                    onClick={() => navigate("/poussage/historique")}
                     style={{ fontSize:12, padding:"6px 12px" }}>
                     Voir tout →
                   </button>
                   <button className="db-btn-primary"
-                    onClick={() => { navigate("/"); setShowForm(true); }}
+                    onClick={() => { navigate("/poussage"); setShowForm(true); }}
                     style={{ fontSize:12, padding:"6px 12px" }}>
                     + Ajouter
                   </button>
@@ -1103,12 +1103,12 @@ function DashboardComplet() {
                             <button
                               className="db-btn-edit"
                               onClick={() => handleEdit(p, poussages.indexOf(p))}>
-                               Modifier
+                              Modifier
                             </button>
                             <button
                               className="db-btn-del"
                               onClick={() => handleDelete(poussages.indexOf(p))}>
-                               Supprimer
+                              Supprimer
                             </button>
                           </td>
                         </tr>

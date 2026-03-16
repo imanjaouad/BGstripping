@@ -168,13 +168,13 @@ const casements = useSelector(state=>state.casement?.list || []);
 
 /* KPI CALCUL */
 
-const totalVolume = useMemo(()=>casements.reduce((s,c)=>s+Number(c.volume_saute||0),0),[casements]);
+const totalVolume = useMemo(()=>casements.reduce((s,c)=>s+Number(c.volume_casse||0),0),[casements]);
 const totalTemps  = useMemo(()=>casements.reduce((s,c)=>s+Number(c.temps||0),0),[casements]);
 const totalCoups  = useMemo(()=>casements.reduce((s,c)=>s+Number(c.nombreCoups||0),0),[casements]);
 
 const rendement   = totalTemps>0 ? (totalVolume/totalTemps).toFixed(2) : 0;
 
-const nbMarche    = useMemo(()=>casements.filter(c=>c.etatMachine==="En marche").length,[casements]);
+const nbMarche    = useMemo(()=>casements.filter(c=>c.etatMachine==="marche").length,[casements]);
 
 const txDispo = casements.length>0 ? ((nbMarche/casements.length)*100).toFixed(1) : 0;
 
@@ -190,7 +190,7 @@ const map={};
       if(!c.date) return;
       const m=MONTHS[new Date(c.date).getMonth()];
       if(!map[m]) map[m]={volume:0,temps:0,coups:0,ops:0};
-      map[m].volume+=Number(c.volume_saute||0);
+      map[m].volume+=Number(c.volume_casse||0);
       map[m].temps+=Number(c.temps||0);
       map[m].coups+=Number(c.nombreCoups||0);
       map[m].ops+=1;

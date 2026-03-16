@@ -1,0 +1,81 @@
+/* Reset بسيط */
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* container principal : formulaire + liste côte à côte */
+div {
+  display: flex;
+  justify-content: center; /* centrer l'ensemble */
+  align-items: flex-start; /* aligner en haut */
+  gap: 15px;               /* petit espace entre formulaire et liste */
+  margin-top: 20px;
+}
+
+/* form ultra compact */
+form {
+  background: #ffffff;
+  padding: 10px;           /* moins de padding */
+  width: 180px;             /* formulaire plus étroit */
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* labels et champs */
+form div {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;  /* label au-dessus de l'input */
+}
+
+form div input {
+  width: 100%;
+  padding: 5px;            /* champs plus petits */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 11px;         /* texte plus petit */
+}
+
+form div input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* buttons */
+form div button {
+  width: 100%;
+  padding: 5px;            /* boutons plus petits */
+  margin-top: 4px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;         /* texte plus petit */
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+form div button:hover {
+  background: #3730a3;
+}
+
+/* liste des livres simple à droite */
+ul {
+  width: 180px;             /* même largeur que le formulaire */
+  padding-left: 15px;
+}
+
+ul li {
+  margin-bottom: 4px;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.liste-produits {
+  display: flex;       /* cartes côte à côte */
+  flex-wrap: wrap;     /* passe à la ligne si nécessaire */
+  gap: 15px;           /* espace entre les cartes */
+}

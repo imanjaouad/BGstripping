@@ -23,7 +23,7 @@ const Header = () => {
 
       <nav className="navbar">
         <a href="#poussage" className="nav-link">Poussage</a>
-        <a href="#cumenage" className="nav-link">encasement</a>
+        <a href="#casement" className="nav-link">Casement</a>
         <a href="#transport" className="nav-link">Transport</a>
         <a href="#reports" className="nav-link">Reports</a>
         <a href="#statistics" className="nav-link">Statistiques</a>

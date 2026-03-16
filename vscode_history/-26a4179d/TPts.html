@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Générateur de CV Professionnel ATS-Friendly</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        body {
+          background: white;
+        }
+        .print-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 210mm;
+          min-height: 297mm;
+          padding: 15mm;
+          margin: 0;
+          box-shadow: none !important;
+          border-radius: 0 !important;
+        }
+      }
+
+      /* Format A4 pour la prévisualisation */
+      .cv-a4 {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 15mm;
+        background: white;
+        box-sizing: border-box;
+      }
+
+      .cv-preview {
+        font-family: "Calibri", "Arial", sans-serif;
+        font-size: 11pt;
+        line-height: 1.5;
+        color: #1a1a1a;
+      }
+
+      .cv-preview h1 {
+        font-size: 22pt;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      .cv-preview h2 {
+        font-size: 12pt;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid #2563eb;
+        padding-bottom: 4px;
+        margin-bottom: 10px;
+        color: #1e40af;
+      }
+
+      .cv-preview .section {
+        margin-bottom: 16px;
+      }
+
+      .progress-ring {
+        transform: rotate(-90deg);
+      }
+
+      .tab-active {
+        border-bottom: 3px solid #2563eb;
+        color: #2563eb;
+      }
+
+      .template-card {
+        transition: all 0.3s ease;
+      }
+      .template-card:hover {
+        transform: translateY(-2px);
+      }
+      .template-card.selected {
+        ring: 3px;
+        ring-color: #2563eb;
+      }
+
+      .field-required::after {
+        content: " *";
+        color: #ef4444;
+      }
+
+      .tooltip {
+        visibility: hidden;
+        opacity: 0;
+        transition: all 0.2s;
+      }
+      .tooltip-trigger:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      /* Scrollbar personnalisée */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-slate-100 to-blue-50 min-h-screen">
+    <!-- Header -->
+    <header
+      class="no-print bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white py-6 shadow-xl"
+    >
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-center gap-3">
+          <div class="bg-white/20 p-3 rounded-xl">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h6v6h6v10H6z"
+              />
+              <path d="M8 12h8v2H8zm0 4h8v2H8zm0-8h2v2H8z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold">CV Pro Generator</h1>
+            <p class="text-blue-100 text-sm">
+              Créez un CV professionnel 100% compatible ATS
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Score ATS et Stats -->
+    <div class="no-print max-w-7xl mx-auto px-4 -mt-4">
+      <div
+        class="bg-white rounded-2xl shadow-lg p-4 flex flex-wrap items-center justify-between gap-4"
+      >
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <svg class="progress-ring w-16 h-16">
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  stroke="#e5e7eb"
+                  stroke-width="6"
+                  fill="none"
+                />
+                <circle
+                  id="scoreCircle"
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  stroke="#22c55e"
+                  stroke-width="6"
+                  fill="none"
+                  stroke-dasharray="175.93"
+                  stroke-dashoffset="175.93"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span
+                id="scoreText"
+                class="absolute inset-0 flex items-center justify-center text-lg font-bold text-gray-700"
+                >0%</span
+              >
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-600">Score ATS</p>
+              <p id="scoreLabel" class="text-xs text-gray-400">
+                Remplissez le formulaire
+              </p>
+            </div>
+          </div>
+          <div class="hidden md:flex gap-4 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span id="completedSections">0</span>/8 sections
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+              <span id="keywordsCount">0</span> mots-clés
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button
+            onclick="generateCV()"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition flex items-center gap-2"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Générer
+          </button>
+          <button
+            onclick="printCV()"
+            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition flex items-center gap-2"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+      <div class="grid lg:grid-cols-5 gap-6">
+        <!-- Formulaire (3 colonnes) -->
+        <div class="lg:col-span-3 no-print space-y-5">
+          <!-- Choix du modèle -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              🎨 Choisir un modèle
+            </h2>
+            <div class="grid grid-cols-3 gap-3">
+              <div
+                onclick="selectTemplate('classic')"
+                id="tpl-classic"
+                class="template-card selected cursor-pointer border-2 border-blue-500 rounded-lg p-3 text-center bg-blue-50"
+              >
+                <div
+                  class="w-full h-16 bg-gradient-to-b from-gray-200 to-gray-100 rounded mb-2 flex flex-col items-center justify-center"
+                >
+                  <div class="w-8 h-1 bg-gray-400 mb-1"></div>
+                  <div class="w-12 h-0.5 bg-gray-300 mb-1"></div>
+                  <div class="w-10 h-0.5 bg-gray-300"></div>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Classique</span>
+              </div>
+              <div
+                onclick="selectTemplate('modern')"
+                id="tpl-modern"
+                class="template-card cursor-pointer border-2 border-gray-200 rounded-lg p-3 text-center hover:border-blue-300"
+              >
+                <div
+                  class="w-full h-16 bg-gradient-to-b from-blue-100 to-white rounded mb-2 flex flex-col items-center justify-center"
+                >
+                  <div class="w-8 h-1.5 bg-blue-400 mb-1"></div>
+                  <div class="w-12 h-0.5 bg-gray-300 mb-1"></div>
+                  <div class="w-10 h-0.5 bg-gray-300"></div>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Moderne</span>
+              </div>
+              <div
+                onclick="selectTemplate('executive')"
+                id="tpl-executive"
+                class="template-card cursor-pointer border-2 border-gray-200 rounded-lg p-3 text-center hover:border-blue-300"
+              >
+                <div
+                  class="w-full h-16 bg-gradient-to-b from-slate-700 to-slate-500 rounded mb-2 flex flex-col items-center justify-center"
+                >
+                  <div class="w-8 h-1 bg-white mb-1"></div>
+                  <div class="w-12 h-0.5 bg-slate-300 mb-1"></div>
+                  <div class="w-10 h-0.5 bg-slate-300"></div>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Exécutif</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Informations personnelles -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="bg-blue-100 text-blue-600 p-2 rounded-lg">👤</span>
+              Informations Personnelles
+              <span
+                class="ml-auto text-xs bg-red-100 text-red-600 px-2 py-1 rounded"
+                >Obligatoire</span
+              >
+            </h2>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1 field-required"
+                  >Prénom</label
+                >
+                <input
+                  type="text"
+                  id="firstName"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Jean"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1 field-required"
+                  >Nom</label
+                >
+                <input
+                  type="text"
+                  id="lastName"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="DUPONT"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1 field-required"
+                  >Email professionnel</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="jean.dupont@email.com"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1 field-required"
+                  >Téléphone</label
+                >
+                <input
+                  type="tel"
+                  id="phone"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="+33 6 12 34 56 78"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Ville, Pays</label
+                >
+                <input
+                  type="text"
+                  id="address"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Paris, France"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1 field-required"
+                  >Titre professionnel</label
+                >
+                <input
+                  type="text"
+                  id="jobTitle"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Développeur Full Stack Senior"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >LinkedIn</label
+                >
+                <input
+                  type="url"
+                  id="linkedin"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="linkedin.com/in/jeandupont"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Portfolio / Site web</label
+                >
+                <input
+                  type="url"
+                  id="portfolio"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="www.monportfolio.com"
+                />
+              </div>
+            </div>
+          </section>
+
+          <!-- Résumé professionnel -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h2
+                class="text-lg font-semibold text-gray-800 flex items-center gap-2"
+              >
+                <span class="bg-green-100 text-green-600 p-2 rounded-lg"
+                  >📝</span
+                >
+                Résumé Professionnel
+              </h2>
+              <span
+                class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded"
+                >Très important</span
+              >
+            </div>
+            <textarea
+              id="summary"
+              rows="4"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Professionnel expérimenté avec X années d'expérience en [domaine]. Expert en [compétences clés]. Reconnu pour [réalisations principales]. Passionné par [valeur ajoutée]."
+            ></textarea>
+            <div class="mt-2 flex items-center justify-between">
+              <p class="text-xs text-gray-500">
+                💡 3-4 phrases maximum. Incluez vos années d'expérience et
+                compétences principales.
+              </p>
+              <span id="summaryCount" class="text-xs text-gray-400">0/500</span>
+            </div>
+          </section>
+
+          <!-- Expériences professionnelles -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h2
+                class="text-lg font-semibold text-gray-800 flex items-center gap-2"
+              >
+                <span class="bg-purple-100 text-purple-600 p-2 rounded-lg"
+                  >💼</span
+                >
+                Expériences Professionnelles
+              </h2>
+              <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded"
+                >Ordre anti-chronologique</span
+              >
+            </div>
+            <div id="experienceContainer" class="space-y-4"></div>
+            <button
+              onclick="addExperience()"
+              class="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition"
+            >
+              <span class="text-xl">+</span> Ajouter une expérience
+            </button>
+            <div
+              class="mt-3 p-3 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg"
+            >
+              <p class="text-xs text-amber-800">
+                <strong>Conseil ATS :</strong> Utilisez des verbes d'action
+                (Développé, Géré, Augmenté, Créé) et quantifiez vos réalisations
+                (+20%, 15 personnes, 50K€).
+              </p>
+            </div>
+          </section>
+
+          <!-- Formation -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="bg-yellow-100 text-yellow-600 p-2 rounded-lg"
+                >🎓</span
+              >
+              Formation
+            </h2>
+            <div id="educationContainer" class="space-y-4"></div>
+            <button
+              onclick="addEducation()"
+              class="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition"
+            >
+              <span class="text-xl">+</span> Ajouter une formation
+            </button>
+          </section>
+
+          <!-- Compétences techniques -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="bg-red-100 text-red-600 p-2 rounded-lg">⚡</span>
+              Compétences Techniques
+            </h2>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Compétences techniques / Hard Skills</label
+                >
+                <textarea
+                  id="hardSkills"
+                  rows="2"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="JavaScript, Python, React, Node.js, SQL, Git, AWS, Docker, Agile/Scrum..."
+                ></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Compétences transversales / Soft Skills</label
+                >
+                <textarea
+                  id="softSkills"
+                  rows="2"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="Leadership, Communication, Gestion d'équipe, Résolution de problèmes, Adaptabilité..."
+                ></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Outils & Logiciels</label
+                >
+                <textarea
+                  id="tools"
+                  rows="2"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="Microsoft Office, Jira, Figma, Adobe Creative Suite, SAP, Salesforce..."
+                ></textarea>
+              </div>
+            </div>
+          </section>
+
+          <!-- Langues -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg"
+                >🌍</span
+              >
+              Langues
+            </h2>
+            <div id="languageContainer" class="space-y-2"></div>
+            <button
+              onclick="addLanguage()"
+              class="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition"
+            >
+              <span class="text-xl">+</span> Ajouter une langue
+            </button>
+          </section>
+
+          <!-- Certifications -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="bg-teal-100 text-teal-600 p-2 rounded-lg">🏆</span>
+              Certifications & Formations continues
+            </h2>
+            <div id="certificationContainer" class="space-y-2"></div>
+            <button
+              onclick="addCertification()"
+              class="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition"
+            >
+              <span class="text-xl">+</span> Ajouter une certification
+            </button>
+          </section>
+
+          <!-- Projets -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="bg-cyan-100 text-cyan-600 p-2 rounded-lg">🚀</span>
+              Projets Significatifs
+              <span class="text-xs text-gray-400 font-normal ml-2"
+                >(Optionnel)</span
+              >
+            </h2>
+            <div id="projectContainer" class="space-y-4"></div>
+            <button
+              onclick="addProject()"
+              class="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition"
+            >
+              <span class="text-xl">+</span> Ajouter un projet
+            </button>
+          </section>
+
+          <!-- Centres d'intérêt -->
+          <section class="bg-white rounded-xl shadow-md p-5">
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="bg-pink-100 text-pink-600 p-2 rounded-lg">❤️</span>
+              Centres d'intérêt
+              <span class="text-xs text-gray-400 font-normal ml-2"
+                >(Optionnel)</span
+              >
+            </h2>
+            <textarea
+              id="interests"
+              rows="2"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              placeholder="Course à pied (Marathon de Paris 2023), Photographie, Bénévolat association locale..."
+            ></textarea>
+            <p class="text-xs text-gray-500 mt-1">
+              💡 Mentionnez des activités qui démontrent des qualités
+              professionnelles
+            </p>
+          </section>
+
+          <!-- Boutons d'action -->
+          <div class="flex flex-wrap gap-3">
+            <button
+              onclick="generateCV()"
+              class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Générer mon CV
+            </button>
+            <button
+              onclick="printCV()"
+              class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Télécharger PDF
+            </button>
+            <button
+              onclick="saveData()"
+              class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-5 rounded-xl shadow-lg transition"
+            >
+              💾
+            </button>
+            <button
+              onclick="clearForm()"
+              class="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-5 rounded-xl shadow-lg transition"
+            >
+              🗑️
+            </button>
+          </div>
+
+          <!-- Guide ATS -->
+          <div
+            class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 rounded-xl shadow-lg"
+          >
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                />
+              </svg>
+              Checklist CV Professionnel ATS
+            </h3>
+            <div class="grid md:grid-cols-2 gap-2 text-sm">
+              <label class="flex items-center gap-2 bg-white/10 p-2 rounded-lg">
+                <input type="checkbox" id="check1" class="w-4 h-4 rounded" />
+                Format simple sans colonnes
+              </label>
+              <label class="flex items-center gap-2 bg-white/10 p-2 rounded-lg">
+                <input type="checkbox" id="check2" class="w-4 h-4 rounded" />
+                Mots-clés de l'offre inclus
+              </label>
+              <label class="flex items-center gap-2 bg-white/10 p-2 rounded-lg">
+                <input type="checkbox" id="check3" class="w-4 h-4 rounded" />
+                Titres de section standards
+              </label>
+              <label class="flex items-center gap-2 bg-white/10 p-2 rounded-lg">
+                <input type="checkbox" id="check4" class="w-4 h-4 rounded" />
+                Résultats quantifiés
+              </label>
+              <label class="flex items-center gap-2 bg-white/10 p-2 rounded-lg">
+                <input type="checkbox" id="check5" class="w-4 h-4 rounded" />
+                Pas de photos/graphiques
+              </label>
+              <label class="flex items-center gap-2 bg-white/10 p-2 rounded-lg">
+                <input type="checkbox" id="check6" class="w-4 h-4 rounded" />
+                Police lisible (10-12pt)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prévisualisation CV (2 colonnes) -->
+        <div class="lg:col-span-2 lg:sticky lg:top-4 lg:self-start">
+          <div
+            class="no-print bg-white rounded-t-xl shadow-md p-3 flex items-center justify-between border-b"
+          >
+            <h2 class="font-semibold text-gray-700 flex items-center gap-2">
+              <svg
+                class="w-5 h-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              Aperçu du CV
+            </h2>
+            <span
+              class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
+              >Format A4</span
+            >
+          </div>
+          <div class="overflow-auto max-h-[85vh] bg-gray-300 p-4 rounded-b-xl">
+            <div
+              id="cvPreview"
+              class="print-area cv-a4 cv-preview mx-auto shadow-2xl"
+            >
+              <div class="text-center text-gray-400 py-32">
+                <div class="text-6xl mb-4">📄</div>
+                <p class="text-lg">Remplissez le formulaire</p>
+                <p class="text-sm">et cliquez sur "Générer mon CV"</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="no-print bg-slate-800 text-white py-8 mt-12">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="text-lg font-medium mb-2">
+          CV Pro Generator - Créez un CV qui passe les filtres ATS
+        </p>
+        <p class="text-slate-400 text-sm">
+          Votre CV professionnel en quelques minutes | 100% gratuit
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      let experienceCount = 0;
+      let educationCount = 0;
+      let languageCount = 0;
+      let certificationCount = 0;
+      let projectCount = 0;
+      let selectedTemplate = "classic";
+
+      // Initialisation
+      document.addEventListener("DOMContentLoaded", function () {
+        loadData();
+        addExperience();
+        addEducation();
+        addLanguage();
+        addCertification();
+        updateScore();
+
+        // Compteur pour le résumé
+        document
+          .getElementById("summary")
+          .addEventListener("input", function () {
+            document.getElementById("summaryCount").textContent =
+              this.value.length + "/500";
+          });
+
+        // Mise à jour du score en temps réel
+        document.addEventListener("input", updateScore);
+      });
+
+      function selectTemplate(template) {
+        selectedTemplate = template;
+        document.querySelectorAll(".template-card").forEach((card) => {
+          card.classList.remove("selected", "border-blue-500", "bg-blue-50");
+          card.classList.add("border-gray-200");
+        });
+        const selected = document.getElementById("tpl-" + template);
+        selected.classList.add("selected", "border-blue-500", "bg-blue-50");
+        selected.classList.remove("border-gray-200");
+        generateCV();
+      }
+
+      function addExperience() {
+        experienceCount++;
+        const container = document.getElementById("experienceContainer");
+        const div = document.createElement("div");
+        div.className =
+          "border border-gray-200 rounded-xl p-4 bg-gradient-to-r from-gray-50 to-white";
+        div.id = `experience-${experienceCount}`;
+        div.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="bg-purple-100 text-purple-600 w-6 h-6 rounded-full flex items-center justify-center text-sm">${experienceCount}</span>
+                        Expérience
+                    </span>
+                    <button onclick="removeElement('experience-${experienceCount}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition">✕</button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-3">
+                    <input type="text" placeholder="Titre du poste *" class="exp-title border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" placeholder="Entreprise *" class="exp-company border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Date début" class="exp-start flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                        <input type="text" placeholder="Date fin" class="exp-end flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <input type="text" placeholder="Ville, Pays" class="exp-location border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <textarea placeholder="• Réalisation 1 avec résultat quantifié (+20% de CA)&#10;• Réalisation 2 avec impact mesurable&#10;• Responsabilité clé et compétences utilisées" class="exp-desc w-full mt-3 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+            `;
+        container.appendChild(div);
+      }
+
+      function addEducation() {
+        educationCount++;
+        const container = document.getElementById("educationContainer");
+        const div = document.createElement("div");
+        div.className =
+          "border border-gray-200 rounded-xl p-4 bg-gradient-to-r from-gray-50 to-white";
+        div.id = `education-${educationCount}`;
+        div.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-semibold text-gray-700 flex items-center gap-2">
+                        <span class="bg-yellow-100 text-yellow-600 w-6 h-6 rounded-full flex items-center justify-center text-sm">${educationCount}</span>
+                        Formation
+                    </span>
+                    <button onclick="removeElement('education-${educationCount}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition">✕</button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-3">
+                    <input type="text" placeholder="Diplôme / Titre *" class="edu-degree border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    <input type="text" placeholder="Établissement *" class="edu-school border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Année début" class="edu-start flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                        <input type="text" placeholder="Année fin" class="edu-end flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <input type="text" placeholder="Ville, Pays" class="edu-location border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <input type="text" placeholder="Mention / Spécialisation (optionnel)" class="edu-mention w-full mt-3 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+            `;
+        container.appendChild(div);
+      }
+
+      function addLanguage() {
+        languageCount++;
+        const container = document.getElementById("languageContainer");
+        const div = document.createElement("div");
+        div.className = "flex gap-3 items-center";
+        div.id = `language-${languageCount}`;
+        div.innerHTML = `
+                <input type="text" placeholder="Langue" class="lang-name flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <select class="lang-level border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 bg-white">
+                    <option value="">Niveau</option>
+                    <option value="Langue maternelle">Langue maternelle</option>
+                    <option value="Bilingue (C2)">Bilingue (C2)</option>
+                    <option value="Courant (C1)">Courant (C1)</option>
+                    <option value="Avancé (B2)">Avancé (B2)</option>
+                    <option value="Intermédiaire (B1)">Intermédiaire (B1)</option>
+                    <option value="Élémentaire (A2)">Élémentaire (A2)</option>
+                    <option value="Débutant (A1)">Débutant (A1)</option>
+                </select>
+                <button onclick="removeElement('language-${languageCount}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition">✕</button>
+            `;
+        container.appendChild(div);
+      }
+
+      function addCertification() {
+        certificationCount++;
+        const container = document.getElementById("certificationContainer");
+        const div = document.createElement("div");
+        div.className = "flex gap-3 items-center";
+        div.id = `certification-${certificationCount}`;
+        div.innerHTML = `
+                <input type="text" placeholder="Nom de la certification" class="cert-name flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <input type="text" placeholder="Organisme" class="cert-org w-32 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <input type="text" placeholder="Année" class="cert-year w-20 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <button onclick="removeElement('certification-${certificationCount}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition">✕</button>
+            `;
+        container.appendChild(div);
+      }
+
+      function addProject() {
+        projectCount++;
+        const container = document.getElementById("projectContainer");
+        const div = document.createElement("div");
+        div.className =
+          "border border-gray-200 rounded-xl p-4 bg-gradient-to-r from-gray-50 to-white";
+        div.id = `project-${projectCount}`;
+        div.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-semibold text-gray-700">Projet ${projectCount}</span>
+                    <button onclick="removeElement('project-${projectCount}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition">✕</button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-3">
+                    <input type="text" placeholder="Nom du projet" class="proj-name border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    <input type="text" placeholder="Technologies utilisées" class="proj-tech border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <textarea placeholder="Description du projet et résultats obtenus..." class="proj-desc w-full mt-3 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
+            `;
+        container.appendChild(div);
+      }
+
+      function removeElement(id) {
+        document.getElementById(id)?.remove();
+        updateScore();
+      }
+
+      function updateScore() {
+        let score = 0;
+        let sections = 0;
+        let keywords = 0;
+
+        // Vérification des champs obligatoires
+        if (document.getElementById("firstName").value) {
+          score += 5;
+        }
+        if (document.getElementById("lastName").value) {
+          score += 5;
+        }
+        if (document.getElementById("email").value) {
+          score += 5;
+          sections++;
+        }
+        if (document.getElementById("phone").value) {
+          score += 5;
+        }
+        if (document.getElementById("jobTitle").value) {
+          score += 10;
+          sections++;
+        }
+        if (document.getElementById("summary").value.length > 50) {
+          score += 15;
+          sections++;
+        }
+
+        // Expériences
+        const exps = document.querySelectorAll('[id^="experience-"]');
+        let expFilled = 0;
+        exps.forEach((exp) => {
+          if (
+            exp.querySelector(".exp-title")?.value &&
+            exp.querySelector(".exp-company")?.value
+          ) {
+            expFilled++;
+            if (exp.querySelector(".exp-desc")?.value.length > 30) score += 5;
+          }
+        });
+        if (expFilled > 0) {
+          score += 15;
+          sections++;
+        }
+
+        // Formation
+        const edus = document.querySelectorAll('[id^="education-"]');
+        let eduFilled = 0;
+        edus.forEach((edu) => {
+          if (edu.querySelector(".edu-degree")?.value) eduFilled++;
+        });
+        if (eduFilled > 0) {
+          score += 10;
+          sections++;
+        }
+
+        // Compétences
+        const hardSkills = document.getElementById("hardSkills").value;
+        const softSkills = document.getElementById("softSkills").value;
+        if (hardSkills) {
+          score += 10;
+          sections++;
+          keywords += hardSkills.split(",").length;
+        }
+        if (softSkills) {
+          score += 5;
+          keywords += softSkills.split(",").length;
+        }
+
+        // Langues
+        const langs = document.querySelectorAll('[id^="language-"]');
+        let langFilled = 0;
+        langs.forEach((lang) => {
+          if (lang.querySelector(".lang-name")?.value) langFilled++;
+        });
+        if (langFilled > 0) {
+          score += 5;
+          sections++;
+        }
+
+        // Certifications
+        const certs = document.querySelectorAll('[id^="certification-"]');
+        let certFilled = 0;
+        certs.forEach((cert) => {
+          if (cert.querySelector(".cert-name")?.value) certFilled++;
+        });
+        if (certFilled > 0) {
+          score += 5;
+          sections++;
+        }
+
+        // Bonus LinkedIn
+        if (document.getElementById("linkedin").value) score += 5;
+
+        score = Math.min(score, 100);
+
+        // Mise à jour visuelle
+        const circle = document.getElementById("scoreCircle");
+        const circumference = 2 * Math.PI * 28;
+        const offset = circumference - (score / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+
+        // Couleur selon le score
+        if (score < 40) {
+          circle.style.stroke = "#ef4444";
+        } else if (score < 70) {
+          circle.style.stroke = "#f59e0b";
+        } else {
+          circle.style.stroke = "#22c55e";
+        }
+
+        document.getElementById("scoreText").textContent = score + "%";
+        document.getElementById("completedSections").textContent = sections;
+        document.getElementById("keywordsCount").textContent = keywords;
+
+        // Label du score
+        const label = document.getElementById("scoreLabel");
+        if (score < 40) {
+          label.textContent = "CV incomplet";
+          label.className = "text-xs text-red-500";
+        } else if (score < 70) {
+          label.textContent = "CV correct";
+          label.className = "text-xs text-yellow-600";
+        } else if (score < 90) {
+          label.textContent = "Bon CV";
+          label.className = "text-xs text-green-600";
+        } else {
+          label.textContent = "CV excellent !";
+          label.className = "text-xs text-green-600 font-bold";
+        }
+      }
+
+      function getTemplateStyles() {
+        const styles = {
+          classic: {
+            headerBg: "#ffffff",
+            headerColor: "#1a1a1a",
+            accentColor: "#1e40af",
+            sectionBorder: "2px solid #1e40af",
+            fontFamily: "'Calibri', 'Arial', sans-serif",
+          },
+          modern: {
+            headerBg: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+            headerColor: "#ffffff",
+            accentColor: "#3b82f6",
+            sectionBorder: "3px solid #3b82f6",
+            fontFamily: "'Roboto', sans-serif",
+          },
+          executive: {
+            headerBg: "#1e293b",
+            headerColor: "#ffffff",
+            accentColor: "#475569",
+            sectionBorder: "2px solid #475569",
+            fontFamily: "'Georgia', serif",
+          },
+        };
+        return styles[selectedTemplate];
+      }
+
+      function generateCV() {
+        const style = getTemplateStyles();
+        const firstName =
+          document.getElementById("firstName").value || "Prénom";
+        const lastName = document.getElementById("lastName").value || "NOM";
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const address = document.getElementById("address").value;
+        const linkedin = document.getElementById("linkedin").value;
+        const portfolio = document.getElementById("portfolio").value;
+        const jobTitle = document.getElementById("jobTitle").value;
+        const summary = document.getElementById("summary").value;
+        const hardSkills = document.getElementById("hardSkills").value;
+        const softSkills = document.getElementById("softSkills").value;
+        const tools = document.getElementById("tools").value;
+        const interests = document.getElementById("interests").value;
+
+        // Construction du header selon le template
+        let headerStyle = "";
+        let headerTextColor = style.headerColor;
+
+        if (selectedTemplate === "modern" || selectedTemplate === "executive") {
+          headerStyle = `background: ${style.headerBg}; color: ${style.headerColor}; padding: 20px; margin: -15mm -15mm 15px -15mm; width: calc(100% + 30mm);`;
+        }
+
+        let cvHTML = `
+                <div style="font-family: ${
+                  style.fontFamily
+                }; color: #1a1a1a; font-size: 11pt; line-height: 1.5;">
+                    <!-- En-tête -->
+                    <div style="${headerStyle} text-align: center; margin-bottom: 15px;">
+                        <h1 style="font-size: 26pt; margin: 0; font-weight: 700; letter-spacing: 1px; color: ${headerTextColor};">${firstName} ${lastName.toUpperCase()}</h1>
+                        ${
+                          jobTitle
+                            ? `<p style="font-size: 14pt; margin: 8px 0 5px 0; color: ${
+                                selectedTemplate === "classic"
+                                  ? style.accentColor
+                                  : headerTextColor
+                              }; font-weight: 500;">${jobTitle}</p>`
+                            : ""
+                        }
+                        <p style="font-size: 10pt; margin: 8px 0; color: ${
+                          selectedTemplate === "classic"
+                            ? "#4b5563"
+                            : headerTextColor
+                        };">
+                            ${[email, phone, address]
+                              .filter(Boolean)
+                              .join("  •  ")}
+                        </p>
+                        ${
+                          linkedin || portfolio
+                            ? `<p style="font-size: 10pt; margin: 5px 0; color: ${
+                                selectedTemplate === "classic"
+                                  ? "#4b5563"
+                                  : headerTextColor
+                              };">
+                            ${[linkedin, portfolio]
+                              .filter(Boolean)
+                              .join("  •  ")}
+                        </p>`
+                            : ""
+                        }
+                    </div>
+            `;
+
+        // Résumé professionnel
+        if (summary) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${style.sectionBorder}; padding-bottom: 4px; margin-bottom: 8px; color: ${style.accentColor};">Profil Professionnel</h2>
+                        <p style="text-align: justify; color: #374151;">${summary}</p>
+                    </div>
+                `;
+        }
+
+        // Expériences professionnelles
+        const experiences = document.querySelectorAll('[id^="experience-"]');
+        let expHTML = "";
+        experiences.forEach((exp) => {
+          const title = exp.querySelector(".exp-title")?.value;
+          const company = exp.querySelector(".exp-company")?.value;
+          const start = exp.querySelector(".exp-start")?.value;
+          const end = exp.querySelector(".exp-end")?.value;
+          const location = exp.querySelector(".exp-location")?.value;
+          const desc = exp.querySelector(".exp-desc")?.value;
+
+          if (title || company) {
+            expHTML += `
+                        <div style="margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <strong style="font-size: 11pt; color: #1f2937;">${title}</strong>
+                                <span style="font-size: 10pt; color: #6b7280;">${start}${
+              end ? " – " + end : ""
+            }</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px;">
+                                <em style="color: ${
+                                  style.accentColor
+                                };">${company}</em>
+                                <span style="font-size: 10pt; color: #6b7280;">${
+                                  location || ""
+                                }</span>
+                            </div>
+                            ${
+                              desc
+                                ? `<ul style="margin: 5px 0; padding-left: 18px; color: #374151;">
+                                ${desc
+                                  .split("\n")
+                                  .filter((d) => d.trim())
+                                  .map(
+                                    (d) =>
+                                      `<li style="margin-bottom: 3px;">${d
+                                        .trim()
+                                        .replace(/^[•\-]\s*/, "")}</li>`
+                                  )
+                                  .join("")}
+                            </ul>`
+                                : ""
+                            }
+                        </div>
+                    `;
+          }
+        });
+        if (expHTML) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${style.sectionBorder}; padding-bottom: 4px; margin-bottom: 10px; color: ${style.accentColor};">Expérience Professionnelle</h2>
+                        ${expHTML}
+                    </div>
+                `;
+        }
+
+        // Formation
+        const educations = document.querySelectorAll('[id^="education-"]');
+        let eduHTML = "";
+        educations.forEach((edu) => {
+          const degree = edu.querySelector(".edu-degree")?.value;
+          const school = edu.querySelector(".edu-school")?.value;
+          const start = edu.querySelector(".edu-start")?.value;
+          const end = edu.querySelector(".edu-end")?.value;
+          const location = edu.querySelector(".edu-location")?.value;
+          const mention = edu.querySelector(".edu-mention")?.value;
+
+          if (degree || school) {
+            eduHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <strong style="color: #1f2937;">${degree}</strong>
+                                <span style="font-size: 10pt; color: #6b7280;">${start}${
+              end ? " – " + end : ""
+            }</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <em style="color: ${
+                                  style.accentColor
+                                };">${school}</em>
+                                <span style="font-size: 10pt; color: #6b7280;">${
+                                  location || ""
+                                }</span>
+                            </div>
+                            ${
+                              mention
+                                ? `<p style="font-size: 10pt; color: #6b7280; margin-top: 2px;">${mention}</p>`
+                                : ""
+                            }
+                        </div>
+                    `;
+          }
+        });
+        if (eduHTML) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${style.sectionBorder}; padding-bottom: 4px; margin-bottom: 10px; color: ${style.accentColor};">Formation</h2>
+                        ${eduHTML}
+                    </div>
+                `;
+        }
+
+        // Compétences
+        if (hardSkills || softSkills || tools) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${
+                          style.sectionBorder
+                        }; padding-bottom: 4px; margin-bottom: 10px; color: ${
+            style.accentColor
+          };">Compétences</h2>
+                        ${
+                          hardSkills
+                            ? `<p style="margin-bottom: 5px;"><strong>Techniques :</strong> ${hardSkills}</p>`
+                            : ""
+                        }
+                        ${
+                          softSkills
+                            ? `<p style="margin-bottom: 5px;"><strong>Transversales :</strong> ${softSkills}</p>`
+                            : ""
+                        }
+                        ${
+                          tools
+                            ? `<p style="margin-bottom: 5px;"><strong>Outils :</strong> ${tools}</p>`
+                            : ""
+                        }
+                    </div>
+                `;
+        }
+
+        // Certifications
+        const certifications = document.querySelectorAll(
+          '[id^="certification-"]'
+        );
+        let certHTML = "";
+        certifications.forEach((cert) => {
+          const name = cert.querySelector(".cert-name")?.value;
+          const org = cert.querySelector(".cert-org")?.value;
+          const year = cert.querySelector(".cert-year")?.value;
+          if (name) {
+            certHTML += `<li>${name}${org ? " – " + org : ""}${
+              year ? " (" + year + ")" : ""
+            }</li>`;
+          }
+        });
+        if (certHTML) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${style.sectionBorder}; padding-bottom: 4px; margin-bottom: 10px; color: ${style.accentColor};">Certifications</h2>
+                        <ul style="margin: 0; padding-left: 18px;">${certHTML}</ul>
+                    </div>
+                `;
+        }
+
+        // Projets
+        const projects = document.querySelectorAll('[id^="project-"]');
+        let projHTML = "";
+        projects.forEach((proj) => {
+          const name = proj.querySelector(".proj-name")?.value;
+          const tech = proj.querySelector(".proj-tech")?.value;
+          const desc = proj.querySelector(".proj-desc")?.value;
+          if (name) {
+            projHTML += `
+                        <div style="margin-bottom: 8px;">
+                            <strong>${name}</strong>${
+              tech ? ` <span style="color: #6b7280;">| ${tech}</span>` : ""
+            }
+                            ${
+                              desc
+                                ? `<p style="margin: 3px 0; color: #374151;">${desc}</p>`
+                                : ""
+                            }
+                        </div>
+                    `;
+          }
+        });
+        if (projHTML) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${style.sectionBorder}; padding-bottom: 4px; margin-bottom: 10px; color: ${style.accentColor};">Projets</h2>
+                        ${projHTML}
+                    </div>
+                `;
+        }
+
+        // Langues
+        const languages = document.querySelectorAll('[id^="language-"]');
+        let langHTML = "";
+        languages.forEach((lang) => {
+          const name = lang.querySelector(".lang-name")?.value;
+          const level = lang.querySelector(".lang-level")?.value;
+          if (name) {
+            langHTML += `<span style="margin-right: 15px;">${name}${
+              level ? " : " + level : ""
+            }</span>`;
+          }
+        });
+        if (langHTML) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${style.sectionBorder}; padding-bottom: 4px; margin-bottom: 10px; color: ${style.accentColor};">Langues</h2>
+                        <p>${langHTML}</p>
+                    </div>
+                `;
+        }
+
+        // Centres d'intérêt
+        if (interests) {
+          cvHTML += `
+                    <div style="margin-bottom: 16px;">
+                        <h2 style="font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: ${style.sectionBorder}; padding-bottom: 4px; margin-bottom: 10px; color: ${style.accentColor};">Centres d'Intérêt</h2>
+                        <p>${interests}</p>
+                    </div>
+                `;
+        }
+
+        cvHTML += "</div>";
+        document.getElementById("cvPreview").innerHTML = cvHTML;
+        updateScore();
+      }
+
+      function printCV() {
+        generateCV();
+        setTimeout(() => window.print(), 500);
+      }
+
+      function saveData() {
+        const data = {
+          firstName: document.getElementById("firstName").value,
+          lastName: document.getElementById("lastName").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          address: document.getElementById("address").value,
+          jobTitle: document.getElementById("jobTitle").value,
+          linkedin: document.getElementById("linkedin").value,
+          portfolio: document.getElementById("portfolio").value,
+          summary: document.getElementById("summary").value,
+          hardSkills: document.getElementById("hardSkills").value,
+          softSkills: document.getElementById("softSkills").value,
+          tools: document.getElementById("tools").value,
+          interests: document.getElementById("interests").value,
+          template: selectedTemplate,
+        };
+        localStorage.setItem("cvData", JSON.stringify(data));
+        alert("✅ Données sauvegardées !");
+      }
+
+      function loadData() {
+        const saved = localStorage.getItem("cvData");
+        if (saved) {
+          const data = JSON.parse(saved);
+          Object.keys(data).forEach((key) => {
+            const el = document.getElementById(key);
+            if (el) el.value = data[key];
+          });
+          if (data.template) {
+            selectTemplate(data.template);
+          }
+        }
+      }
+
+      function clearForm() {
+        if (
+          confirm("⚠️ Êtes-vous sûr de vouloir effacer toutes les données ?")
+        ) {
+          document
+            .querySelectorAll("input, textarea")
+            .forEach((el) => (el.value = ""));
+          document
+            .querySelectorAll("select")
+            .forEach((el) => (el.selectedIndex = 0));
+          document.getElementById("experienceContainer").innerHTML = "";
+          document.getElementById("educationContainer").innerHTML = "";
+          document.getElementById("languageContainer").innerHTML = "";
+          document.getElementById("certificationContainer").innerHTML = "";
+          document.getElementById("projectContainer").innerHTML = "";
+          experienceCount = 0;
+          educationCount = 0;
+          languageCount = 0;
+          certificationCount = 0;
+          projectCount = 0;
+          addExperience();
+          addEducation();
+          addLanguage();
+          addCertification();
+          localStorage.removeItem("cvData");
+          document.getElementById("cvPreview").innerHTML = `
+                    <div class="text-center text-gray-400 py-32">
+                        <div class="text-6xl mb-4">📄</div>
+                        <p class="text-lg">Remplissez le formulaire</p>
+                        <p class="text-sm">et cliquez sur "Générer mon CV"</p>
+                    </div>
+                `;
+          updateScore();
+        }
+      }
+    </script>
+  </body>
+</html>

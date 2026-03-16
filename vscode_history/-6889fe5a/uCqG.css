@@ -1,0 +1,758 @@
+/* =========================================
+   1. RESET & GLOBAL
+   ========================================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  overflow-x: hidden; /* Évite le scroll horizontal accidentel */
+  line-height: 1.6;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* =========================================
+   2. HEADER & LOGO
+   ========================================= */
+.header {
+  position: relative;
+  height: 120px;
+  background: white;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+}
+
+.diagonal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+  z-index: 1;
+}
+
+.logo-container {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  height: 100px;
+  z-index: 2;
+  transition: transform 0.3s;
+  position-area: left;
+    margin-right:500px;
+    height: 200px;
+}
+
+.logo-container:hover {
+  transform: scale(1.02);
+}
+
+.logo-container img {
+  height: 100%;
+  object-fit: contain;
+}
+
+/* =========================================
+   3. STRUCTURE & TITRES
+   ========================================= */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 10;
+  position: relative;
+}
+
+.section {
+  margin-bottom: 50px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.section-title {
+  color: #0056b3;
+  border-left: 6px solid #007bff;
+  padding-left: 20px;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* --- BOUTON RETOUR --- */
+.back-button {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-radius: 50px;
+}
+
+.back-button:hover {
+  background: #e3f2fd;
+  transform: translateX(-5px);
+  color: #0056b3;
+}
+
+/* =========================================
+   4. PAGE D'ACCUEIL (LANDING)
+   ========================================= */
+.text-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.title {
+  font-size: 2.8rem;
+  color: #007bff;
+  display: inline-block;
+  position: relative;
+  margin: 10px 0 30px 0;
+  font-weight: 700;
+}
+
+.underline1, .underline2 {
+  height: 5px;
+  background: linear-gradient(to right, #00c6ff, #007bff);
+  width: 60%;
+  margin: 10px auto 0 auto;
+  border-radius: 5px;
+}
+
+.start-button {
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  border: none;
+  padding: 18px 50px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.start-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 123, 255, 0.5);
+  background: linear-gradient(135deg, #0056b3, #0099cc);
+}
+
+.welcome-box {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin: 20px auto;
+  max-width: 800px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  border: 1px solid #eef2f5;
+}
+
+.welcome-box ul {
+  list-style: none;
+  padding: 0;
+}
+
+.welcome-box li {
+  padding: 8px 0;
+  font-size: 1.1rem;
+}
+
+/* =========================================
+   5. PAGE SÉLECTION
+   ========================================= */
+.button-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.button {
+  padding: 20px 30px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.3s;
+  flex: 1 1 200px; /* Responsive flex */
+  max-width: 300px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.button:hover {
+  border-color: #007bff;
+  color: #007bff;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+}
+
+/* GRILLE FILIÈRES */
+.filiere-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.filiere-button {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 25px;
+  border-radius: 15px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.filiere-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border-color: #80bdff;
+}
+
+/* Classe ajoutée pour la sélection active */
+.filiere-button.active-card {
+  border: 2px solid #007bff;
+  background-color: #f0f7ff;
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+}
+
+.filiere-button h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+/* Résumé et bouton continuer */
+.info-box {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-top: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  text-align: center;
+  border: 1px solid #eef2f5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.continue-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100%;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.continue-button:hover {
+  background: #218838;
+  transform: scale(1.02);
+}
+
+/* =========================================
+   6. PAGE MODULES (GRILLE & CARTE)
+   ========================================= */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  padding-bottom: 50px;
+}
+
+.module-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.module-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  border-color: #007bff;
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.module-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.module-code {
+  background: #e3f2fd;
+  color: #007bff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.select-module-btn {
+  background: #f8f9fa;
+  color: #007bff;
+  border: 1px solid #dee2e6;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.module-card:hover .select-module-btn {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* =========================================
+   7. MODALE (POP-UP)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+  padding: 15px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+  padding: 20px 30px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.close-modal-btn {
+  background: #ffecf0;
+  color: #ff3366;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.close-modal-btn:hover {
+  background: #ff3366;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 30px;
+  overflow-y: auto;
+  flex: 1;
+  background: #fcfcfc;
+}
+
+/* --- ONGLETS (TABS) --- */
+.tabs {
+  display: flex;
+  gap: 15px;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: #8898aa;
+  font-size: 15px;
+  transition: all 0.3s;
+  margin-bottom: -2px; /* Pour chevaucher la ligne */
+}
+
+.tabs button:hover {
+  color: #007bff;
+}
+
+.tabs button.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+}
+
+.badge {
+  background: #e9ecef;
+  color: #555;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  margin-left: 6px;
+  vertical-align: middle;
+  transition: all 0.3s;
+}
+
+.tabs button.active .badge {
+  background: #e3f2fd;
+  color: #007bff;
+}
+
+/* --- LISTE CONTENU --- */
+.content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.content-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border: 1px solid #edf2f7;
+  padding: 20px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.content-item:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  border-color: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+.content-info {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.content-info h4 {
+  margin: 0 0 6px 0;
+  color: #2d3748;
+  font-size: 1.05rem;
+}
+
+.content-info p {
+  margin: 0;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.content-info small {
+  display: inline-block;
+  margin-top: 6px;
+  color: #a0aec0;
+  font-size: 0.8rem;
+  background: #f7fafc;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.download-btn {
+  background: #edf2f7;
+  color: #4a5568;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.download-btn:hover {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.no-link {
+  font-size: 0.8rem;
+  color: #e53e3e;
+  background: #fff5f5;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+/* =========================================
+   8. UTILITAIRES & EMPTY STATES
+   ========================================= */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+  margin: 20px auto;
+  max-width: 600px;
+  color: #718096;
+}
+
+.empty-state h3 {
+  margin: 15px 0 5px 0;
+  color: #2d3748;
+  font-size: 1.5rem;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 40px;
+  color: #007bff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background: #fff5f5;
+  color: #c53030;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  text-align: center;
+  border: 1px solid #feb2b2;
+  font-weight: 500;
+}
+
+/* =========================================
+   9. DÉCORATION (TRIANGLES)
+   ========================================= */
+.triangles-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-bottom: 60px solid rgba(0, 123, 255, 0.08);
+  display: inline-block;
+  margin: 0 15px;
+  animation: float 4s infinite ease-in-out;
+}
+
+.triangle.small {
+  border-bottom: 30px solid rgba(0, 198, 255, 0.1);
+  animation-duration: 6s;
+  animation-delay: 1s;
+}
+
+/* =========================================
+   10. ANIMATIONS
+   ========================================= */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* =========================================
+   11. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .header { height: 90px; }
+  .logo-container { height: 50px; top: 20px; }
+  
+  .title { font-size: 2rem; }
+  .section-title { font-size: 1.5rem; }
+  
+  .content-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .content-info { padding-right: 0; }
+  
+  .download-btn {
+    margin-left: 0;
+    margin-top: 15px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .tabs button {
+    flex: 1 1 45%; /* 2 par ligne */
+    text-align: center;
+    font-size: 14px;
+    padding: 10px 5px;
+  }
+  
+  .modal-content {
+    height: 95vh;
+  }
+  
+  .button-group .button {
+    flex: 1 1 100%; /* Boutons prennent toute la largeur sur mobile */
+  }
+}
+
+/* =========================================
+   9. DÉCORATION (TRIANGLES SUBTILS)
+   ========================================= */
+.triangles-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  
+  /* Flexbox pour bien les aligner */
+  display: flex;
+  justify-content: space-around; /* Espacement égal */
+  align-items: flex-end;
+  padding: 0 20px;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  
+  /* COULEUR DE BASE : Bleu très léger */
+  border-bottom: 40px solid rgba(0, 123, 255, 0.12);
+  
+  display: inline-block;
+  margin: 0 5px;
+  position: relative;
+  bottom: -10px;
+  
+  /* Animation lente et douce */
+  animation: float 6s infinite ease-in-out;
+}
+
+/* --- VARIATIONS DOUCES (Juste Bleu et Ciel) --- */
+
+/* 1. Un sur deux est plus petit et couleur Ciel */
+.triangle:nth-child(even) {
+  border-bottom-color: rgba(0, 190, 255, 0.15); /* Bleu Ciel */
+  transform: scale(0.7); /* Plus petit */
+  animation-duration: 8s; /* Bouge plus lentement */
+  animation-delay: 1s; /* Décalé */
+}
+
+/* 2. Un sur trois est un peu plus grand et transparent */
+.triangle:nth-child(3n) {
+  border-bottom-color: rgba(0, 86, 179, 0.08); /* Bleu foncé très transparent */
+  transform: scale(1.1);
+  animation-duration: 5s;
+  animation-delay: 2s;
+}
+
+/* --- ANIMATION --- */
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); } /* Mouvement plus court */
+  100% { transform: translateY(0); }
+}

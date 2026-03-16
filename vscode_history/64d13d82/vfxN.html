@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🔍 Trouver un compte partout</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      color: #1e293b;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    header {
+      background: #0ea5e9;
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    header h1 {
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    .input-group {
+      padding: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 18px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: #0ea5e9;
+    }
+    .btn-google {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #dc2626;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      margin: 20px;
+      transition: background 0.2s;
+    }
+    .btn-google:hover {
+      background: #b91c1c;
+    }
+    .section {
+      padding: 0 20px 20px;
+    }
+    .section h2 {
+      margin: 24px 0 16px;
+      color: #0c4a6e;
+      font-size: 1.3rem;
+    }
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .link-card {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 10px;
+      border-left: 3px solid #0ea5e9;
+      word-break: break-all;
+    }
+    .link-card a {
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .link-card a:hover {
+      text-decoration: underline;
+    }
+    .empty {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 0.85rem;
+      color: #64748b;
+      background: #f1f5f9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🔍 Trouver un compte sur tous les réseaux</h1>
+    </header>
+
+    <div class="input-group">
+      <input 
+        type="text" 
+        id="query" 
+        placeholder="Nom ou pseudo (ex: julien dupont)" 
+        autocomplete="off"
+        autocapitalize="words"
+      />
+    </div>
+
+    <a id="googleLink" class="btn-google" href="#">🔎 Rechercher sur Google</a>
+
+    <div class="section">
+      <h2>Liens directs (si pseudo valide)</h2>
+      <div id="directLinks" class="links-grid">
+        <div class="empty">Tapez un pseudo pour générer les liens</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Outil légal • Aucun scraping • Données publiques uniquement
+  </footer>
+
+  <script>
+    const queryInput = document.getElementById('query');
+    const googleLink = document.getElementById('googleLink');
+    const directLinks = document.getElementById('directLinks');
+
+    // Liste étendue des plateformes
+    const platforms = [
+      { name: "Instagram", url: "https://instagram.com/" },
+      { name: "Facebook", url: "https://facebook.com/" },
+      { name: "Twitter / X", url: "https://twitter.com/" },
+      { name: "LinkedIn", url: "https://linkedin.com/in/" },
+      { name: "TikTok", url: "https://tiktok.com/@" },
+      { name: "YouTube", url: "https://youtube.com/@" },
+      { name: "Reddit", url: "https://reddit.com/user/" },
+      { name: "Pinterest", url: "https://pinterest.com/" },
+      { name: "GitHub", url: "https://github.com/" },
+      { name: "GitLab", url: "https://gitlab.com/" },
+      { name: "Tumblr", url: ".tumblr.com", special: true },
+      { name: "Steam", url: "https://steamcommunity.com/id/" },
+      { name: "Discord", url: "https://discord.com/users/", note: "ID numérique requis" },
+      { name: "Behance", url: "https://behance.net/" },
+      { name: "Dribbble", url: "https://dribbble.com/" },
+      { name: "Medium", url: "https://medium.com/@" },
+    ];
+
+    // Génère une requête Google puissante
+    function buildGoogleSearch(name) {
+      const encodedName = encodeURIComponent(`"${name}"`);
+      const sites = [
+        'instagram.com', 'facebook.com', 'twitter.com', 'x.com', 'linkedin.com',
+        'tiktok.com', 'youtube.com', 'reddit.com', 'pinterest.com', 'github.com',
+        'tumblr.com', 'steamcommunity.com', 'behance.net', 'dribbble.com', 'medium.com'
+      ].map(s => `site:${s}`).join(' OR ');
+
+      return `https://www.google.com/search?q=${encodedName}+(${sites})&hl=fr&gl=FR`;
+    }
+
+    // Nettoie le pseudo pour les plateformes (lettres, chiffres, . _ -)
+    function cleanUsername(str) {
+      return str.trim().toLowerCase().replace(/[^a-z0-9._-]/g, '');
+    }
+
+    // Met à jour tout en temps réel
+    function updateResults() {
+      const raw = queryInput.value;
+      const trimmed = raw.trim();
+
+      // Mise à jour du lien Google (même avec espaces)
+      if (trimmed) {
+        googleLink.href = buildGoogleSearch(trimmed);
+        googleLink.textContent = `🔎 Rechercher "${trimmed}" sur Google`;
+      } else {
+        googleLink.href = "#";
+        googleLink.textContent = "🔎 Rechercher sur Google";
+      }
+
+      // Génération des liens directs (uniquement si pseudo valide)
+      if (trimmed && cleanUsername(trimmed).length >= 2) {
+        const clean = cleanUsername(trimmed);
+        let html = '';
+        platforms.forEach(p => {
+          let url;
+          if (p.special && p.name === "Tumblr") {
+            url = `https://${clean}.tumblr.com`;
+          } else if (p.name === "Discord") {
+            // Discord nécessite un ID numérique → on garde le lien mais on note
+            url = p.url;
+          } else {
+            url = p.url + clean;
+          }
+
+          html += `
+            <div class="link-card">
+              <a href="${url}" target="_blank" rel="noopener">${p.name}</a>
+              ${p.note ? `<div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">${p.note}</div>` : ''}
+            </div>
+          `;
+        });
+        directLinks.innerHTML = html;
+      } else {
+        directLinks.innerHTML = '<div class="empty">Tapez un pseudo (min. 2 caractères)</div>';
+      }
+    }
+
+    // Écoute en temps réel
+    queryInput.addEventListener('input', updateResults);
+    updateResults(); // au chargement
+  </script>
+
+</body>
+</html>

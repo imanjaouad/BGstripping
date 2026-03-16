@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Recherche Universelle de Comptes Sociaux</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+        .search-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        #input-nom {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        #btn-rechercher {
+            padding: 12px 25px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        #btn-rechercher:hover { background: #0056b3; }
+        #btn-rechercher:disabled {
+            background: var(--secondary-color);
+            cursor: not-allowed;
+        }
+        #resultats {
+            margin-top: 20px;
+        }
+        .result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        .result-info .platform-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .result-info .platform-url {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+        .result-link {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        .result-link:hover { background-color: #0056b3; }
+        .loading, .error, .no-results {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+        }
+        .loading { color: var(--secondary-color); }
+        .error { color: #dc3545; }
+        .no-results { color: var(--secondary-color); }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <header>
+            <h1>🔍 Recherche Universelle</h1>
+            <p class="subtitle">Trouvez les comptes sociaux d'une personne à partir de son nom</p>
+        </header>
+
+        <section class="search-area">
+            <input type="text" id="input-nom" placeholder="Entrez un nom complet (ex: Marie Curie)">
+            <button id="btn-rechercher">Lancer la recherche</button>
+        </section>
+
+        <div id="resultats">
+            <!-- Les résultats apparaîtront ici -->
+        </div>
+    </main>
+
+    <script>
+        const inputNom = document.getElementById("input-nom");
+        const btnRechercher = document.getElementById("btn-rechercher");
+        const resultatsDiv = document.getElementById("resultats");
+
+        // Liste des plateformes avec leurs schémas d'URL
+        const platforms = [
+            { name: 'Facebook', url: 'https://www.facebook.com/', checkMethod: 'head' },
+            { name: 'Instagram', url: 'https://www.instagram.com/', checkMethod: 'head' },
+            { name: 'Twitter', url: 'https://twitter.com/', checkMethod: 'head' },
+            { name: 'TikTok', url: 'https://www.tiktok.com/@', checkMethod: 'head' },
+            { name: 'LinkedIn', url: 'https://www.linkedin.com/in/', checkMethod: 'head' },
+            { name: 'YouTube', url: 'https://www.youtube.com/', checkMethod: 'head' },
+            { name: 'Pinterest', url: 'https://www.pinterest.com/', checkMethod: 'head' },
+            { name: 'Snapchat', url: 'https://www.snapchat.com/add/', checkMethod: 'head' },
+            { name: 'Reddit', url: 'https://www.reddit.com/user/', checkMethod: 'api', apiSuffix: '/about.json' },
+            { name: 'GitHub', url: 'https://api.github.com/users/', checkMethod: 'api', isDirectApi: true },
+            { name: 'Vimeo', url: 'https://vimeo.com/', checkMethod: 'head' },
+            { name: 'Medium', url: 'https://medium.com/@', checkMethod: 'head' },
+        ];
+
+        btnRechercher.addEventListener("click", () => {
+            const nom = inputNom.value.trim();
+            if (!nom) {
+                alert("Veuillez entrer un nom valide.");
+                return;
+            }
+            lancerRecherche(nom);
+        });
+
+        function genererPseudos(nom) {
+            const noms = nom.toLowerCase().replace(/[^a-z\s]/g, '').split(' ').filter(n => n);
+            if (noms.length < 2) return [nom.toLowerCase()];
+
+            const [prenom, ...autresNoms] = noms;
+            const nomDeFamille = autresNoms.join('');
+            
+            return [
+                `${prenom}${nomDeFamille}`,
+                `${prenom}.${nomDeFamille}`,
+                `${prenom}_${nomDeFamille}`,
+                `${prenom[0]}${nomDeFamille}`,
+                `${nomDeFamille}${prenom}`,
+                `${prenom}`,
+                `${nomDeFamille}`,
+                `${prenom}${nomDeFamille.charAt(0)}`
+            ].filter((value, index, self) => self.indexOf(value) === index); // Supprimer les doublons
+        }
+
+        async function lancerRecherche(nom) {
+            btnRechercher.disabled = true;
+            btnRechercher.textContent = "Recherche...";
+            resultatsDiv.innerHTML = '<p class="loading">Analyse en cours, veuillez patienter...</p>';
+
+            const pseudos = genererPseudos(nom);
+            const foundAccounts = [];
+
+            // Parcourir chaque plateforme et tester chaque pseudo
+            for (const platform of platforms) {
+                for (const pseudo of pseudos) {
+                    let url = platform.url + pseudo;
+                    if (platform.checkMethod === 'api' && platform.apiSuffix) {
+                        url += platform.apiSuffix;
+                    }
+
+                    try {
+                        const response = await fetch(url, { method: 'HEAD' });
+                        if (response.ok) {
+                            // Pour éviter de trouver des pages d'erreur 404 personnalisées qui renvoient 200
+                            // On pourrait vérifier le content-type, mais pour la simplicité, on se fie au statut.
+                            foundAccounts.push({
+                                platform: platform.name,
+                                username: pseudo,
+                                link: platform.url + pseudo
+                            });
+                            break; // Passer à la plateforme suivante dès qu'un pseudo est trouvé
+                        }
+                    } catch (error) {
+                        // Erreur réseau ou CORS, on ignore
+                    }
+                }
+            }
+
+            afficherResultats(foundAccounts);
+            btnRechercher.disabled = false;
+            btnRechercher.textContent = "Lancer la recherche";
+        }
+
+        function afficherResultats(comptes) {
+            if (comptes.length === 0) {
+                resultatsDiv.innerHTML = '<p class="no-results">Aucun compte public trouvé pour ce nom.</p>';
+                return;
+            }
+
+            const html = comptes.map(compte => `
+                <div class="result-item">
+                    <div class="result-info">
+                        <div class="platform-name">${compte.platform}</div>
+                        <div class="platform-url">@${compte.username}</div>
+                    </div>
+                    <a href="${compte.link}" target="_blank" rel="noopener noreferrer" class="result-link">Voir le profil</a>
+                </div>
+            `).join('');
+
+            resultatsDiv.innerHTML = html;
+        }
+        
+    </script>
+</body>
+</html>

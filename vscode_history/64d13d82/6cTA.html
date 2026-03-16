@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🔍 Recherche Dynamique sur Réseaux Sociaux</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 30px;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 24px;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    input {
+      flex: 1;
+      padding: 14px;
+      font-size: 18px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #3498db;
+    }
+    .results {
+      display: grid;
+      gap: 12px;
+    }
+    .result-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+    .result-item a {
+      text-decoration: none;
+      color: #2980b9;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .result-item a:hover {
+      color: #e74c3c;
+      text-decoration: underline;
+    }
+    .platform-name {
+      font-weight: bold;
+      color: #2c3e50;
+      margin-right: 8px;
+    }
+    .empty {
+      text-align: center;
+      color: #7f8c8d;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Rechercher un pseudo sur les réseaux sociaux</h1>
+    <div class="input-group">
+      <input
+        type="text"
+        id="username"
+        placeholder="Tapez un pseudo (ex: elonmusk)..."
+        autocomplete="off"
+        autocapitalize="off"
+      />
+    </div>
+
+    <div class="results" id="results">
+      <div class="empty">Commencez à taper un pseudo ci-dessus 👆</div>
+    </div>
+  </div>
+
+  <script>
+    const platforms = [
+      { name: "Facebook", url: "https://www.facebook.com/" },
+      { name: "Instagram", url: "https://www.instagram.com/" },
+      { name: "Twitter / X", url: "https://twitter.com/" },
+      { name: "LinkedIn", url: "https://www.linkedin.com/in/" },
+      { name: "TikTok", url: "https://www.tikTok.com/@" },
+      { name: "YouTube", url: "https://www.youtube.com/@" },
+      { name: "Reddit", url: "https://www.reddit.com/user/" },
+      { name: "Pinterest", url: "https://www.pinterest.com/" },
+      { name: "GitHub", url: "https://github.com/" },
+      { name: "Tumblr", url: ".tumblr.com" }, // traité différemment
+    ];
+
+    const input = document.getElementById("username");
+    const resultsDiv = document.getElementById("results");
+
+    // Fonction pour nettoyer le pseudo (optionnel)
+    function sanitizeUsername(username) {
+      return username
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, ""); // garde seulement lettres, chiffres, points, tirets
+    }
+
+    function updateResults() {
+      let rawInput = input.value;
+      let cleanInput = sanitizeUsername(rawInput);
+
+      if (!cleanInput) {
+        resultsDiv.innerHTML = '<div class="empty">Commencez à taper un pseudo ci-dessus 👆</div>';
+        return;
+      }
+
+      let html = '';
+      platforms.forEach(platform => {
+        let fullUrl;
+        if (platform.name === "Tumblr") {
+          fullUrl = `https://${cleanInput}.tumblr.com`;
+        } else {
+          fullUrl = platform.url + cleanInput;
+        }
+
+        html += `
+          <div class="result-item">
+            <a href="${fullUrl}" target="_blank" rel="noopener noreferrer">
+              <span class="platform-name">${platform.name} :</span> ${fullUrl}
+            </a>
+          </div>
+        `;
+      });
+
+      resultsDiv.innerHTML = html;
+    }
+
+    // Écouter chaque frappe (avec léger délai pour performance)
+    input.addEventListener("input", () => {
+      // Optionnel : ajouter un petit délai (debounce) si tu veux
+      updateResults();
+    });
+  </script>
+
+</body>
+</html>

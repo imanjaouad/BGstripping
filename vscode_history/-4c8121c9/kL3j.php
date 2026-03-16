@@ -1,0 +1,41 @@
+@extends("layouts.main")
+
+@section("content")
+
+<div class="mb-3">
+    <h1 class="h3 d-inline align-middle">Nouvelle école</h1>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"></h5>
+            </div>
+            <div class="card-body">
+                <form action="/schools" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Nom du module</label>
+                        <input type="text" name="name" class="form-control" placeholder="Ex: BACKEND" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description </label>
+                        <input type="text" name="description" class="form-control" placeholder="Technique" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description </label>
+                        <input type="number" name="description" class="form-control" placeholder="Technique" required min="1">
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <a href="/schools" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection

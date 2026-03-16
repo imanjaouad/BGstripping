@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calculateur note module</title>
+<style>
+body { font-family: Arial; display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
+h2 { color: #333; }
+label { margin: 5px; display: block; }
+input { margin: 5px; width: 100px; }
+button { margin-top: 10px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+button:hover { background-color: #45a049; }
+#result { margin-top: 20px; font-weight: bold; font-size: 18px; text-align: center; }
+.container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; width: 350px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>Calculateur note module</h2>
+
+<label>Nom du module :</label>
+<input type="text" id="moduleName" placeholder="ex: Math"><br>
+
+<label>Coef du module :</label>
+<input type="number" id="coefModule" value="1"><br>
+
+<label>Note finale souhaitée (/20) :</label>
+<input type="number" id="noteFinale" placeholder="ex: 14"><br>
+
+<button onclick="calculer()">Calculer</button>
+
+<div id="result"></div>
+</div>
+
+<script>
+function calculer(){
+    const moduleName = document.getElementById('moduleName').value || "Module";
+    const coef = parseFloat(document.getElementById('coefModule').value) || 1;
+    const noteFinale = parseFloat(document.getElementById('noteFinale').value);
+
+    if(isNaN(noteFinale) || noteFinale < 0 || noteFinale > 20){
+        alert("Merci de saisir une note finale entre 0 et 20");
+        return;
+    }
+
+    // Pondération simplifiée : CC1=25%, CC2=25%, EFM=50% de la note finale
+    const cc1 = (noteFinale * 0.25 / 0.25).toFixed(2); // sur 20
+    const cc2 = (noteFinale * 0.25 / 0.25).toFixed(2); // sur 20
+    const efm = (noteFinale * 0.5 * 2).toFixed(2);     // sur 40
+
+    document.getElementById('result').innerHTML =
+        `${moduleName} (coef ${coef}) :<br>` +
+        `CC1 /20 : ${cc1}<br>` +
+        `CC2 /20 : ${cc2}<br>` +
+        `EFM /40 : ${efm}`;
+}
+</script>
+
+</body>
+</html>

@@ -27,7 +27,7 @@ export default function Footer() {
           <div>
             <h5>Opérations</h5>
             <ul>
-              <li><Link to="/operations/poussage">Poussage</Link></li>
+              <li><Link to="/poussage">Poussage</Link></li>
               <li><Link to="/operations/casement">Casement</Link></li>
               <li><Link to="/operations/transport">Transport</Link></li>
             </ul>

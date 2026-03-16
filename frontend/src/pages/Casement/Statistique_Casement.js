@@ -487,7 +487,7 @@ function StatistiqueCasement() {
         return a+(t>0?v/t:0);
       },0)/totalOps).toFixed(2)
     : 0;
-  const enMarcheCnt = casements.filter(c=>c.etatMachine==="marche").length;
+  const enMarcheCnt = casements.filter(c=>c.etatMachine==="En marche").length;
 
   // Engins
   const enginStats = {};
@@ -554,7 +554,7 @@ function StatistiqueCasement() {
       "Nb Coups BRH":c.nombreCoups,
       Équipements:c.equipements?.join(", "),
       Conducteur:c.conducteur, Matricule:c.matricule, Poste:c.poste,
-      "Volume Sauté(t)":c.volume_saute, "Heures Marche":c.temps,
+      "Volume sauté(t)":c.volume_saute, "Heures Marche":c.temps,
       Rendement:c.temps>0?(c.volume_saute/c.temps).toFixed(2):0,
       État:c.etatMachine, "Nature Arrêt":c.typeArret||"",
     }));
@@ -845,7 +845,7 @@ function StatistiqueCasement() {
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
                   ),
-                  label:"Volume Sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
+                  label:"Volume sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
                 },
                 {
                   icon:(
@@ -1061,7 +1061,7 @@ function StatistiqueCasement() {
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
                   ),
-                  label:"Volume Sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
+                  label:"Volume sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
                 },
                 {
                   icon:(

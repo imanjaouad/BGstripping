@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Test React JSX avec Babel</title>
+
+  <script src="./react.development.js" ></script>
+  <script src="./react-dom.development.js" ></script>
+  <script src="./babel.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script type="text/babel">
+    
+var elems = ["Element1", "Element2", "Element3", "Element4", 
+"Element5"];
+class Element extends React.Component {
+    constructor(props) {
+        super(props);
+}
+render() {
+    return <li
+style={{color:this.props.color}}>{this.props.elem}</li>
+}
+}
+cl
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🔍 Trouver un compte via Google</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 20px;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #1e40af;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #3b82f6;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn:hover {
+      background: #b91c1c;
+    }
+    .note {
+      margin-top: 25px;
+      padding: 15px;
+      background: #eff6ff;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #1e40af;
+    }
+    .direct-links {
+      margin-top: 25px;
+    }
+    .direct-links h3 {
+      color: #1e40af;
+      margin-bottom: 12px;
+    }
+    .link-item {
+      margin: 8px 0;
+    }
+    .link-item a {
+      color: #3b82f6;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .link-item a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🔍 Trouver un compte sur les réseaux sociaux</h1>
+    
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Entrez un nom ou pseudo (ex: Marie Dubois)" 
+      autocomplete="off"
+    />
+
+    <a id="googleBtn" class="btn" href="#" target="_blank" rel="noopener">
+      🔎 Rechercher sur Google
+    </a>
+
+    <div class="direct-links">
+      <h3>Liens directs (si pseudo connu) :</h3>
+      <div id="directLinks"></div>
+    </div>
+
+    <div class="note">
+      💡 Astuce : Google trouve souvent des comptes même avec un vrai nom.  
+      Cette méthode fonctionne mieux que les recherches directes sur Facebook/Instagram.
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("searchInput");
+    const googleBtn = document.getElementById("googleBtn");
+    const directLinksDiv = document.getElementById("directLinks");
+
+    // Plateformes pour liens directs (si c'est un pseudo)
+    const platforms = [
+      { name: "Instagram", url: "https://instagram.com/" },
+      { name: "Twitter / X", url: "https://twitter.com/" },
+      { name: "TikTok", url: "https://tiktok.com/@" },
+      { name: "YouTube", url: "https://youtube.com/@" },
+      { name: "Reddit", url: "https://reddit.com/user/" },
+      { name: "GitHub", url: "https://github.com/" },
+    ];
+
+    function buildGoogleQuery(name) {
+      // Encode le nom pour URL
+      const q = encodeURIComponent(`"${name}"`);
+      
+      // Cible les sites de réseaux sociaux + blogs qui mentionnent le nom
+      const sites = [
+        "instagram.com",
+        "twitter.com",
+        "x.com",
+        "facebook.com",
+        "linkedin.com",
+        "tiktok.com",
+        "pinterest.com",
+        "reddit.com",
+        "youtube.com",
+        "github.com"
+      ].map(site => `site:${site}`).join(' OR ');
+
+      return `https://www.google.com/search?q=${q}+(${sites})&hl=fr`;
+    }
+
+    function update() {
+      const name = input.value.trim();
+      
+      if (name) {
+        // Mise à jour du bouton Google
+        googleBtn.href = buildGoogleQuery(name);
+        googleBtn.textContent = `🔎 Rechercher "${name}" sur Google`;
+        
+        // Génération des liens directs (pour pseudos)
+        let linksHTML = '';
+        const cleanUsername = name.toLowerCase().replace(/[^a-z0-9._-]/g, '');
+        if (cleanUsername && cleanUsername.length >= 3) {
+          platforms.forEach(p => {
+            const url = p.url + cleanUsername;
+            linksHTML += `<div class="link-item"><a href="${url}" target="_blank">${p.name}</a></div>`;
+          });
+        } else {
+          linksHTML = '<div style="color:#9ca3af;">(Saisissez un pseudo valide pour voir les liens)</div>';
+        }
+        directLinksDiv.innerHTML = linksHTML;
+        
+      } else {
+        googleBtn.href = "#";
+        googleBtn.textContent = "🔎 Rechercher sur Google";
+        directLinksDiv.innerHTML = '<div style="color:#9ca3af;">Commencez à taper...</div>';
+      }
+    }
+
+    input.addEventListener("input", update);
+    // Aussi au chargement (au cas où)
+    update();
+  </script>
+
+</body>
+</html>
