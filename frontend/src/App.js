@@ -16,7 +16,15 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-
+        {/* USER MANAGEMENT */}
+      <Route
+        path="/admin/users"
+        element={
+          <PrivateRoute>
+            <UserManagement />
+          </PrivateRoute>
+        }
+      />
       {/* Poussage — wildcard /* required for nested <Routes> in poussage.js */}
       <Route path="/poussage/*" element={<PrivateRoute><Poussage /></PrivateRoute>} />
       <Route path="/operations/poussage/*" element={<PrivateRoute><Poussage /></PrivateRoute>} />
