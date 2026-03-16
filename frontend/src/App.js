@@ -6,6 +6,8 @@ import Poussage from "./pages/Poussage/poussage";
 import Casement from "./pages/Casement/casement";
 import TransportDashboard from "./pages/Transport/TransportDashboard";
 import TransportStatistiques from "./pages/Transport/TransportStatistiques";
+import UserManagement from "./pages/Admin/UserManagement";
+import PrivateRoute from "./components/PrivateRoute";
 import "./style/PoussageForm.css";
 import "./style/ReportsSection.css";
 
@@ -16,17 +18,20 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       {/* Poussage — wildcard /* required for nested <Routes> in poussage.js */}
-      <Route path="/poussage/*" element={<Poussage />} />
-      <Route path="/operations/poussage/*" element={<Poussage />} />
+      <Route path="/poussage/*" element={<PrivateRoute><Poussage /></PrivateRoute>} />
+      <Route path="/operations/poussage/*" element={<PrivateRoute><Poussage /></PrivateRoute>} />
 
       {/* Casement — wildcard /* required for nested <Routes> in casement.js */}
-      <Route path="/casement/*" element={<Casement />} />
-      <Route path="/operations/casement/*" element={<Casement />} />
+      <Route path="/casement/*" element={<PrivateRoute><Casement /></PrivateRoute>} />
+      <Route path="/operations/casement/*" element={<PrivateRoute><Casement /></PrivateRoute>} />
 
       {/* Transport */}
-      <Route path="/transport" element={<TransportDashboard />} />
-      <Route path="/transport/statistiques" element={<TransportStatistiques />} />
-      <Route path="/operations/transport" element={<TransportDashboard />} />
+      <Route path="/transport" element={<PrivateRoute><TransportDashboard /></PrivateRoute>} />
+      <Route path="/transport/statistiques" element={<PrivateRoute><TransportStatistiques /></PrivateRoute>} />
+      <Route path="/operations/transport" element={<PrivateRoute><TransportDashboard /></PrivateRoute>} />
+
+      {/* Admin — User Management (admin only) */}
+      <Route path="/admin/users" element={<PrivateRoute adminOnly><UserManagement /></PrivateRoute>} />
     </Routes>
   );
 }

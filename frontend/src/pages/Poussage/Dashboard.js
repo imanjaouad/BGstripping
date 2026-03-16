@@ -8,6 +8,11 @@ function Dashboard() {
   const dispatch = useDispatch();
   const { loading } = useSelector((s) => s.poussage);
 
+  // ── Role check ──────────────────────────────────────────────
+  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const currentUser = userStr ? JSON.parse(userStr) : null;
+  const isLimited = currentUser?.role === "limited";
+
   // Load data from API on mount
   useEffect(() => {
     dispatch(fetchPoussages());
@@ -116,6 +121,34 @@ function Dashboard() {
     formData.temps > 0
       ? (formData.volume_soté / formData.temps).toFixed(2)
       : 0;
+
+  // ── If limited user, show read-only message ──────────────────────────────
+  if (isLimited) {
+    return (
+      <div>
+        <div className="dashboard-header">
+          <h2 className="dashboard-title">
+            Gestion Décapage <span>ZD11</span>
+          </h2>
+          <img src={image} alt="logo" className="header-logo" />
+        </div>
+        <div style={{
+          background: "#fff", border: "1.5px solid #bbf7d0", borderRadius: 16,
+          padding: "40px 32px", marginTop: 20, textAlign: "center",
+          boxShadow: "0 4px 20px rgba(22,163,74,0.06)"
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+          <h3 style={{ color: "#14532d", fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+            Accès en lecture seule
+          </h3>
+          <p style={{ color: "#6b7280", fontSize: 14 }}>
+            Vous avez un accès limité. Les formulaires de saisie ne sont pas disponibles.<br/>
+            Consultez les statistiques et l'historique via le menu latéral.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

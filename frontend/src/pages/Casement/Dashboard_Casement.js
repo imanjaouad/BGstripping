@@ -178,6 +178,11 @@ function DashboardCasement() {
   const [editId, setEditId] = useState(null);
   const [equipOpts, setEquipOpts] = useState(["7500M1", "7500M2", "P&H1", "P&H2", "200B1"]);
 
+  // ── Role check ──────────────────────────────────────────────
+  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const currentUser = userStr ? JSON.parse(userStr) : null;
+  const isLimited = currentUser?.role === "limited";
+
   // Load data from API on mount
   useEffect(() => {
     dispatch(fetchCasements());
@@ -227,6 +232,42 @@ function DashboardCasement() {
 
   const rendement = form.temps > 0 ? parseFloat((form.volume_casse / form.temps).toFixed(2)) : 0;
   const isArret = form.etatMachine === "En arrêt";
+
+  // ── If limited user, show read-only message ──────────────────────────────
+  if (isLimited) {
+    return (
+      <div className="lcsm-root">
+        <style>{CSS}</style>
+        <div className="lcsm-bg" /><div className="lcsm-dots" />
+        <div className="lcsm-page">
+          <header className="lcsm-header">
+            <div>
+              <div className="lcsm-vol-label">Opérations Minières · </div>
+              <h1 className="lcsm-title">Décapage par <em>Casement</em></h1>
+            </div>
+            <div className="lcsm-header-right">
+              <div className="lcsm-pill"><div className="lcsm-pill-dot" />Système actif</div>
+              <img src={image} alt="logo" className="lcsm-logo" />
+            </div>
+          </header>
+          <div style={{
+            background: "#fff", border: "1.5px solid #bbf7d0", borderRadius: 20,
+            padding: "40px 32px", textAlign: "center",
+            boxShadow: "0 4px 20px rgba(22,163,74,0.06)"
+          }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+            <h3 style={{ color: "#14532d", fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+              Accès en lecture seule
+            </h3>
+            <p style={{ color: "#6b7280", fontSize: 14 }}>
+              Vous avez un accès limité. Les formulaires de saisie ne sont pas disponibles.<br/>
+              Consultez les statistiques et l'historique via le menu latéral.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="lcsm-root">

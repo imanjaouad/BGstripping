@@ -211,7 +211,7 @@ function AnimCount({ target, duration = 1100 }) {
 
 // ─── Company Section Component ────────────────────────────────────────────────
 // ─── Company Section Component ────────────────────────────────────────────────
-function CompanySection({ name, icon, color, filteredPoussages, selectedDate, transportData, dispatch }) {
+function CompanySection({ name, icon, color, filteredPoussages, selectedDate, transportData, dispatch, isLimited = false }) {
   const entrepriseKey = name.toLowerCase();
   const [activeTab, setActiveTab] = useState("petits");
 
@@ -313,13 +313,21 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
           <div className="camion-row">
             <div>
               <div className="camion-label">Nombre de Voyages</div>
-              <input className="input-camion" type="number" min="0" value={voyagesPetits}
-                onChange={(e) => handleVoyagesPetits(Number(e.target.value))} placeholder="0" />
+              {isLimited ? (
+                <div className="camion-value">{voyagesPetits}</div>
+              ) : (
+                <input className="input-camion" type="number" min="0" value={voyagesPetits}
+                  onChange={(e) => handleVoyagesPetits(Number(e.target.value))} placeholder="0" />
+              )}
             </div>
             <div>
               <div className="camion-label">Capacité Camion (t)</div>
-              <input className="input-camion" type="number" min="0" value={capacitePetits}
-                onChange={(e) => handleCapacitePetits(Number(e.target.value))} placeholder="20" />
+              {isLimited ? (
+                <div className="camion-value">{capacitePetits}</div>
+              ) : (
+                <input className="input-camion" type="number" min="0" value={capacitePetits}
+                  onChange={(e) => handleCapacitePetits(Number(e.target.value))} placeholder="20" />
+              )}
             </div>
             <div>
               <div className="camion-label">Volume Décapé</div>
@@ -340,13 +348,21 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
           <div className="camion-row">
             <div>
               <div className="camion-label">Nombre de Voyages</div>
-              <input className="input-camion" type="number" min="0" value={voyagesGrands}
-                onChange={(e) => handleVoyagesGrands(Number(e.target.value))} placeholder="0" />
+              {isLimited ? (
+                <div className="camion-value">{voyagesGrands}</div>
+              ) : (
+                <input className="input-camion" type="number" min="0" value={voyagesGrands}
+                  onChange={(e) => handleVoyagesGrands(Number(e.target.value))} placeholder="0" />
+              )}
             </div>
             <div>
               <div className="camion-label">Capacité Camion (t)</div>
-              <input className="input-camion" type="number" min="0" value={capaciteGrands}
-                onChange={(e) => handleCapaciteGrands(Number(e.target.value))} placeholder="50" />
+              {isLimited ? (
+                <div className="camion-value">{capaciteGrands}</div>
+              ) : (
+                <input className="input-camion" type="number" min="0" value={capaciteGrands}
+                  onChange={(e) => handleCapaciteGrands(Number(e.target.value))} placeholder="50" />
+              )}
             </div>
             <div>
               <div className="camion-label">Volume Décapé</div>
@@ -401,6 +417,11 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
 export default function TransportDashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // ── Role check ──────────────────────────────────────────────
+  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const currentUser = userStr ? JSON.parse(userStr) : null;
+  const isLimited = currentUser?.role === "limited";
 
   const poussages = useSelector((s) => s.poussage?.list || []);
   const transportData = useSelector((s) => s.transport?.list || []);
@@ -641,12 +662,13 @@ export default function TransportDashboard() {
         <div id="section-procaneq">
           <CompanySection
             name="Procaneq"
-            icon="🟧"
+            icon="🚚"
             color="#f59e0b"
             filteredPoussages={filteredPoussages}
             selectedDate={selectedDate}
             transportData={transportData}
             dispatch={dispatch}
+            isLimited={isLimited}
           />
         </div>
 
@@ -654,12 +676,13 @@ export default function TransportDashboard() {
         <div id="section-transwine">
           <CompanySection
             name="Transwine"
-            icon="🟦"
+            icon="🚛"
             color="#3b82f6"
             filteredPoussages={filteredPoussages}
             selectedDate={selectedDate}
             transportData={transportData}
             dispatch={dispatch}
+            isLimited={isLimited}
           />
         </div>
 
