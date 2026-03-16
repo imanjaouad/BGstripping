@@ -1,0 +1,295 @@
+/* ========================================
+   ETUDIA - DESIGN "JOURNAL DE BORD PROFESSIONNEL"
+   Cible : Stagiaires & Formation Adulte
+   ======================================== */
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap');
+
+/* =========================================
+   1. RESET & GLOBAL
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #1a202c;
+  line-height: 1.6;
+  background-color: #e5e7eb; /* Fond gris technique */
+  
+  /* FOND PAPIER TECHNIQUE (Quadrillage discret) */
+  background-image: 
+    linear-gradient(#cbd5e0 1px, transparent 1px),
+    linear-gradient(90deg, #cbd5e0 1px, transparent 1px);
+  background-size: 30px 30px;
+  min-height: 100vh;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* =========================================
+   2. HEADER & LOGO CENTRALISÉ
+   ========================================= */
+.header {
+  display: flex;
+  justify-content: center; /* Centre horizontalement */
+  align-items: center;
+  padding: 40px 20px;
+  width: 100%;
+  position: relative;
+  z-index: 20;
+}
+
+.logo-container {
+  width: 100%;
+  max-width: 350px; /* Plus grand */
+  display: flex;
+  justify-content: center;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.logo-container:hover {
+  transform: scale(1.05);
+}
+
+.logo-container img {
+  width: 100%; /* S'adapte au container */
+  height: auto;
+  max-height: 150px;
+  object-fit: contain;
+}
+
+/* On désactive les anciens styles inutiles */
+.diagonal { display: none; }
+
+/* =========================================
+   3. STRUCTURE (Page Cornée / Page Turn)
+   ========================================= */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section, .text-section {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 4px; /* Coins plus carrés pour faire "livre" */
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+  position: relative;
+  margin-bottom: 50px;
+  border-left: 10px solid #2d3748; /* Tranche de cahier */
+}
+
+/* EFFET PAGE CORNÉE (Page Turn Effect) */
+.section::after, .text-section::after, .module-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: #e5e7eb #e5e7eb #cbd5e0 #cbd5e0; /* Couleur du fond pour simuler le vide */
+  box-shadow: -2px 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.section:hover::after, .text-section:hover::after, .module-card:hover::after {
+  border-width: 0 60px 60px 0; /* La page se corne plus au survol */
+}
+
+/* =========================================
+   4. TYPOGRAPHIE PROFESSIONNELLE
+   ========================================= */
+.section-title {
+  color: #2d3748;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #edf2f7;
+  padding-bottom: 10px;
+}
+
+.title {
+  font-size: 3.5rem;
+  color: #1a365d; /* Bleu Marine */
+  margin-bottom: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* --- BOUTON RETOUR --- */
+.back-button {
+  background: #2d3748;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: background 0.3s;
+}
+
+.back-button:hover {
+  background: #4a5568;
+}
+
+/* =========================================
+   5. BOUTONS STAGIAIRES ( Indigo / Vert Pro )
+   ========================================= */
+.start-button {
+  background: #2b6cb0; /* Bleu Formation */
+  color: white;
+  padding: 20px 60px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.start-button:hover {
+  background: #2c5282;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+}
+
+.continue-button {
+  background: #276749; /* Vert Réussite / Pro */
+  color: white;
+  padding: 18px 40px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.3s;
+}
+
+.continue-button:hover {
+  background: #22543d;
+}
+
+/* =========================================
+   6. CARTES MODULES (Style Dossier Technique)
+   ========================================= */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.module-card {
+  background: #ffffff;
+  border-radius: 2px;
+  padding: 30px;
+  border-left: 5px solid #4a5568;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  position: relative;
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.1);
+}
+
+.module-header h3 {
+  font-size: 1.2rem;
+  color: #2d3748;
+  margin-bottom: 10px;
+}
+
+.module-code {
+  background: #ebf8ff;
+  color: #2c5282;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.select-module-btn {
+  background: #f7fafc;
+  color: #2d3748;
+  border: 1px solid #cbd5e0;
+  padding: 12px;
+  border-radius: 4px;
+  margin-top: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.module-card:hover .select-module-btn {
+  background: #2b6cb0;
+  color: white;
+  border-color: #2b6cb0;
+}
+
+/* =========================================
+   7. DÉCORATION (Gribouillis techniques discrets)
+   ========================================= */
+.triangles-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-around;
+  opacity: 0.1;
+}
+
+.triangle {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #2d3748; /* Carrés/Triangles type schéma technique */
+  transform: rotate(45deg);
+  animation: float 8s infinite ease-in-out;
+}
+
+/* =========================================
+   8. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .title { font-size: 2.2rem; }
+  .logo-container { max-width: 250px; }
+  .section, .text-section { padding: 25px; }
+  .header { padding: 20px 10px; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(45deg); }
+  50% { transform: translateY(-20px) rotate(60deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

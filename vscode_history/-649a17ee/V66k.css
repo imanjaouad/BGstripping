@@ -1,0 +1,81 @@
+.header {
+  background: #f8f9fa;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-top {
+  position: relative;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.blue-splash {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150%;
+  height: 120px;
+  background: #ADD8E6;
+  border-radius: 50%;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.logo-container {
+  position: relative;
+  z-index: 1;
+}
+
+.graduation-cap {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+h1 {
+  color: #2c3e50;
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.learn-more {
+  color: #3498db;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.header-bottom {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.welcome-text p {
+  margin: 5px 0;
+  color: #2c3e50;
+  font-size: 1.4rem;
+}
+
+.decorative-line {
+  width: 50px;
+  height: 2px;
+  background: #3498db;
+  margin: 15px auto;
+}
+
+.mountains-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.mountain {
+  width: 30px;
+  height: 30px;
+  background: #ADD8E6;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}

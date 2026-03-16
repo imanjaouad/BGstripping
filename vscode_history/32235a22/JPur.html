@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Portfolio professionnel : projets, compétences, expérience et contact."
+    />
+    <title>Portfolio — Votre Nom</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      /* Petites finitions non couvertes facilement par Tailwind */
+      .glass {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 selection:bg-indigo-500/25"
+  >
+    <!-- Top progress bar -->
+    <div
+      id="scrollProgress"
+      class="fixed top-0 left-0 h-1 w-0 bg-indigo-500 z-[60]"
+    ></div>
+
+    <!-- Header -->
+    <header class="fixed top-0 inset-x-0 z-50">
+      <div class="mx-auto max-w-6xl px-4">
+        <div
+          class="mt-3 flex items-center justify-between rounded-2xl border border-zinc-200/70 bg-white/70 glass px-4 py-3 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-900/60"
+        >
+          <a
+            href="#top"
+            class="flex items-center gap-2 group"
+            aria-label="Retour en haut"
+          >
+            <div
+              class="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 grid place-items-center text-white font-semibold"
+            >
+              YN
+            </div>
+            <div class="leading-tight">
+              <p class="text-sm font-semibold group-hover:underline">
+                Votre Nom
+              </p>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                Développeur Web
+              </p>
+            </div>
+          </a>
+
+          <nav
+            class="hidden md:flex items-center gap-1"
+            aria-label="Navigation principale"
+          >
+            <a
+              class="navlink px-3 py-2 rounded-xl text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+              href="#projets"
+              >Projets</a
+            >
+            <a
+              class="navlink px-3 py-2 rounded-xl text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+              href="#competences"
+              >Compétences</a
+            >
+            <a
+              class="navlink px-3 py-2 rounded-xl text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+              href="#experience"
+              >Expérience</a
+            >
+            <a
+              class="navlink px-3 py-2 rounded-xl text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+              href="#contact"
+              >Contact</a
+            >
+          </nav>
+
+          <div class="flex items-center gap-2">
+            <button
+              id="copyEmailBtn"
+              class="hidden sm:inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
+              type="button"
+            >
+              <span class="text-zinc-500 dark:text-zinc-400">Copier</span>
+              <span class="font-medium" id="emailLabel"
+                >prenom.nom@email.com</span
+              >
+            </button>
+
+            <button
+              id="themeToggle"
+              class="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
+              type="button"
+              aria-label="Basculer le thème"
+            >
+              <svg
+                id="themeIcon"
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+
+            <button
+              id="mobileMenuBtn"
+              class="md:hidden inline-flex items-center justify-center h-10 w-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
+              type="button"
+              aria-label="Ouvrir le menu"
+            >
+              <svg
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 6H20M4 12H20M4 18H20"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div
+          id="mobileMenu"
+          class="md:hidden hidden mt-2 rounded-2xl border border-zinc-200/70 bg-white/80 glass p-2 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-900/70"
+        >
+          <a
+            class="block px-4 py-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+            href="#projets"
+            >Projets</a
+          >
+          <a
+            class="block px-4 py-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+            href="#competences"
+            >Compétences</a
+          >
+          <a
+            class="block px-4 py-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+            href="#experience"
+            >Expérience</a
+          >
+          <a
+            class="block px-4 py-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+            href="#contact"
+            >Contact</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <!-- Background accents -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+    >
+      <div
+        class="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-indigo-500/15 blur-3xl"
+      ></div>
+      <div
+        class="absolute top-40 -right-24 h-80 w-80 rounded-full bg-fuchsia-500/15 blur-3xl"
+      ></div>
+      <div
+        class="absolute -bottom-24 left-1/3 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"
+      ></div>
+    </div>
+
+    <main id="top" class="pt-24">
+      <!-- Hero -->
+      <section class="mx-auto max-w-6xl px-4 py-10 md:py-16">
+        <div class="grid items-center gap-10 md:grid-cols-12">
+          <div class="md:col-span-7">
+            <div
+              class="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/70 glass px-3 py-1 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200"
+            >
+              <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+              Disponible pour missions freelance / CDI
+            </div>
+
+            <h1 class="mt-5 text-4xl font-semibold tracking-tight md:text-5xl">
+              Je conçois des
+              <span
+                class="bg-gradient-to-r from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent"
+                >sites rapides</span
+              >, élégants et utiles.
+            </h1>
+            <p
+              class="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300"
+            >
+              Développeur web orienté produit : interface soignée, performance,
+              accessibilité et intégration API. Voici une sélection de projets,
+              compétences et mon parcours.
+            </p>
+
+            <div class="mt-6 flex flex-wrap items-center gap-3">
+              <a
+                href="#projets"
+                class="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Voir les projets
+              </a>
+              <a
+                href="#contact"
+                class="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white/70 glass px-4 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+              >
+                Me contacter
+              </a>
+              <button
+                id="downloadCv"
+                class="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white/70 glass px-4 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+                type="button"
+              >
+                Télécharger CV (PDF)
+              </button>
+            </div>
+
+            <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div
+                class="rounded-2xl border border-zinc-200 bg-white/70 glass p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
+              >
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                  Spécialité
+                </p>
+                <p class="mt-1 text-sm font-semibold">Front-end & UI</p>
+              </div>
+              <div
+                class="rounded-2xl border border-zinc-200 bg-white/70 glass p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
+              >
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">Stack</p>
+                <p class="mt-1 text-sm font-semibold">JS / TS / Node</p>
+              </div>
+              <div
+                class="rounded-2xl border border-zinc-200 bg-white/70 glass p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
+              >
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">Focus</p>
+                <p class="mt-1 text-sm font-semibold">Perf & SEO</p>
+              </div>
+              <div
+                class="rounded-2xl border border-zinc-200 bg-white/70 glass p-4 dark:border-zinc-800 dark:bg-zinc-900/60"
+              >
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                  Localisation
+                </p>
+                <p class="mt-1 text-sm font-semibold">France / Remote</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-5">
+            <div
+              class="rounded-3xl border border-zinc-200 bg-white/70 glass p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/60"
+            >
+              <div class="flex items-center gap-4">
+                <div class="relative">
+                  <div
+                    class="h-20 w-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500"
+                  ></div>
+                  <div
+                    class="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-xl bg-white shadow-sm dark:bg-zinc-950"
+                  >
+                    <span class="text-sm font-semibold">✓</span>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-lg font-semibold">Votre Nom</p>
+                  <p class="text-sm text-zinc-600 dark:text-zinc-300">
+                    Développeur Web — Portfolio
+                  </p>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <span
+                      class="inline-flex items-center rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs text-indigo-700 dark:text-indigo-200"
+                      >UI</span
+                    >
+                    <span
+                      class="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-700 dark:text-emerald-200"
+                      >API</span
+                    >
+                    <span
+                      class="inline-flex items-center rounded-full bg-fuchsia-500/10 px-2.5 py-1 text-xs text-fuchsia-700 dark:text-fuchsia-200"
+                      >React</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="mt-6 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950/40"
+              >
+                <p class="text-sm font-semibold">En bref</p>
+                <ul
+                  class="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300"
+                >
+                  <li class="flex gap-2">
+                    <span class="text-zinc-400">•</span> Interfaces claires et
+                    accessibles
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-zinc-400">•</span> Intégration API, auth,
+                    paiements
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-zinc-400">•</span> Optimisation Core Web
+                    Vitals
+                  </li>
+                </ul>
+              </div>
+
+              <div class="mt-4 flex gap-2">
+                <a
+                  class="flex-1 inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white/70 glass px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+                  href="#contact"
+                >
+                  Disponibilités
+                </a>
+                <button
+                  id="shareBtn"
+                  class="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-zinc-200 bg-white/70 glass hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+                  type="button"
+                  aria-label="Partager"
+                >
+                  <svg
+                    class="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M16 8a3 3 0 1 0-2.83-4H13a3 3 0 0 0 3 4ZM6 14a3 3 0 1 0 2.83 4H9a3 3 0 0 0-3-4Zm10-1a3 3 0 1 0 2.83 4H19a3 3 0 0 0-3-4Z"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M8.6 16.5l6.9-3.7M15.5 7.2 8.6 10.9"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section id="projets" class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
+        >
+          <div>
+            <h2 class="text-2xl font-semibold tracking-tight">Projets</h2>
+            <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+              Sélection de réalisations (démo + détails). Filtrez par catégorie.
+            </p>
+          </div>
+
+          <div
+            class="flex flex-wrap gap-2"
+            role="tablist"
+            aria-label="Filtre de projets"
+          >
+            <button
+              class="filterBtn rounded-full border border-zinc-200 bg-white/70 glass px-3 py-1.5 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+              data-filter="all"
+              type="button"
+            >
+              Tous
+            </button>
+            <button
+              class="filterBtn rounded-full border border-zinc-200 bg-white/70 glass px-3 py-1.5 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+              data-filter="frontend"
+              type="button"
+            >
+              Front-end
+            </button>
+            <button
+              class="filterBtn rounded-full border border-zinc-200 bg-white/70 glass px-3 py-1.5 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+              data-filter="fullstack"
+              type="button"
+            >
+              Full-stack
+            </button>
+            <button
+              class="filterBtn rounded-full border border-zinc-200 bg-white/70 glass px-3 py-1.5 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:bg-zinc-800/60"
+              data-filter="design"
+              type="button"
+            >
+              Design
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          id="projectsGrid"
+          aria-live="polite"
+        ></div>
+
+        <div
+          class="mt-8 rounded-2xl border border-zinc-200 bg-white/70 glass p-5 dark:border-zinc-800 dark:bg-zinc-900/60"
+        >
+          <p class="text-sm text-zinc-600 dark:text-zinc-300">
+            Vous voulez voir davantage ? Je peux partager un portfolio complet
+            (Figma, repos privés, études de cas).
+            <a
+              class="font-medium underline underline-offset-4 hover:text-zinc-900 dark:hover:text-white"
+              href="#contact"
+              >Demander un accès</a
+            >.
+          </p>
+        </div>
+      </section>
+
+      <!-- Skills -->
+      <section id="competences" class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <div class="grid gap-8 md:grid-cols-12">
+          <div class="md:col-span-5">
+            <h2 class="text-2xl font-semibold tracking-tight">Compétences</h2>
+            <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+              Une stack pragmatique, orientée livraison : UI, performance,
+              intégration, tests.
+            </p>
+
+            <div class="mt-6 space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-medium">Front-end (HTML/CSS/JS/TS)</span>
+                  <span class="text-zinc-500 dark:text-zinc-400">Avancé</span>
+                </div>
+                <div class="mt-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800">
+                  <div
+                    class="h-2 w-[90%] rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-medium">Frameworks (React/Next/Vue)</span>
+                  <span class="text-zinc-500 dark:text-zinc-400">Confirmé</span>
+                </div>
+                <div class="mt-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800">
+                  <div
+                    class="h-2 w-[82%] rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-medium">Back-end (Node/Express/DB)</span>
+                  <span class="text-zinc-500 dark:text-zinc-400">Confirmé</span>
+                </div>
+                <div class="mt-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800">
+                  <div
+                    class="h-2 w-[75%] rounded-full bg-gradient-to-r from-amber-500 to-rose-500"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="font-medium">Qualité (tests, lint, CI)</span>
+                  <span class="text-zinc-500 dark:text-zinc-400">Solide</span>
+                </div>
+                <div class="mt-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800">
+                  <div
+                    class="h-2 w-[70%] rounded-full bg-gradient-to-r from-violet-500 to-indigo-500"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-7">
+            <div
+              class="rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60"
+            >
+              <div
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p class="text-sm font-semibold">Boîte à outils</p>
+                  <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                    Quelques technos que j’utilise au quotidien :
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button
+                    id="skillsShuffle"
+                    class="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60"
+                    type="button"
+                  >
+                    Mélanger
+                  </button>
+                  <button
+                    id="skillsReset"
+                    class="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60"
+                    type="button"
+                  >
+                    Réinitialiser
+                  </button>
+                </div>
+              </div>
+
+              <div id="skillsCloud" class="mt-5 flex flex-wrap gap-2"></div>
+
+              <div
+                class="mt-6 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950/40"
+              >
+                <p class="text-sm font-semibold">Approche</p>
+                <ul
+                  class="mt-2 space-y-2 text-sm text-zinc-600 dark:text-zinc-300"
+                >
+                  <li class="flex gap-2">
+                    <span class="text-zinc-400">1.</span> Clarifier le besoin
+                    (objectif, audience, KPI)
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-zinc-400">2.</span> Prototyper (wireframe
+                    / design system léger)
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-zinc-400">3.</span> Construire & mesurer
+                    (perf, analytics, SEO)
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Experience -->
+      <section id="experience" class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <div class="flex items-end justify-between gap-6">
+          <div>
+            <h2 class="text-2xl font-semibold tracking-tight">Expérience</h2>
+            <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+              Quelques jalons (à adapter à votre parcours).
+            </p>
+          </div>
+          <div class="hidden sm:block text-sm text-zinc-500 dark:text-zinc-400">
+            Dernière mise à jour : <span id="lastUpdated"></span>
+          </div>
+        </div>
+
+        <ol class="mt-6 grid gap-4">
+          <li
+            class="rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60"
+          >
+            <div
+              class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400">
+                  2024 → Aujourd’hui
+                </p>
+                <p class="text-lg font-semibold">
+                  Développeur Full‑stack — Freelance
+                </p>
+              </div>
+              <span
+                class="inline-flex w-fit items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-200"
+                >Delivery & qualité</span
+              >
+            </div>
+            <ul class="mt-4 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> Création de sites vitrines
+                & apps (auth, dashboards, paiements)
+              </li>
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> Optimisation perf
+                (LCP/CLS), SEO technique & accessibilité
+              </li>
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> CI/CD, monitoring et
+                documentation pour handover
+              </li>
+            </ul>
+          </li>
+
+          <li
+            class="rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60"
+          >
+            <div
+              class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400">
+                  2022 → 2024
+                </p>
+                <p class="text-lg font-semibold">
+                  Développeur Front‑end — Produit SaaS
+                </p>
+              </div>
+              <span
+                class="inline-flex w-fit items-center rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-200"
+                >UX & composants</span
+              >
+            </div>
+            <ul class="mt-4 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> Design system, composants,
+                accessibilité (ARIA)
+              </li>
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> Amélioration du taux de
+                conversion via itérations UI
+              </li>
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> Tests E2E et revue de code
+                pour réduire les régressions
+              </li>
+            </ul>
+          </li>
+
+          <li
+            class="rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60"
+          >
+            <div
+              class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400">
+                  Avant 2022
+                </p>
+                <p class="text-lg font-semibold">
+                  Projets perso & missions ponctuelles
+                </p>
+              </div>
+              <span
+                class="inline-flex w-fit items-center rounded-full bg-fuchsia-500/10 px-3 py-1 text-xs font-medium text-fuchsia-700 dark:text-fuchsia-200"
+                >Polyvalence</span
+              >
+            </div>
+            <ul class="mt-4 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> Sites rapides, landing
+                pages et intégrations CMS
+              </li>
+              <li class="flex gap-2">
+                <span class="text-zinc-400">•</span> APIs REST, automatisations,
+                scripts de déploiement
+              </li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <div class="grid gap-8 md:grid-cols-12">
+          <div class="md:col-span-5">
+            <h2 class="text-2xl font-semibold tracking-tight">Contact</h2>
+            <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+              Décrivez votre besoin (objectif, délai, budget). Réponse rapide.
+            </p>
+
+            <div
+              class="mt-6 rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60"
+            >
+              <p class="text-sm font-semibold">Infos</p>
+              <div
+                class="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300"
+              >
+                <p>
+                  <span class="text-zinc-500 dark:text-zinc-400">Email :</span>
+                  <button
+                    id="copyEmailInline"
+                    class="font-medium underline underline-offset-4"
+                    type="button"
+                  >
+                    prenom.nom@email.com
+                  </button>
+                </p>
+                <p>
+                  <span class="text-zinc-500 dark:text-zinc-400"
+                    >LinkedIn :</span
+                  >
+                  <a
+                    class="font-medium underline underline-offset-4"
+                    href="#"
+                    id="linkedinLink"
+                    rel="noreferrer"
+                    >linkedin.com/in/votrenom</a
+                  >
+                </p>
+                <p>
+                  <span class="text-zinc-500 dark:text-zinc-400">GitHub :</span>
+                  <a
+                    class="font-medium underline underline-offset-4"
+                    href="#"
+                    id="githubLink"
+                    rel="noreferrer"
+                    >github.com/votrenom</a
+                  >
+                </p>
+              </div>
+
+              <div
+                class="mt-5 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950/40"
+              >
+                <p class="text-sm font-semibold">Disponibilités</p>
+                <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+                  <span
+                    class="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-700 dark:text-emerald-200"
+                    >1–2 semaines</span
+                  >
+                  <span class="ml-2 text-xs text-zinc-500 dark:text-zinc-400"
+                    >(adaptable selon projet)</span
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-7">
+            <form
+              id="contactForm"
+              class="rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60"
+              novalidate
+            >
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="text-sm font-medium" for="name">Nom</label>
+                  <input
+                    class="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-800 dark:bg-zinc-950/40"
+                    id="name"
+                    name="name"
+                    autocomplete="name"
+                    placeholder="Votre nom"
+                  />
+                  <p
+                    class="mt-1 text-xs text-rose-600 hidden"
+                    data-error-for="name"
+                  ></p>
+                </div>
+                <div>
+                  <label class="text-sm font-medium" for="email">Email</label>
+                  <input
+                    class="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-800 dark:bg-zinc-950/40"
+                    id="email"
+                    name="email"
+                    autocomplete="email"
+                    placeholder="vous@domaine.com"
+                  />
+                  <p
+                    class="mt-1 text-xs text-rose-600 hidden"
+                    data-error-for="email"
+                  ></p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <label class="text-sm font-medium" for="topic">Sujet</label>
+                <select
+                  class="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-800 dark:bg-zinc-950/40"
+                  id="topic"
+                  name="topic"
+                >
+                  <option value="">Choisir…</option>
+                  <option value="site">Site vitrine / landing</option>
+                  <option value="app">Application web</option>
+                  <option value="audit">Audit performance / SEO</option>
+                  <option value="autre">Autre</option>
+                </select>
+                <p
+                  class="mt-1 text-xs text-rose-600 hidden"
+                  data-error-for="topic"
+                ></p>
+              </div>
+
+              <div class="mt-4">
+                <label class="text-sm font-medium" for="message">Message</label>
+                <textarea
+                  class="mt-2 w-full min-h-[140px] rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-800 dark:bg-zinc-950/40"
+                  id="message"
+                  name="message"
+                  placeholder="Contexte, objectifs, contraintes, délai…"
+                ></textarea>
+                <p
+                  class="mt-1 text-xs text-rose-600 hidden"
+                  data-error-for="message"
+                ></p>
+              </div>
+
+              <div
+                class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <label
+                  class="inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300"
+                >
+                  <input
+                    id="consent"
+                    type="checkbox"
+                    class="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-700"
+                  />
+                  J’accepte d’être recontacté.
+                </label>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    id="prefillBtn"
+                    class="rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60"
+                    type="button"
+                  >
+                    Préremplir
+                  </button>
+                  <button
+                    class="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500"
+                    type="submit"
+                  >
+                    Envoyer
+                  </button>
+                </div>
+              </div>
+
+              <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+                Ce formulaire simule l’envoi (sans backend). Pour une mise en
+                production : EmailJS, Formspree ou API.
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mx-auto max-w-6xl px-4 pb-12">
+        <div
+          class="rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60"
+        >
+          <div
+            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <p class="font-semibold">Votre Nom</p>
+              <p class="text-sm text-zinc-600 dark:text-zinc-300">
+                Portfolio — <span id="year"></span>
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <a
+                class="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60"
+                href="#projets"
+                >Projets</a
+              >
+              <a
+                class="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60"
+                href="#contact"
+                >Contact</a
+              >
+              <button
+                id="toTop"
+                class="rounded-xl bg-zinc-900 px-3 py-2 text-sm text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                type="button"
+              >
+                Haut
+              </button>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Modal: project details -->
+    <div
+      id="projectModal"
+      class="fixed inset-0 z-[70] hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="absolute inset-0 bg-black/40"></div>
+      <div class="relative mx-auto mt-20 max-w-2xl px-4">
+        <div
+          class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 id="modalTitle" class="text-lg font-semibold"></h3>
+              <p
+                id="modalSubtitle"
+                class="mt-1 text-sm text-zinc-600 dark:text-zinc-300"
+              ></p>
+            </div>
+            <button
+              id="closeModal"
+              class="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
+              type="button"
+              aria-label="Fermer"
+            >
+              <svg
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 6l12 12M18 6L6 18"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            class="mt-5 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40"
+          >
+            <p class="text-sm font-medium">Contexte</p>
+            <p
+              id="modalContext"
+              class="mt-2 text-sm text-zinc-600 dark:text-zinc-300"
+            ></p>
+          </div>
+
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <div
+              class="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800"
+            >
+              <p class="text-sm font-medium">Stack</p>
+              <div id="modalStack" class="mt-2 flex flex-wrap gap-2"></div>
+            </div>
+            <div
+              class="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800"
+            >
+              <p class="text-sm font-medium">Résultats</p>
+              <ul
+                id="modalResults"
+                class="mt-2 space-y-2 text-sm text-zinc-600 dark:text-zinc-300"
+              ></ul>
+            </div>
+          </div>
+
+          <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+            <a
+              id="modalDemo"
+              class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500"
+              href="#"
+              target="_blank"
+              rel="noreferrer"
+              >Voir la démo</a
+            >
+            <a
+              id="modalRepo"
+              class="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/60"
+              href="#"
+              target="_blank"
+              rel="noreferrer"
+              >Voir le repo</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toasts -->
+    <div
+      id="toastContainer"
+      class="fixed bottom-4 right-4 z-[80] flex w-[min(92vw,360px)] flex-col gap-2"
+    ></div>
+
+    <script>
+      // ----------------------
+      // Theme
+      // ----------------------
+      const html = document.documentElement;
+      const themeToggle = document.getElementById("themeToggle");
+      const themeIcon = document.getElementById("themeIcon");
+
+      function applyTheme(theme) {
+        const isDark = theme === "dark";
+        html.classList.toggle("dark", isDark);
+        localStorage.setItem("theme", theme);
+        // Icon switch: moon (default) vs sun
+        themeIcon.innerHTML = isDark
+          ? '<path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.7"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>'
+          : '<path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>';
+      }
+
+      const storedTheme = localStorage.getItem("theme");
+      if (storedTheme) {
+        applyTheme(storedTheme);
+      } else {
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        applyTheme(prefersDark ? "dark" : "light");
+      }
+
+      themeToggle.addEventListener("click", () => {
+        const isDark = html.classList.contains("dark");
+        applyTheme(isDark ? "light" : "dark");
+        toast(isDark ? "Thème clair activé" : "Thème sombre activé", "info");
+      });
+
+      // ----------------------
+      // Mobile menu
+      // ----------------------
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+      mobileMenuBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      // Close mobile menu when clicking a link
+      mobileMenu.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", () => mobileMenu.classList.add("hidden"));
+      });
+
+      // ----------------------
+      // Toast
+      // ----------------------
+      const toastContainer = document.getElementById("toastContainer");
+
+      function toast(message, type = "success", timeout = 2600) {
+        const el = document.createElement("div");
+        const color =
+          type === "success"
+            ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-100"
+            : type === "error"
+            ? "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-100"
+            : "border-indigo-200 bg-indigo-50 text-indigo-900 dark:border-indigo-900/60 dark:bg-indigo-950/40 dark:text-indigo-100";
+
+        el.className = `rounded-2xl border ${color} px-4 py-3 shadow-sm`;
+        el.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="mt-0.5 h-2 w-2 rounded-full ${
+            type === "error"
+              ? "bg-rose-500"
+              : type === "info"
+              ? "bg-indigo-500"
+              : "bg-emerald-500"
+          }"></div>
+          <div class="text-sm leading-snug">${escapeHtml(message)}</div>
+          <button class="ml-auto text-xs opacity-70 hover:opacity-100" aria-label="Fermer">Fermer</button>
+        </div>
+      `;
+
+        const closeBtn = el.querySelector("button");
+        closeBtn.addEventListener("click", () => {
+          el.remove();
+        });
+
+        toastContainer.appendChild(el);
+        setTimeout(() => {
+          if (el.isConnected) el.remove();
+        }, timeout);
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      // ----------------------
+      // Copy email
+      // ----------------------
+      const EMAIL = "prenom.nom@email.com";
+      const copyEmailBtn = document.getElementById("copyEmailBtn");
+      const copyEmailInline = document.getElementById("copyEmailInline");
+
+      async function copyEmail() {
+        try {
+          await navigator.clipboard.writeText(EMAIL);
+          toast("Email copié dans le presse-papiers.", "success");
+        } catch {
+          toast(
+            "Impossible de copier automatiquement. Sélectionnez l'email manuellement.",
+            "error"
+          );
+        }
+      }
+
+      copyEmailBtn?.addEventListener("click", copyEmail);
+      copyEmailInline?.addEventListener("click", copyEmail);
+
+      // ----------------------
+      // Share
+      // ----------------------
+      const shareBtn = document.getElementById("shareBtn");
+      shareBtn.addEventListener("click", async () => {
+        const shareData = {
+          title: document.title,
+          text: "Découvrez ce portfolio",
+          url: location.href,
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+            toast("Lien partagé.", "success");
+          } else {
+            await navigator.clipboard.writeText(location.href);
+            toast("Lien copié (partage non disponible).", "info");
+          }
+        } catch {
+          toast("Partage annulé.", "info");
+        }
+      });
+
+      // ----------------------
+      // Scroll progress
+      // ----------------------
+      const scrollProgress = document.getElementById("scrollProgress");
+      function updateScrollProgress() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const pct =
+          docHeight > 0
+            ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100))
+            : 0;
+        scrollProgress.style.width = pct + "%";
+      }
+      window.addEventListener("scroll", updateScrollProgress, {
+        passive: true,
+      });
+      updateScrollProgress();
+
+      // ----------------------
+      // Active nav highlighting via IntersectionObserver
+      // ----------------------
+      const navLinks = Array.from(document.querySelectorAll(".navlink"));
+      const sections = ["projets", "competences", "experience", "contact"]
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+          if (!visible) return;
+          const id = visible.target.id;
+          navLinks.forEach((a) => {
+            const active = a.getAttribute("href") === "#" + id;
+            a.classList.toggle("bg-zinc-100", active);
+            a.classList.toggle("dark:bg-zinc-800/60", active);
+            a.classList.toggle("font-medium", active);
+          });
+        },
+        { threshold: [0.2, 0.35, 0.5] }
+      );
+
+      sections.forEach((s) => io.observe(s));
+
+      // ----------------------
+      // Projects data + rendering
+      // ----------------------
+      const projects = [
+        {
+          id: "perf-audit",
+          title: "Audit Performance & SEO",
+          subtitle: "Amélioration Core Web Vitals d’un site vitrine",
+          category: "frontend",
+          badges: ["Perf", "SEO", "Accessibilité"],
+          context:
+            "Analyse Lighthouse + corrections (images, fonts, JS), nettoyage du CSS, optimisation du rendu initial et mise en place de bonnes pratiques SEO.",
+          stack: ["Lighthouse", "Tailwind", "Vite"],
+          results: [
+            "LCP réduit de 3.1s → 1.6s",
+            "CLS stabilisé < 0.1",
+            "Structure Hn & metadata améliorées",
+          ],
+          demoUrl: "https://example.com",
+          repoUrl: "https://github.com/",
+        },
+        {
+          id: "dashboard-saas",
+          title: "Dashboard SaaS",
+          subtitle: "UI + data tables + filtres + auth",
+          category: "fullstack",
+          badges: ["Full‑stack", "Auth", "Charts"],
+          context:
+            "Création d’un tableau de bord pour suivre des indicateurs clés : authentification, pages protégées, filtres, export et visualisation de données.",
+          stack: ["TypeScript", "Node", "PostgreSQL"],
+          results: [
+            "Composants réutilisables",
+            "Temps de chargement optimisé via pagination",
+            "Logs & erreurs structurés",
+          ],
+          demoUrl: "https://example.com",
+          repoUrl: "https://github.com/",
+        },
+        {
+          id: "landing-design",
+          title: "Landing Page Produit",
+          subtitle: "Conversion + design system léger",
+          category: "design",
+          badges: ["Design", "UI", "Copy"],
+          context:
+            "Conception d’une landing page orientée conversion : hiérarchie visuelle, messages clairs, sections FAQ, CTA répétés, et adaptation mobile.",
+          stack: ["Figma", "Tailwind", "A/B test"],
+          results: [
+            "Structure orientée benefits",
+            "Accessibilité améliorée (contrastes)",
+            "Composants modulaires",
+          ],
+          demoUrl: "https://example.com",
+          repoUrl: "https://github.com/",
+        },
+        {
+          id: "ecommerce",
+          title: "Mini e‑commerce",
+          subtitle: "Panier, recherche, paiement (mock)",
+          category: "fullstack",
+          badges: ["Catalogue", "Panier", "API"],
+          context:
+            "Prototype e-commerce : listing produits, recherche, filtres, gestion de panier, page checkout (simulation) et stockage local.",
+          stack: ["JavaScript", "API REST", "LocalStorage"],
+          results: [
+            "UX fluide (optimistic UI)",
+            "Composants isolés",
+            "Persistance panier",
+          ],
+          demoUrl: "https://example.com",
+          repoUrl: "https://github.com/",
+        },
+        {
+          id: "portfolio",
+          title: "Portfolio Moderne",
+          subtitle: "One-page avec thème, modales, filtres",
+          category: "frontend",
+          badges: ["UI", "Animations", "Accessibilité"],
+          context:
+            "Un portfolio rapide et agréable à parcourir : sections claires, navigation, filtre projets, modale, et formulaire de contact.",
+          stack: ["HTML", "Tailwind", "Vanilla JS"],
+          results: [
+            "Score Lighthouse élevé",
+            "Mode sombre persisté",
+            "Navigation fluide",
+          ],
+          demoUrl: "https://example.com",
+          repoUrl: "https://github.com/",
+        },
+        {
+          id: "design-system",
+          title: "Design System (starter)",
+          subtitle: "Tokens, composants, guidelines",
+          category: "design",
+          badges: ["Tokens", "Docs", "UI Kit"],
+          context:
+            "Mise en place d’une base réutilisable : typographies, espacements, couleurs, composants et documentation.",
+          stack: ["Figma", "Storybook", "CSS"],
+          results: [
+            "Cohérence UI",
+            "Accélération des nouvelles pages",
+            "Moins de dettes CSS",
+          ],
+          demoUrl: "https://example.com",
+          repoUrl: "https://github.com/",
+        },
+      ];
+
+      const projectsGrid = document.getElementById("projectsGrid");
+      const filterButtons = Array.from(document.querySelectorAll(".filterBtn"));
+      let activeFilter = "all";
+
+      function badgePill(text) {
+        return `<span class="inline-flex items-center rounded-full bg-zinc-900/5 px-2.5 py-1 text-xs text-zinc-700 dark:bg-white/10 dark:text-zinc-200">${escapeHtml(
+          text
+        )}</span>`;
+      }
+
+      function renderProjects() {
+        const visible =
+          activeFilter === "all"
+            ? projects
+            : projects.filter((p) => p.category === activeFilter);
+
+        projectsGrid.innerHTML = visible
+          .map((p) => {
+            const badges = p.badges.map(badgePill).join("");
+            return `
+          <article class="group rounded-3xl border border-zinc-200 bg-white/70 glass p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/60">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-base font-semibold tracking-tight">${escapeHtml(
+                  p.title
+                )}</h3>
+                <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-300">${escapeHtml(
+                  p.subtitle
+                )}</p>
+              </div>
+              <div class="h-11 w-11 shrink-0 rounded-2xl bg-gradient-to-br from-indigo-500/90 to-fuchsia-500/90"></div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">${badges}</div>
+
+            <div class="mt-5 flex items-center justify-between">
+              <button class="openProject inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200" data-project-id="${escapeHtml(
+                p.id
+              )}" type="button">
+                Détails
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <span class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml(
+                p.category
+              )}</span>
+            </div>
+          </article>
+        `;
+          })
+          .join("");
+
+        projectsGrid.querySelectorAll(".openProject").forEach((btn) => {
+          btn.addEventListener("click", () =>
+            openProject(btn.dataset.projectId)
+          );
+        });
+
+        if (!visible.length) {
+          projectsGrid.innerHTML = `
+          <div class="sm:col-span-2 lg:col-span-3 rounded-3xl border border-zinc-200 bg-white/70 glass p-6 dark:border-zinc-800 dark:bg-zinc-900/60">
+            <p class="text-sm text-zinc-600 dark:text-zinc-300">Aucun projet dans ce filtre. Essayez « Tous ».</p>
+          </div>
+        `;
+        }
+      }
+
+      filterButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          activeFilter = btn.dataset.filter;
+          filterButtons.forEach((b) => {
+            const isActive = b.dataset.filter === activeFilter;
+            b.classList.toggle("bg-zinc-900", isActive);
+            b.classList.toggle("text-white", isActive);
+            b.classList.toggle("dark:bg-white", isActive);
+            b.classList.toggle("dark:text-zinc-900", isActive);
+          });
+          renderProjects();
+        });
+      });
+
+      // Default active
+      filterButtons
+        .find((b) => b.dataset.filter === "all")
+        ?.classList.add(
+          "bg-zinc-900",
+          "text-white",
+          "dark:bg-white",
+          "dark:text-zinc-900"
+        );
+      renderProjects();
+
+      // ----------------------
+      // Modal behavior
+      // ----------------------
+      const projectModal = document.getElementById("projectModal");
+      const closeModalBtn = document.getElementById("closeModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalSubtitle = document.getElementById("modalSubtitle");
+      const modalContext = document.getElementById("modalContext");
+      const modalStack = document.getElementById("modalStack");
+      const modalResults = document.getElementById("modalResults");
+      const modalDemo = document.getElementById("modalDemo");
+      const modalRepo = document.getElementById("modalRepo");
+
+      let lastFocus = null;
+
+      function openProject(projectId) {
+        const p = projects.find((x) => x.id === projectId);
+        if (!p) return;
+
+        lastFocus = document.activeElement;
+
+        modalTitle.textContent = p.title;
+        modalSubtitle.textContent = p.subtitle;
+        modalContext.textContent = p.context;
+        modalStack.innerHTML = p.stack
+          .map(
+            (s) =>
+              `<span class="inline-flex items-center rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs text-indigo-700 dark:text-indigo-200">${escapeHtml(
+                s
+              )}</span>`
+          )
+          .join("");
+        modalResults.innerHTML = p.results
+          .map(
+            (r) =>
+              `<li class="flex gap-2"><span class="text-zinc-400">•</span><span>${escapeHtml(
+                r
+              )}</span></li>`
+          )
+          .join("");
+        modalDemo.href = p.demoUrl;
+        modalRepo.href = p.repoUrl;
+
+        projectModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+        closeModalBtn.focus();
+      }
+
+      function closeModal() {
+        projectModal.classList.add("hidden");
+        document.body.style.overflow = "";
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+
+      closeModalBtn.addEventListener("click", closeModal);
+      projectModal.addEventListener("click", (e) => {
+        if (e.target === projectModal.firstElementChild) closeModal();
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !projectModal.classList.contains("hidden"))
+          closeModal();
+      });
+
+      // ----------------------
+      // Skills cloud
+      // ----------------------
+      const skillsCloud = document.getElementById("skillsCloud");
+      const skillsShuffle = document.getElementById("skillsShuffle");
+      const skillsReset = document.getElementById("skillsReset");
+
+      const baseSkills = [
+        { label: "JavaScript", tone: "indigo" },
+        { label: "TypeScript", tone: "indigo" },
+        { label: "React", tone: "fuchsia" },
+        { label: "Next.js", tone: "fuchsia" },
+        { label: "Node.js", tone: "emerald" },
+        { label: "Express", tone: "emerald" },
+        { label: "PostgreSQL", tone: "amber" },
+        { label: "REST", tone: "zinc" },
+        { label: "Auth (JWT/OAuth)", tone: "zinc" },
+        { label: "Tailwind CSS", tone: "indigo" },
+        { label: "Tests (Playwright/Jest)", tone: "zinc" },
+        { label: "CI/CD", tone: "zinc" },
+        { label: "Accessibilité (ARIA)", tone: "emerald" },
+        { label: "SEO technique", tone: "amber" },
+        { label: "Figma", tone: "fuchsia" },
+      ];
+
+      let skills = [...baseSkills];
+
+      function skillPill(s) {
+        const map = {
+          indigo: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-200",
+          fuchsia: "bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-200",
+          emerald: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-200",
+          amber: "bg-amber-500/10 text-amber-800 dark:text-amber-200",
+          zinc: "bg-zinc-900/5 text-zinc-700 dark:bg-white/10 dark:text-zinc-200",
+        };
+        return `<span class="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium ${
+          map[s.tone]
+        }">${escapeHtml(s.label)}</span>`;
+      }
+
+      function renderSkills() {
+        skillsCloud.innerHTML = skills.map(skillPill).join("");
+      }
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      skillsShuffle.addEventListener("click", () => {
+        skills = shuffle([...skills]);
+        renderSkills();
+      });
+
+      skillsReset.addEventListener("click", () => {
+        skills = [...baseSkills];
+        renderSkills();
+      });
+
+      renderSkills();
+
+      // ----------------------
+      // Contact form validation + simulate send
+      // ----------------------
+      const contactForm = document.getElementById("contactForm");
+      const prefillBtn = document.getElementById("prefillBtn");
+
+      function setError(field, message) {
+        const el = contactForm.querySelector(`[data-error-for="${field}"]`);
+        if (!el) return;
+        if (message) {
+          el.textContent = message;
+          el.classList.remove("hidden");
+        } else {
+          el.textContent = "";
+          el.classList.add("hidden");
+        }
+      }
+
+      function isEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      }
+
+      function validateForm() {
+        const name = contactForm.name.value.trim();
+        const email = contactForm.email.value.trim();
+        const topic = contactForm.topic.value;
+        const message = contactForm.message.value.trim();
+        const consent = document.getElementById("consent").checked;
+
+        let ok = true;
+
+        setError("name", "");
+        setError("email", "");
+        setError("topic", "");
+        setError("message", "");
+
+        if (name.length < 2) {
+          setError("name", "Veuillez entrer votre nom.");
+          ok = false;
+        }
+        if (!isEmail(email)) {
+          setError("email", "Email invalide.");
+          ok = false;
+        }
+        if (!topic) {
+          setError("topic", "Veuillez choisir un sujet.");
+          ok = false;
+        }
+        if (message.length < 12) {
+          setError("message", "Dites-en un peu plus (min. 12 caractères).");
+          ok = false;
+        }
+        if (!consent) {
+          toast("Veuillez accepter d’être recontacté.", "error");
+          ok = false;
+        }
+
+        return ok;
+      }
+
+      contactForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        const payload = {
+          name: contactForm.name.value.trim(),
+          email: contactForm.email.value.trim(),
+          topic: contactForm.topic.value,
+          message: contactForm.message.value.trim(),
+        };
+
+        // Simulate send
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const prev = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Envoi…";
+
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.textContent = prev;
+          contactForm.reset();
+          toast(
+            "Message envoyé (simulation). Je reviens vers vous rapidement.",
+            "success"
+          );
+          console.log("Contact payload (simulation):", payload);
+        }, 850);
+      });
+
+      prefillBtn.addEventListener("click", () => {
+        contactForm.name.value = "Marie Dupont";
+        contactForm.email.value = "marie.dupont@exemple.com";
+        contactForm.topic.value = "app";
+        contactForm.message.value =
+          "Bonjour, je souhaite une application web pour gérer des demandes internes (auth, rôles, tableau de bord). Délais : 6 semaines. Budget : à discuter.";
+        document.getElementById("consent").checked = true;
+        toast("Formulaire prérempli.", "info");
+      });
+
+      // ----------------------
+      // CV download (generated on the fly)
+      // ----------------------
+      const downloadCv = document.getElementById("downloadCv");
+      downloadCv.addEventListener("click", () => {
+        const content = `CV — Votre Nom\n\nTitre : Développeur Web\nEmail : ${EMAIL}\n\nRésumé\n- Développement front-end & full-stack\n- Performance, SEO, accessibilité\n\nCompétences\n- JS/TS, React, Node\n- Tailwind, tests, CI/CD\n\nExpérience\n- Freelance (2024—)\n- Front-end SaaS (2022—2024)\n\nCe fichier est une démo. Remplacez le contenu par votre CV réel.`;
+        const blob = new Blob([content], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "CV_VotreNom.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        toast("Téléchargement du CV (démo) lancé.", "info");
+      });
+
+      // ----------------------
+      // Footer: year & last updated
+      // ----------------------
+      document.getElementById("year").textContent = new Date().getFullYear();
+      const updated = new Date();
+      document.getElementById("lastUpdated").textContent =
+        updated.toLocaleDateString("fr-FR", { year: "numeric", month: "long" });
+
+      // ----------------------
+      // To top
+      // ----------------------
+      document.getElementById("toTop").addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // ----------------------
+      // Small enhancement: set social links placeholders
+      // ----------------------
+      document.getElementById("linkedinLink").href = "https://www.linkedin.com";
+      document.getElementById("githubLink").href = "https://github.com";
+    </script>
+  </body>
+</html>

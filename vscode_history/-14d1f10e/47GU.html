@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculateur de notes simple</title>
+</head>
+<body>
+  <h2>Calculateur de notes</h2>
+
+  <label>Note finale souhaitée (%): </label>
+  <input type="number" id="noteSouhaitee" placeholder="ex: 60">
+  <br><br>
+
+  <div id="modules">
+    <div class="module">
+      <label>Nom du module:</label>
+      <input type="text" class="nom" placeholder="ex: Module 1">
+      <label>Poids:</label>
+      <input type="number" class="poids" value="1">
+      <label>Note obtenue (%):</label>
+      <input type="number" class="note" placeholder="laisser vide si pas encore">
+      <br><br>
+    </div>
+  </div>
+
+  <button onclick="ajouterModule()">Ajouter un module</button>
+  <button onclick="calculer()">Calculer</button>
+
+  <h3>Résultat:</h3>
+  <div id="resultat"></div>
+
+  <script>
+    function ajouterModule() {
+      const modules = document.getElementById("modules");
+      const div = document.createElement("div");
+      div.className = "module";
+      div.innerHTML = `
+        <label>Nom du module:</label>
+        <input type="text" class="nom" placeholder="ex: Module">
+        <label>Poids:</label>
+        <input type="number" class="poids" value="1">
+        <label>Note obtenue (%):</label>
+        <input type="number" class="note" placeholder="laisser vide si pas encore">
+        <br><br>
+      `;
+      modules.appendChild(div);
+    }
+
+    function calculer() {
+      const noteSouhaitee = parseFloat(document.getElementById("noteSouhaitee").value);
+      const lignes = document.querySelectorAll(".module");
+      let totalPoids = 0;
+      let totalPondere = 0;
+      let poidsRestant = 0;
+
+      lignes.forEach(ligne => {
+        const poids = parseFloat(ligne.querySelector(".poids").value) || 0;
+        const note = ligne.querySelector(".note").value;
+        totalPoids += poids;
+
+        if (note === "") {
+          poidsRestant += poids;
+        } else {
+          totalPondere += (parseFloat(note) / 100) * poids;
+        }
+      });
+
+      const ciblePondere = (noteSouhaitee / 100) * totalPoids;
+      const reste = ciblePondere - totalPondere;
+
+      let resultat = document.getElementById("resultat");
+
+      if (poidsRestant === 0) {
+        resultat.innerHTML = "Tous les modules ont déjà une note.";
+        return;
+      }
+
+      const moyenneNecessaire = (reste / poidsRestant) * 100;
+
+      if (moyenneNecessaire > 100) {
+        resultat.innerHTML = "Impossible : il faudrait plus de 100% dans les modules restants.";
+      } else if (moyenneNecessaire <= 0) {
+        resultat.innerHTML = "Tu as déjà atteint la note souhaitée !";
+      } else {
+        resultat.innerHTML = "Il te faut environ <b>" + moyenneNecessaire.toFixed(2) +
+          "%</b> de moyenne dans les modules restants.";
+      }
+    }
+  </script>
+</body>
+</html>

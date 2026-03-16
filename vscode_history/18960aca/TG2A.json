@@ -1,0 +1,6 @@
+{
+    "files.autoSave": "afterDelay",
+    "workbench.colorTheme": "Monokai",
+    "tabnine.experimentalAutoImports": true,
+    "workbench.iconTheme": "material-icon-theme"
+}

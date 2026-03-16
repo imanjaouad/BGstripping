@@ -1,0 +1,64 @@
+/* Reset بسيط */
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* container */
+div {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px; /* un peu moins d'espace */
+}
+
+/* form */
+form {
+  background: #ffffff;
+  padding: 20px;       /* un peu moins de padding */
+  width: 260px;         /* réduit la largeur */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* inputs */
+input {
+  width: 100%;
+  padding: 8px;        /* réduit le padding */
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 13px;     /* un peu plus petit */
+}
+
+input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* button */
+button {
+  width: 100%;
+  padding: 8px;         /* réduit le padding */
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;      /* réduit légèrement la taille */
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #3730a3;
+}
+
+/* result */
+p {
+  margin-top: 12px;
+  padding: 8px;         /* un peu moins de padding */
+  background: #f0f9ff;
+  border-left: 4px solid #4f46e5;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 13px;
+}

@@ -1,0 +1,38 @@
+import { useState } from "react";
+import Form from "./Form";
+
+export default function Users() {
+  const [users, setUsers] = useState([]);
+
+  // Ajouter un utilisateur
+  const handleRegister = (user) => {
+    setUsers([...users, user]);
+  };
+
+  // Supprimer un utilisateur par id
+  const handleDelete = (id) => {
+    const newUsers = users.filter((user) => user.id !== id);
+    setUsers(newUsers);
+  };
+
+  return (
+    <div>
+      <h2>Ajouter un utilisateur</h2>
+      <Form onRegister={handleRegister} />
+
+      <h2>Liste des utilisateurs</h2>
+      {users.length === 0 ? (
+        <p>Aucun utilisateur pour le moment.</p>
+      ) : (
+        <ul>
+          {users.map((user, index) => (
+            <li key={index}>
+              Nom: {user.nom}, Email: {user.email}{" "}
+              <button onClick={() => handleDelete(index)}>Supprimer</button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

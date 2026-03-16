@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculateur de notes — Quel score il te faut ?</title>
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+    body{max-width:980px;margin:22px auto;padding:18px;background:#f7f8fb;color:#0b1220}
+    header{display:flex;align-items:center;gap:12px}
+    h1{font-size:20px;margin:0}
+    .card{background:#fff;border-radius:12px;box-shadow:0 6px 18px rgba(11,18,32,0.06);padding:16px;margin-top:12px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;text-align:left;border-bottom:1px solid #eef2f7}
+    input[type="number"], input[type="text"], select{width:100%;padding:8px;border-radius:8px;border:1px solid #d9e2ef}
+    button{padding:8px 12px;border-radius:10px;border:0;background:#2b6cb0;color:white;cursor:pointer}
+    .btn-ghost{background:transparent;border:1px solid #cbd5e1;color:#0b1220}
+    .muted{color:#6b7280;font-size:13px}
+    .danger{color:#b91c1c}
+    .ok{color:#166534}
+    .row-actions{display:flex;gap:6px}
+    .result{margin-top:12px;padding:10px;border-radius:8px;background:#f1f5f9}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Calculateur de notes</h1>
+      <div class="muted">Dakhil les modules, leurs poids, et les notes déjà obtenues. L'app te dira ch7al khassek tjib f li ba9i.</div>
+    </div>
+  </header>
+
+  <section class="card">
+    <div style="display:flex;gap:12px;align-items:center">
+      <label style="min-width:220px">Note finale souhaitée (%)</label>
+      <input id="desired" type="number" min="0" max="100" value="12" />
+      <span class="muted">(ex: 12 pour 12/20 — ou 60 pour 60%)</span>
+    </div>
+
+    <div style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Modules</strong>
+        <div style="display:flex;gap:8px">
+          <button id="addRow">➕ Ajouter module</button>
+          <button id="reset" class="btn-ghost">Réinitialiser</button>
+        </div>
+      </div>
+
+      <table id="modulesTable" style="margin-top:8px">
+        <thead>
+          <tr>
+            <th style="width:34%">Nom</th>
+            <th style="width:22%">Poids (points)</th>
+            <th style="width:22%">Note obtenue (%) — laisse vide si pas encore</th>
+            <th style="width:22%">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="modulesBody">
+          <!-- rows inserted by JS -->
+        </tbody>
+      </table>
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="calculate">Calculer</button>
+        <button id="equalWeight" class="btn-ghost">Poids égaux</button>
+      </div>
+
+      <div id="output" class="result" style="display:none"></div>
+    </div>
+  </section>
+
+  <script>
+    // Simple dynamic app
+    const modulesBody = document.getElementById('modulesBody');
+    const addRowBtn = document.getElementById('addRow');
+    const calculateBtn = document.getElementById('calculate');
+    const desiredInput = document.getElementById('desired');
+    const output = document.getElementById('output');
+    const equalWeightBtn = document.getElementById('equalWeight');
+    const resetBtn = document.getElementById('reset');
+
+    function createRow(name = '', weight = 1, score = ''){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input class="m-name" type="text" value="${name}" placeholder="ex: Module 1" /></td>
+        <td><input class="m-weight" type="number" step="0.01" min="0" value="${weight}" /></td>
+        <td><input class="m-score" type="number" min="0" max="100" placeholder="ex: 75" value="${score}" /></td>
+        <td class="row-actions"><button class="remove btn-ghost">Suppr</button><button class="fill btn-ghost">Set 100</button></td>
+      `;
+      modulesBody.appendChild(tr);
+      tr.querySelector('.remove').addEventListener('click', ()=>{tr.remove();});
+      tr.querySelector('.fill').addEventListener('click', ()=>{tr.querySelector('.m-score').value = 100;});
+    }
+
+    // start with 3 modules
+    createRow('Module 1', 1, '');
+    createRow('Module 2', 1, '');
+    createRow('Module 3', 1, '');
+
+    addRowBtn.addEventListener('click', ()=>createRow('',1,''));
+    resetBtn.addEventListener('click', ()=>{
+      modulesBody.innerHTML = '';
+      createRow('Module 1',1,'');
+      createRow('Module 2',1,'');
+      createRow('Module 3',1,'');
+      desiredInput.value = '';
+      output.style.display='none';
+    });
+
+    equalWeightBtn.addEventListener('click', ()=>{
+      // set all weights equal (1)
+      document.querySelectorAll('.m-weight').forEach(i=>i.value = 1);
+    });
+
+    function gatherModules(){
+      const rows = Array.from(document.querySelectorAll('#modulesBody tr'));
+      return rows.map(r=>({
+        name: r.querySelector('.m-name').value || '–',
+        weight: parseFloat(r.querySelector('.m-weight').value) || 0,
+        score: (r.querySelector('.m-score').value === '') ? null : parseFloat(r.querySelector('.m-score').value)
+      }));
+    }
+
+    calculateBtn.addEventListener('click', ()=>{
+      output.style.display = 'block';
+      output.innerHTML = '';
+      const modules = gatherModules();
+      if(modules.length === 0){ output.innerHTML = '<div class="danger">Ajoute au moins un module.</div>'; return; }
+
+      const totalWeight = modules.reduce((s,m)=>s + (isFinite(m.weight)?m.weight:0),0);
+      if(totalWeight <= 0){ output.innerHTML = '<div class="danger">Les poids doivent être > 0.</div>'; return; }
+
+      const desiredStr = desiredInput.value.trim();
+      if(desiredStr === ''){ output.innerHTML = '<div class="danger">Donne la note finale souhaitée.</div>'; return; }
+      const desired = parseFloat(desiredStr);
+      if(!(desired >= 0 && desired <= 100)){ output.innerHTML = '<div class="danger">La note souhaitée doit être entre 0 et 100.</div>'; return; }
+
+      // convert desired to same scale as weights
+      const desiredTotal = (desired/100) * totalWeight;
+
+      let currentWeighted = 0;
+      let remainingWeight = 0;
+      modules.forEach(m=>{
+        if(m.score === null) remainingWeight += m.weight;
+        else currentWeighted += (m.score/100) * m.weight;
+      });
+
+      const neededWeighted = desiredTotal - currentWeighted;
+
+      // output summary
+      const lines = [];
+      lines.push(`<strong>Total poids:</strong> ${totalWeight.toFixed(2)}`);
+      lines.push(`<strong>Note désirée:</strong> ${desired.toFixed(2)}% -> cible pondérée ${desiredTotal.toFixed(2)} points`);
+      lines.push(`<strong>Score actuel (pondéré):</strong> ${currentWeighted.toFixed(2)} points`);
+      lines.push(`<strong>Poids restant (modules non notés):</strong> ${remainingWeight.toFixed(2)} points`);
+
+      if(remainingWeight <= 0){
+        // no remaining modules
+        if(neededWeighted <= 0) {
+          lines.push(`<div class="ok">Bravo — t'as déjà atteint ou dépassé la note souhaitée.</div>`);
+        } else {
+          lines.push(`<div class="danger">Impossible — y'a plus de poids restant et t'as pas atteint la cible.</div>`);
+        }
+        output.innerHTML = lines.join('<br>');
+        return;
+      }
+
+      const requiredAverageFraction = neededWeighted / remainingWeight; // in 0..1
+      const requiredAveragePct = requiredAverageFraction * 100;
+
+      if(requiredAveragePct > 100){
+        lines.push(`<div class="danger">Impossible mathématiquement: il faudrait en moyenne ${requiredAveragePct.toFixed(2)}% dans les modules restants (>100%).</div>`);
+      } else if(requiredAveragePct <= 0){
+        lines.push(`<div class="ok">Tu as déjà atteint la note désirée. Tu n'as besoin que de ${Math.max(0,requiredAveragePct).toFixed(2)}% en moyenne dans les modules restants.</div>`);
+      } else {
+        lines.push(`<strong>Il te faut en moyenne :</strong> ${requiredAveragePct.toFixed(2)}% sur les modules restants.`);
+
+        // calculate per-module requirement (proportional to poids)
+        lines.push('<br><strong>Détail par module restant (proportionnel au poids)</strong>');
+        modules.forEach(m=>{
+          if(m.score === null){
+            const reqForModule = requiredAverageFraction * 100; // same average for each unit of weight
+            lines.push(`${m.name} (poids ${m.weight}): il faudrait environ <strong>${reqForModule.toFixed(2)}%</strong> dans ce module.`);
+          } else {
+            lines.push(`${m.name} — déjà noté: ${m.score}%`);
+          }
+        });
+
+        // Also show alternative: if user wants a specific module target
+        lines.push('<br><span class="muted">Si tu veux fixer un objectif différent pour chaque module, calculerai aussi selon ces valeurs — demande-moi.</span>');
+      }
+
+      output.innerHTML = lines.join('<br>');
+    });
+
+  </script>
+</body>
+</html>

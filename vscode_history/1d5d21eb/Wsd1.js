@@ -1,0 +1,31 @@
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+
+function Filieres() {
+  const { yearId } = useParams();
+  const [filieres, setFilieres] = useState([]);
+
+  useEffect(() => {
+    fetch(`https://podo.b1.ma/api/public/years/${yearId}/filieres`)
+      .then(res => res.json())
+      .then(data => setFilieres(data.data)) // API structure
+      .catch(err => console.log(err));
+  }, [yearId]);
+
+  return (
+    <div>
+      <h1>Filieres for Year {yearId}</h1>
+      <ul>
+        {filieres.map(f => (
+          <li key={f.id}>
+            <p>{f.name}</p>
+            {/* إذا بغيت رابط لتفاصيل */}
+            <Link to={`/filiere/${f.id}`}>Voir détails</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Filieres;

@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import image from "../../images/image3.webp";
 
 /* ══════════════════════════════════════════════════════════════════════════
    HistoriqueCasement
@@ -179,6 +179,24 @@ padding:30px;
 opacity:0.6;
 }
 
+.btn-edit{
+background:#f0fdf4;
+color:#15803d;
+border:1.5px solid #bbf7d0;
+padding:5px 14px;
+border-radius:8px;
+font-weight:600;
+font-size:12px;
+cursor:pointer;
+transition:0.2s;
+white-space:nowrap;
+}
+
+.btn-edit:hover{
+background:#dcfce7;
+border-color:#16a34a;
+}
+
 `;
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -187,84 +205,53 @@ opacity:0.6;
 
 function HistoriqueCasement() {
 
-  /* ────────────────────────────────────────────────────────────────────────
-     DONNÉES REDUX
-     Récupère la liste complète des opérations enregistrées.
-     Le fallback `|| []` évite un crash si le slice n'est pas encore initialisé.
-  ──────────────────────────────────────────────────────────────────────── */
   const casements = useSelector((state) => state.casement?.list || []);
+  const navigate  = useNavigate();
 
-  /* ────────────────────────────────────────────────────────────────────────
-     STATE — FILTRES
-     Chaque filtre est une chaîne vide par défaut (= "aucun filtre actif").
-     Panneau, Tranchée et Poste → listes déroulantes (valeurs dynamiques).
-     Date début / fin → inputs de type "date".
-  ──────────────────────────────────────────────────────────────────────── */
+  const handleEdit = (c, filteredIndex) => {
+    // Retrouver l'index réel dans la liste Redux (pas l'index filtré)
+    const realIndex = casements.indexOf(c);
+    navigate("/operations/casement/gestion", {
+      state: { editData: c, editIndex: realIndex },
+    });
+  };
+
   const [filterPanneau,   setFilterPanneau]   = useState("");
   const [filterTranchee,  setFilterTranchee]  = useState("");
-  const [filterPoste,     setFilterPoste]     = useState("");  // Remplace filterTypeRoche
+  const [filterPoste,     setFilterPoste]     = useState("");
   const [filterDateDebut, setFilterDateDebut] = useState("");
   const [filterDateFin,   setFilterDateFin]   = useState("");
 
-  /* ────────────────────────────────────────────────────────────────────────
-     VALEURS UNIQUES POUR LES SELECTS
-     useMemo évite de recalculer ces listes à chaque rendu.
-     new Set() déduplique les valeurs, filter(Boolean) retire les vides/null.
-  ──────────────────────────────────────────────────────────────────────── */
-
-  /** Panneaux distincts présents dans les données */
   const uniquePanneaux = useMemo(
     () => [...new Set(casements.map(c => c.panneau).filter(Boolean))],
     [casements]
   );
 
-  /** Tranchées distinctes présentes dans les données */
   const uniqueTranchees = useMemo(
     () => [...new Set(casements.map(c => c.tranchee).filter(Boolean))],
     [casements]
   );
 
-  /** Postes distincts (Matin / Après-midi / Nuit) — remplace uniqueTypesRoche */
   const uniquePostes = useMemo(
     () => [...new Set(casements.map(c => c.poste).filter(Boolean))],
     [casements]
   );
 
-  /* ────────────────────────────────────────────────────────────────────────
-     LOGIQUE DE FILTRAGE
-     Applique tous les filtres actifs en chaîne sur la liste complète.
-     useMemo recalcule uniquement quand les données ou les filtres changent.
-  ──────────────────────────────────────────────────────────────────────── */
   const filteredCasements = useMemo(() => {
-
     return casements.filter(c => {
-
-      // Filtres par correspondance exacte (select)
       const matchPanneau  = filterPanneau  ? c.panneau  === filterPanneau  : true;
       const matchTranchee = filterTranchee ? c.tranchee === filterTranchee : true;
       const matchPoste    = filterPoste    ? c.poste    === filterPoste    : true;
-
-      // Filtre par plage de dates
       let matchDate = true;
-
       if (filterDateDebut || filterDateFin) {
-
         const recordDate = new Date(c.date);
-
         if (filterDateDebut && new Date(filterDateDebut) > recordDate) matchDate = false;
         if (filterDateFin   && new Date(filterDateFin)   < recordDate) matchDate = false;
-
       }
-
       return matchPanneau && matchTranchee && matchPoste && matchDate;
-
     });
-
   }, [casements, filterPanneau, filterTranchee, filterPoste, filterDateDebut, filterDateFin]);
 
-  /* ────────────────────────────────────────────────────────────────────────
-     RESET — Remet tous les filtres à leur valeur vide initiale
-  ──────────────────────────────────────────────────────────────────────── */
   const resetFilters = () => {
     setFilterPanneau("");
     setFilterTranchee("");
@@ -273,13 +260,6 @@ function HistoriqueCasement() {
     setFilterDateFin("");
   };
 
-  /* ────────────────────────────────────────────────────────────────────────
-     EXPORT EXCEL
-     Transforme les données filtrées en feuille Excel et déclenche le téléchargement.
-     Champs mis à jour : volume_saute (ex volume_casse), profondeur (ex niveau), poste.
-     Rendement calculé à la volée : volume_saute ÷ temps.
-     État machine converti : "arret" → "En arrêt" / "marche" → "En marche".
-  ──────────────────────────────────────────────────────────────────────── */
   const exportExcel = () => {
 
     const data = filteredCasements.map(c => ({
@@ -334,16 +314,9 @@ return (
   {/* ── HEADER ── */}
 
   <div className="casement-header">
-
     <div>
-
-      <div className="casement-title">
-        Historique Casement
-      </div>
+      <div className="casement-title">Historique Casement</div>
     </div>
-
-    <img src={image} alt="logo" style={{height:40}} />
-
   </div>
 
   {/* ── CARTE FILTRES ── */}
@@ -463,15 +436,16 @@ return (
             <th>Date</th>
             <th>Panneau</th>
             <th>Tranchée</th>
-            <th>Profondeur</th>   {/* ex: Niveau */}
-            <th>Poste</th>        {/* ex: Type Roche */}
+            <th>Profondeur</th>
+            <th>Poste</th>
             <th>Équipements</th>
             <th>Conducteur</th>
             <th>Matricule</th>
-            <th>Volume Sauté</th> {/* ex: Volume */}
+            <th>Volume Sauté</th>
             <th>Heures</th>
             <th>Rendement</th>
             <th>État Machine</th>
+            <th>Action</th>
           </tr>
         </thead>
 
@@ -492,10 +466,13 @@ return (
                 <td>{c.matricule}</td>
                 <td>{c.volume_saute}</td>
                 <td>{c.temps}</td>
-                {/* Rendement calculé : volume_saute ÷ heures de marche */}
                 <td>{c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : 0} t/h</td>
-                {/* Conversion de la valeur interne "arret"/"marche" en texte lisible */}
                 <td>{c.etatMachine === "arret" ? "En arrêt" : "En marche"}</td>
+                <td>
+                  <button className="btn-edit" onClick={() => handleEdit(c, i)}>
+                    ✏️ Modifier
+                  </button>
+                </td>
               </tr>
 
             ))
@@ -504,7 +481,7 @@ return (
 
             /* Ligne affichée si aucun résultat ne correspond aux filtres */
             <tr>
-              <td colSpan="12" className="empty-row">
+              <td colSpan="13" className="empty-row">
                 Aucun résultat trouvé
               </td>
             </tr>
