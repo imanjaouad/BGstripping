@@ -6,7 +6,6 @@ import Poussage from "./pages/Poussage/poussage";
 import Casement from "./pages/Casement/casement";
 import TransportDashboard from "./pages/Transport/TransportDashboard";
 import TransportStatistiques from "./pages/Transport/TransportStatistiques";
-import UserManagement from "./pages/Admin/UserManagement";
 import PrivateRoute from "./components/PrivateRoute";
 import "./style/PoussageForm.css";
 import "./style/ReportsSection.css";
@@ -29,9 +28,6 @@ function App() {
       <Route path="/transport" element={<PrivateRoute><TransportDashboard /></PrivateRoute>} />
       <Route path="/transport/statistiques" element={<PrivateRoute><TransportStatistiques /></PrivateRoute>} />
       <Route path="/operations/transport" element={<PrivateRoute><TransportDashboard /></PrivateRoute>} />
-
-      {/* Admin — User Management (admin only) */}
-      <Route path="/admin/users" element={<PrivateRoute adminOnly><UserManagement /></PrivateRoute>} />
     </Routes>
   );
 }

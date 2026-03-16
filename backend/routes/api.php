@@ -32,16 +32,9 @@ Route::delete('/transport-journaliers/{transportJournalier}', [TransportJournali
 // ─── Routes publiques ─────────────────────────────────────────────────────────
 Route::post('/login', [AuthController::class , 'login']);
 
-use App\Http\Controllers\Api\UserController;
 
 // ─── Routes protégées (Sanctum) ───────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class , 'logout']);
     Route::get('/me', [AuthController::class , 'me']);
-
-    // Gestion des utilisateurs (accès vérifié dans le contrôleur)
-    Route::get('/users', [UserController::class, 'index']);
-    Route::post('/users', [UserController::class, 'store']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
 });
