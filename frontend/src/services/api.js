@@ -130,28 +130,4 @@ export function deleteTransportJournalierAPI(id) {
   });
 }
 
-// ─── Users (Admin Only) ──────────────────────────────────────────────────────
 
-export function fetchUsersAPI() {
-  return request("/users");
-}
-
-export function createUserAPI(payload) {
-  return request("/users", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-}
-
-export function updateUserAPI(id, payload) {
-  return request(`/users/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(payload),
-  });
-}
-
-export function deleteUserAPI(id) {
-  return request(`/users/${id}`, {
-    method: "DELETE",
-  });
-}

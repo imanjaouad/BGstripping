@@ -129,11 +129,6 @@ export default function OperationsSection() {
   const [titleVisible, setTitleVisible] = useState(false);
   const titleRef = useRef(null);
 
-  // Get current user to check if admin
-  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const currentUser = userStr ? JSON.parse(userStr) : null;
-  const isAdmin = currentUser?.role === "admin";
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setTitleVisible(true); },
@@ -157,57 +152,6 @@ export default function OperationsSection() {
             <AnimatedCard key={index} op={op} index={index} />
           ))}
         </div>
-
-        {/* Admin-only: User Management Card */}
-        {isAdmin && (
-          <div style={{ marginTop: 36, display: "flex", justifyContent: "center" }}>
-            <div
-              onClick={() => navigate("/admin/users")}
-              style={{
-                background: "linear-gradient(135deg, #fef3c7, #fff9ec)",
-                border: "1.5px solid rgba(217,119,6,0.3)",
-                borderRadius: 16,
-                padding: "22px 36px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                transition: "all 0.25s",
-                boxShadow: "0 4px 20px rgba(217,119,6,0.1)",
-                maxWidth: 480,
-                width: "100%",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-3px)";
-                e.currentTarget.style.boxShadow = "0 8px 30px rgba(217,119,6,0.2)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 4px 20px rgba(217,119,6,0.1)";
-              }}
-            >
-              <div
-                style={{
-                  width: 48, height: 48, borderRadius: 12,
-                  background: "rgba(217,119,6,0.15)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 24, flexShrink: 0,
-                }}
-              >
-                👥
-              </div>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#92400e", marginBottom: 2 }}>
-                  Gestion des Utilisateurs
-                </div>
-                <div style={{ fontSize: 12, color: "#b45309" }}>
-                  Créer, modifier et gérer les comptes et permissions
-                </div>
-              </div>
-              <div style={{ marginLeft: "auto", fontSize: 20, color: "#b45309" }}>→</div>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

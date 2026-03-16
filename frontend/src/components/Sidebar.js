@@ -53,7 +53,7 @@ function Sidebar() {
         </li>
          <li className="sidebar-nav-item">
           <NavLink
-            to="/poussage/DashboardComplet"
+            to="/poussage/dashboardcomplet"
             end
             className={({ isActive }) =>
               isActive ? "sidebar-link active" : "sidebar-link"
@@ -106,7 +106,7 @@ function Sidebar() {
         </li>
         <li className="sidebar-nav-item">
           <NavLink
-            to="/poussage/Cout"
+            to="/poussage/cout"
             className={({ isActive }) =>
               isActive ? "sidebar-link active" : "sidebar-link"
             }
