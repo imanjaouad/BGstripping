@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../style/Header.css';
-import logo from "../images/logo.png"
-const Header = () => {
-  const [theme, setTheme] = useState('dark');
+import logo from "../images/logo.png";
 
-  useEffect(() => {
+const Header = () => {
+  const navigate = useNavigate();
+  const [theme, setTheme] = React.useState('dark');
+
+  // Get current user info
+  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
+
+  React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
@@ -12,11 +19,36 @@ const Header = () => {
     setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
 
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    try {
+      await fetch("http://127.0.0.1:8000/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+    } catch (err) {
+      console.error("Logout API error:", err);
+    }
+
+    // Clear all auth data
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    navigate("/login");
+  };
+
   return (
     <header className="header">
       <div className="logo-container">
         <div className="logo-icon">
-          <img src={logo} style={{width:"90px",height:"75px",marginTop:"16px"}} />
+          <img src={logo} alt="Logo" style={{width:"90px",height:"75px",marginTop:"16px"}} />
         </div>
         <span className="logo-text">BGstripping</span>
       </div>
@@ -49,8 +81,14 @@ const Header = () => {
             </svg>
           )}
         </button>
-        
-        <button className="deconnexion-btn">Deconnexion</button>
+
+        {user && (
+          <span style={{ color: "#10b981", fontWeight: 600, fontSize: 13 }}>
+            {user.username}
+          </span>
+        )}
+
+        <button className="deconnexion-btn" onClick={handleLogout}>Deconnexion</button>
         
         <div className="user-avatar">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

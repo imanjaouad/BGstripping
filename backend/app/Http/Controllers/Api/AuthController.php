@@ -18,7 +18,6 @@ class AuthController extends Controller
     $request->validate([
         'username'     => 'required|string',
         'password'     => 'required|string',
-        'modeOpiration' => 'required|in:poussage,casement,transport',
     ]);
 
     // Authentification avec username 
@@ -32,15 +31,6 @@ class AuthController extends Controller
     }
 
     $user = Auth::user();
-
-    // Vérification du mode
-    if ($user->role !== 'admin' && $user->modeOpiration !== $request->modeOpiration) {
-        Auth::logout();
-        return response()->json([
-            'success' => false,
-            'message' => 'Accès refusé : mode opération non autorisé.',
-        ], 403);
-    }
 
     $token = $user->createToken('auth_token')->plainTextToken;
 

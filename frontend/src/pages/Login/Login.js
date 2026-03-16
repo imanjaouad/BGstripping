@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEnvelope, FaLock, FaBriefcase, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import Particles from "@tsparticles/react";
 import { loadFull } from "tsparticles";
 
 import "../../style/Login.css";
 import logo from "../../images/logo.png";
+
+const modeRoutes = {
+  poussage: "/poussage",
+  casement: "/operations/casement",
+  transport: "/operations/transport",
+};
 
 const slides = [
   {
@@ -36,10 +42,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [index, setIndex] = useState(0);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    modeOpiration: "",
   });
 
   useEffect(() => {
@@ -56,7 +62,6 @@ export default function Login() {
     setFormData({
       username: "",
       password: "",
-      modeOpiration: "",
     });
   }, []);
 
@@ -70,6 +75,7 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
       const res = await fetch("http://127.0.0.1:8000/api/login", {
@@ -78,21 +84,16 @@ export default function Login() {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        if (
-          data.user.modeOpiration !== formData.modeOpiration &&
-          data.user.role !== "admin"
-        ) {
-          alert("Accès refusé !");
-          setLoading(false);
-          return;
-        }
-
+        // Store auth data
         if (rememberMe) {
           localStorage.setItem("user", JSON.stringify(data.user));
           localStorage.setItem("token", data.token);
@@ -101,21 +102,21 @@ export default function Login() {
           sessionStorage.setItem("token", data.token);
         }
 
-        setFormData({
-          username: "",
-          password: "",
-          modeOpiration: "",
-        });
+        setFormData({ username: "", password: "" });
 
-        if (data.user.modeOpiration === "poussage") navigate("/poussage");
-        else if (data.user.modeOpiration === "casement") navigate("/operations/casement");
-        else if (data.user.modeOpiration === "transport") navigate("/operations/transport");
+        // Redirect to the user's assigned page from the database
+        const targetRoute = modeRoutes[data.user.modeOpiration];
+        if (targetRoute) {
+          navigate(targetRoute);
+        } else {
+          navigate("/");
+        }
       } else {
-        alert(data.message || "Login échoué");
+        setError(data.message || "Login échoué");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Erreur serveur");
+    } catch (err) {
+      console.error(err);
+      setError("Erreur serveur — vérifiez la connexion.");
     }
 
     setLoading(false);
@@ -202,21 +203,6 @@ export default function Login() {
                 </span>
               </div>
 
-              <div className="input-box">
-                <FaBriefcase className="input-icon" />
-                <select
-                  name="modeOpiration"
-                  value={formData.modeOpiration}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Mode opération</option>
-                  <option value="poussage">Poussage</option>
-                  <option value="casement">Casement</option>
-                  <option value="transport">Transport</option>
-                </select>
-              </div>
-
               <div className="options-row">
                 <label className="remember-me">
                   <input
@@ -228,6 +214,8 @@ export default function Login() {
                 </label>
                 <span className="forgot-link">Mot de passe oublié ?</span>
               </div>
+
+              {error && <p style={{ color: "#ef4444", fontSize: 13, marginBottom: 10, textAlign: "center" }}>{error}</p>}
 
               <button type="submit" className="login-btn" disabled={loading}>
                 {loading ? <span className="loader"></span> : "Se connecter"}
