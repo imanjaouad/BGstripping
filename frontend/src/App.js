@@ -8,6 +8,7 @@ import TransportDashboard from "./pages/Transport/TransportDashboard";
 import TransportStatistiques from "./pages/Transport/TransportStatistiques";
 import PrivateRoute from "./components/PrivateRoute";
 import "./style/PoussageForm.css";
+import UserManagement from "./pages/UsersManagement/UserManagement";
 import "./style/ReportsSection.css";
 
 function App() {
