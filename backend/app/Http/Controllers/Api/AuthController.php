@@ -4,76 +4,33 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * POST /api/login
-     * Body: { username, password, modeOpiration }
-     */
-   public function login(Request $request)
-{
-    $request->validate([
-        'username'     => 'required|string',
-        'password'     => 'required|string',
-    ]);
-
-    // Authentification avec username 
-    $credentials = $request->only('username', 'password');
-
-    if (!Auth::attempt($credentials)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Identifiant ou mot de passe incorrect.',
-        ], 401);
-    }
-
-    $user = Auth::user();
-
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    return response()->json([
-        'success' => true,
-        'token'   => $token,
-        'user'    => [
-            'id'            => $user->id,
-            'username'      => $user->username,
-            'role'          => $user->role,
-            'modeOpiration' => $user->modeOpiration,
-        ],
-    ]);
-}
-
-    /**
-     * POST /api/logout
-     */
-    public function logout(Request $request)
+    public function login(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Déconnexion réussie.',
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required'
         ]);
-    }
 
-    /**
-     * GET /api/me
-     */
-    public function me(Request $request)
-    {
-        $user = $request->user();
+        $user = User::where('username', $request->username)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Login invalide'
+            ], 401);
+        }
+
+        // 🔥 إنشاء Token
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'success' => true,
-            'user'    => [
-                'id'            => $user->id,
-                'username'      => $user->username,
-                'role'          => $user->role,
-                'modeOpiration' => $user->modeOpiration,
-            ],
+            'user' => $user,
+            'role' => $user->role,
+            'token' => $token
         ]);
     }
 }

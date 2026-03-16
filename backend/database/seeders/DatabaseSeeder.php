@@ -21,9 +21,8 @@ class DatabaseSeeder extends Seeder
     // Au lieu de User::factory()->create([...])
    User::create([
     'username'      => 'admin',
-    'password'      => Hash::make('admin1234'),
-    'role'          => 'admin',
-    'modeOpiration' => 'poussage',
+ 'password'=>Hash::make('admin'),
+        'role'          => 'admin',
     ]);
     }
 }
