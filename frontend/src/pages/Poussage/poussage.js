@@ -26,12 +26,12 @@ function Poussage() {
 
         <Routes>
 
-          <Route index element={<Dashboard />} />
-          <Route path="home" element={<PoussageHome />} />
-          <Route path="dashboardcomplet" element={<DashboardComplet />} />
-          <Route path="statistique" element={<Statistique />} />
+          <Route index element={<PoussageHome />} />
+          <Route path="Dashboard" element={<Dashboard />} />
+          <Route path="Dashboardcomplet" element={<DashboardComplet />} />
+          <Route path="Statistique" element={<Statistique />} />
           <Route path="historique" element={<Historique />} />
-          <Route path="cout" element={<Cout />} />
+          <Route path="Cout" element={<Cout />} />
 
         </Routes>
 
