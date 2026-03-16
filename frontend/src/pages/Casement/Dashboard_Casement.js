@@ -221,7 +221,7 @@ function DashboardCasement() {
   const casements = useSelector((s) => s.casement?.list || []);
 
   const totalVolume = casements.reduce(
-    (a, c) => a + Number(c.volume_casse || 0),
+    (a, c) => a + Number(c.volume_saute || 0),
     0,
   );
   const totalCoups = casements.reduce(
@@ -234,14 +234,14 @@ function DashboardCasement() {
     totalOps > 0
       ? (
           casements.reduce((a, c) => {
-            const v = Number(c.volume_casse || 0),
+            const v = Number(c.volume_saute || 0),
               t = Number(c.temps || 0);
             return a + (t > 0 ? v / t : 0);
           }, 0) / totalOps
         ).toFixed(1)
       : 0;
   const enMarcheCnt = casements.filter(
-    (c) => c.etatMachine === "En marche",
+    (c) => c.etatMachine === "marche",
   ).length;
 
   const recentCasements = [...casements].slice(-6).reverse();
@@ -269,7 +269,7 @@ function DashboardCasement() {
     {
       icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>),
       title: "Rapport",
-      path: `${BASE}/rapport`,
+      path: `${BASE}/statistique`,
       desc: "Synthèse mensuelle et annuelle. Génération automatique des rapports PDF/Excel.",
     },
     {
@@ -290,7 +290,6 @@ function DashboardCasement() {
           {/* ── HERO ─────────────────────────────────────────────────────── */}
           <div className="acc-hero">
             <div>
-              <div className="acc-hero-eyebrow">Module Casement · </div>
               <h1 className="acc-hero-title">
                 Gestion du <span>Casement</span>
               </h1>
@@ -320,12 +319,12 @@ function DashboardCasement() {
               {
                 icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>),
                 bg: "linear-gradient(145deg,#f0fdf4,#dcfce7)", color: "#15803d",
-                label: "Volume Cassé", value: totalVolume.toLocaleString(), unit: "t", delay: "0.10s",
+                label: "Volume Sauté", value: totalVolume.toLocaleString(), unit: "t", delay: "0.10s",
               },
               {
                 icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>),
                 bg: "linear-gradient(145deg,#f0fdf4,#dcfce7)", color: "#16a34a",
-                label: "Coups BRH", value: totalCoups.toLocaleString(), unit: "", delay: "0.18s",
+                label: "Coups ", value: totalCoups.toLocaleString(), unit: "", delay: "0.18s",
               },
               {
                 icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>),

@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import image from "../../images/image3.webp";
 
 /* ───────── STYLE PREMIUM ───────── */
 
@@ -169,7 +168,7 @@ const casements = useSelector(state=>state.casement?.list || []);
 
 /* KPI CALCUL */
 
-const totalVolume = useMemo(()=>casements.reduce((s,c)=>s+Number(c.volume_casse||0),0),[casements]);
+const totalVolume = useMemo(()=>casements.reduce((s,c)=>s+Number(c.volume_saute||0),0),[casements]);
 const totalTemps  = useMemo(()=>casements.reduce((s,c)=>s+Number(c.temps||0),0),[casements]);
 const totalCoups  = useMemo(()=>casements.reduce((s,c)=>s+Number(c.nombreCoups||0),0),[casements]);
 
@@ -187,19 +186,15 @@ const monthlyStats = useMemo(()=>{
 
 const map={};
 
-casements.forEach(c=>{
-
-if(!c.date) return;
-
-const m=MONTHS[new Date(c.date).getMonth()];
-
-if(!map[m]) map[m]={volume:0,temps:0,coups:0,ops:0};
-
-map[m].volume+=Number(c.volume_casse||0);
-map[m].temps+=Number(c.temps||0);
-map[m].coups+=Number(c.nombreCoups||0);
-
-});
+    casements.forEach(c=>{
+      if(!c.date) return;
+      const m=MONTHS[new Date(c.date).getMonth()];
+      if(!map[m]) map[m]={volume:0,temps:0,coups:0,ops:0};
+      map[m].volume+=Number(c.volume_saute||0);
+      map[m].temps+=Number(c.temps||0);
+      map[m].coups+=Number(c.nombreCoups||0);
+      map[m].ops+=1;
+    });
 
 return map;
 
@@ -226,11 +221,11 @@ const resume=[
 XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(resume),"Résumé");
 
 const mensuel=[
-["Mois","Volume","Coups","Heures","Rendement"],
-...Object.entries(monthlyStats).map(([m,d])=>[
-m,d.ops,d.volume,d.coups,d.temps,
-d.temps>0?(d.volume/d.temps).toFixed(2):0
-])
+  ["Mois","Opérations","Volume","Coups","Heures","Rendement"],
+  ...Object.entries(monthlyStats).map(([m,d])=>[
+    m, d.ops, d.volume, d.coups, d.temps,
+    d.temps>0?(d.volume/d.temps).toFixed(2):0
+  ])
 ];
 
 XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(mensuel),"Mensuel");
@@ -283,7 +278,6 @@ Synthèse des opérations de casement
 
 <div style={{display:"flex",gap:10,alignItems:"center"}}>
 
-<img src={image} alt="logo" style={{height:40}}/>
 
 <button className="btn-export" onClick={exportRapport}>
 Télécharger Excel

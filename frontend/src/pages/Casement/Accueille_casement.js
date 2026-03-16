@@ -1,34 +1,90 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import image from "../../images/image3.webp";
+import { useSelector } from "react-redux";
+import imagePh from "../../images/p&h.jpg";
+import image700 from "../../images/700.jpg";
+import image7001 from "../../images/7001.jpeg";
+import image200 from "../../images/image.png";
+
+
 
 /* ══════════════════════════════════════════════════════════════════════════
    AccueilleCasement — Page d'accueil du module Casement
    AMÉLIORATIONS : Section INFO entièrement redessinée
 ══════════════════════════════════════════════════════════════════════════ */
 
-const SLIDES = {
-  saisie: [
-    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=80",
-    "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
-    "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80",
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
-  ],
-  historique: [
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
-    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
-    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&q=80",
-    "https://images.unsplash.com/photo-1543286386-2e659306cd6c?w=600&q=80",
-  ],
-  rapport: [
-    "https://images.unsplash.com/photo-1591696205602-2f950c417cb9?w=600&q=80",
-    "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80",
-    "https://images.unsplash.com/photo-1666875753105-c63a6f3bdc86?w=600&q=80",
-    "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=600&q=80",
-  ],
-};
-
-const CSS = `
+const EQUIPEMENTS = [
+  {
+    key: "7500M1",
+    nom: "Foreuse 7500 — M1",
+    desc: "Foreuse rotary lourde pour trous de mine de grand diamètre. Utilisée en décapage profond sur front rocheux.",
+    specs: [
+      { label: "Diamètre forage", val: "229–311 mm" },
+      { label: "Profondeur max",  val: "≈ 60 m" },
+      { label: "Puissance",       val: "746 kW" },
+      { label: "Poids opérat.",   val: "≈ 110 t" },
+    ],
+    images: [
+      image700
+    ],
+  },
+  {
+    key: "7500M2",
+    nom: "Foreuse 7500 — M2",
+    desc: "Deuxième unité rotary de la flotte. Opère en rotation avec M1 pour garantir la continuité du forage.",
+    specs: [
+      { label: "Diamètre forage", val: "229–311 mm" },
+      { label: "Profondeur max",  val: "≈ 60 m" },
+      { label: "Puissance",       val: "746 kW" },
+      { label: "Poids opérat.",   val: "≈ 110 t" },
+    ],
+    images: [
+image7001    ],
+  },
+  {
+    key: "P&H1",
+    nom: "Pelle P&H — N°1",
+    desc: "Pelle électrique à câble haute capacité pour chargement des matériaux sautés. Référence sur les grands découverts.",
+    specs: [
+      { label: "Capacité godet", val: "15–23 m³" },
+      { label: "Rayon charg.",   val: "≈ 21 m" },
+      { label: "Puissance",      val: "1 800 kW" },
+      { label: "Poids opérat.",  val: "≈ 700 t" },
+    ],
+    images: [
+    imagePh
+    ],
+  },
+  {
+    key: "P&H2",
+    nom: "Pelle P&H — N°2",
+    desc: "Deuxième pelle électrique de la flotte. Assure la redondance du chargement lors des pics de production.",
+    specs: [
+      { label: "Capacité godet", val: "15–23 m³" },
+      { label: "Rayon charg.",   val: "≈ 21 m" },
+      { label: "Puissance",      val: "1 800 kW" },
+      { label: "Poids opérat.",  val: "≈ 700 t" },
+    ],
+    images: [
+      imagePh 
+      ],
+  },
+  {
+    key: "200B1",
+    nom: "Bulldozer 200 — B1",
+    desc: "Bouteur lourd utilisé pour le régalage, le poussage des déblais et la préparation des pistes en zone de décapage.",
+    specs: [
+      { label: "Puissance",      val: "410 kW" },
+      { label: "Lame capacity",  val: "≈ 22 m³" },
+      { label: "Poids opérat.",  val: "≈ 70 t" },
+      { label: "Vitesse max",    val: "11 km/h" },
+    ],
+    images: [
+      image200
+    ],
+  },
+];
+const CSS=`
   @import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
 
   .acc-csm * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -298,7 +354,7 @@ const CSS = `
   }
 
   /* ════════════════════════════
-     SECTION 3 — MODULES (inchangé)
+     SECTION 3 — ÉQUIPEMENTS
   ════════════════════════════ */
 
   .acc-csm-modules { padding: 72px 48px; background: #f0fdf4; }
@@ -316,8 +372,9 @@ const CSS = `
   }
 
   .acc-csm-modules-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 24px; max-width: 1000px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px; max-width: 1200px; margin: 0 auto;
   }
 
   .acc-csm-mod-card {
@@ -357,26 +414,61 @@ const CSS = `
 
   .acc-csm-dot.active { background: #fff; transform: scale(1.3); }
 
-  .acc-csm-mod-body { padding: 20px; }
+  .acc-csm-mod-body { padding: 18px 20px 20px; }
+
+  .acc-csm-mod-top {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: 8px;
+  }
 
   .acc-csm-mod-accent {
     width: 32px; height: 3px;
     background: linear-gradient(90deg, #16a34a, #86efac);
-    border-radius: 2px; margin-bottom: 10px;
+    border-radius: 2px;
   }
 
-  .acc-csm-mod-body h3 { font-size: 15px; font-weight: 700; color: #14532d; margin-bottom: 6px; }
-  .acc-csm-mod-body p  { font-size: 13px; color: #6b7280; line-height: 1.6; margin-bottom: 14px; }
-
-  .acc-csm-mod-link {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 13px; font-weight: 600; color: #16a34a;
-    text-decoration: none; cursor: pointer;
-    background: none; border: none; padding: 0;
-    transition: gap 0.2s ease;
+  /* Badge état dynamique */
+  .acc-csm-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px;
   }
+  .acc-csm-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .acc-csm-badge.marche {
+    background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
+  }
+  .acc-csm-badge.marche::before { background: #16a34a; animation: acc-pulse 2s ease infinite; }
+  .acc-csm-badge.arret {
+    background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;
+  }
+  .acc-csm-badge.arret::before { background: #ef4444; }
+  .acc-csm-badge.inconnu {
+    background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb;
+  }
+  .acc-csm-badge.inconnu::before { background: #9ca3af; }
 
-  .acc-csm-mod-link:hover { gap: 8px; color: #14532d; }
+  .acc-csm-mod-body h3 { font-size: 15px; font-weight: 700; color: #14532d; margin-bottom: 5px; }
+  .acc-csm-mod-body > p { font-size: 13px; color: #6b7280; line-height: 1.6; margin-bottom: 14px; }
+
+  /* Tableau specs techniques */
+  .acc-csm-specs {
+    display: flex; flex-direction: column; gap: 5px;
+    border-top: 1px solid #f0fdf4; padding-top: 12px; margin-top: 4px;
+  }
+  .acc-csm-spec-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11.5px;
+  }
+  .acc-csm-spec-key {
+    color: #9ca3af; font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .acc-csm-spec-val {
+    color: #14532d; font-weight: 700; font-size: 12px;
+  }
 
   /* ════════════════════════════
      SECTION 4 — CTA (inchangé)
@@ -456,36 +548,27 @@ function Carousel({ images, label }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   DONNÉES — Modules
+   SOUS-COMPOSANT — Carrousel
 ══════════════════════════════════════════════════════════════════════════ */
-
-const MODULES = [
-  {
-    key: "saisie",
-    title: "Saisie des Opérations",
-    desc: "Enregistrez chaque opération de décapage en temps réel : volume sauté, équipements, conducteur, horaires et état machine.",
-    route: "dashboard",
-  },
-  {
-    key: "historique",
-    title: "Historique & Suivi",
-    desc: "Consultez et filtrez l'ensemble des opérations enregistrées par panneau, tranchée, poste ou plage de dates. Export Excel intégré.",
-    route: "historique",
-  },
-  {
-    key: "rapport",
-    title: "Rapports & Statistiques",
-    desc: "Analysez les rendements, les heures de marche et les volumes sautés grâce à des graphiques interactifs et des indicateurs clés.",
-    route: "rapport",
-  },
-];
 
 /* ══════════════════════════════════════════════════════════════════════════
    COMPOSANT PRINCIPAL
 ══════════════════════════════════════════════════════════════════════════ */
 
-function AccueilleCasement() {
+function AccueilCasement() {
   const navigate = useNavigate();
+  const casements = useSelector((state) => state.casement?.list ?? []);
+
+  // Dernier état connu de chaque équipement dans Redux
+  const getEtat = (key) => {
+    const ops = [...casements]
+      .reverse()
+      .find((c) => c.equipements?.includes(key));
+    if (!ops) return "inconnu";
+    return ops.etatMachine === "marche" ? "marche" : "arret";
+  };
+
+  const ETAT_LABEL = { marche: "En marche", arret: "En arrêt", inconnu: "Inconnu" };
 
   return (
     <div className="acc-csm">
@@ -597,26 +680,39 @@ function AccueilleCasement() {
         </div>
       </section>
 
-      {/* ════════ SECTION 3 — MODULES ════════ */}
+      {/* ════════ SECTION 3 — ÉQUIPEMENTS ════════ */}
       <section className="acc-csm-modules">
         <div className="acc-csm-modules-head">
-          <h2>Nos Trois Modules Casement</h2>
-          <p>Gérez l'intégralité de vos opérations de décapage avec nos outils spécialisés.</p>
+          <h2>Nos Équipements Casement</h2>
+          <p>Flotte de machines dédiées aux opérations de décapage — état en temps réel depuis les dernières saisies.</p>
         </div>
         <div className="acc-csm-modules-grid">
-          {MODULES.map((mod) => (
-            <div key={mod.key} className="acc-csm-mod-card">
-              <Carousel images={SLIDES[mod.key]} label={mod.title} />
-              <div className="acc-csm-mod-body">
-                <div className="acc-csm-mod-accent" />
-                <h3>{mod.title}</h3>
-                <p>{mod.desc}</p>
-                <button className="acc-csm-mod-link" onClick={() => navigate(mod.route)}>
-                  Accéder →
-                </button>
+          {EQUIPEMENTS.map((eq) => {
+            const etat = getEtat(eq.key);
+            return (
+              <div key={eq.key} className="acc-csm-mod-card">
+                <Carousel images={eq.images} label={eq.nom} />
+                <div className="acc-csm-mod-body">
+                  <div className="acc-csm-mod-top">
+                    <div className="acc-csm-mod-accent" />
+                    <span className={`acc-csm-badge ${etat}`}>
+                      {ETAT_LABEL[etat]}
+                    </span>
+                  </div>
+                  <h3>{eq.nom}</h3>
+                  <p>{eq.desc}</p>
+                  <div className="acc-csm-specs">
+                    {eq.specs.map((s) => (
+                      <div key={s.label} className="acc-csm-spec-row">
+                        <span className="acc-csm-spec-key">{s.label}</span>
+                        <span className="acc-csm-spec-val">{s.val}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -633,4 +729,4 @@ function AccueilleCasement() {
   );
 }
 
-export default AccueilleCasement;
+export default AccueilCasement;

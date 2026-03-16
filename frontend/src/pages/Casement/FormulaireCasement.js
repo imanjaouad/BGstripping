@@ -673,11 +673,9 @@ function Gestion() {
         {/* ══ HEADER ══ */}
         <header className="lcsm-header">
           <div>
-            <div className="lcsm-vol-label">Opérations Minières</div>
             <h1 className="lcsm-title">Décapage par <em>Casement</em></h1>
           </div>
           <div className="lcsm-header-right">
-            <div className="lcsm-pill"><div className="lcsm-pill-dot" />Système actif</div>
             <img src={image} alt="logo" className="lcsm-logo" />
           </div>
         </header>

@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Chart, registerables } from "chart.js";
+import "../../components/animations.css";
+
 // ── SVG icons ────────────────────────────────────────────────────────────────
 const IcoMoney    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
 const IcoCalc     = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>;
@@ -8,7 +10,10 @@ const IcoChart    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="
 const IcoCalendar = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
 const IcoFilter   = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>;
 const IcoTrash    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
-import "../../components/animations.css";
+
+// ── Design tokens (aligned with Dashboard) ──────────────────────────────────
+const DASH_FONT = "'Plus Jakarta Sans', sans-serif";
+const DASH_MONO = "'DM Mono', monospace";
 
 Chart.register(...registerables);
 
@@ -193,7 +198,7 @@ function CoutCasement() {
       options:{
         responsive:true, maintainAspectRatio:false,
         plugins:{
-          legend:{labels:{font:{family:"'Rajdhani',sans-serif",size:13},color:"#374151"}},
+          legend:{labels:{font:{family:"Plus Jakarta Sans,sans-serif",size:13},color:"#374151"}},
           tooltip:{callbacks:{label:(ctx)=>{
             const h=history[ctx.dataIndex];
             return[
@@ -205,8 +210,8 @@ function CoutCasement() {
           }}},
         },
         scales:{
-          x:{grid:{display:false},ticks:{font:{family:"'Rajdhani',sans-serif",size:12},color:"#6B7280"}},
-          y:{grid:{color:"rgba(22,163,74,0.07)"},ticks:{callback:v=>v+"%",font:{family:"'Rajdhani',sans-serif",size:11},color:"#6B7280"},beginAtZero:true},
+          x:{grid:{display:false},ticks:{font:{family:"Plus Jakarta Sans,sans-serif",size:12},color:"#6B7280"}},
+          y:{grid:{color:"rgba(22,163,74,0.07)"},ticks:{callback:v=>v+"%",font:{family:"Plus Jakarta Sans,sans-serif",size:11},color:"#6B7280"},beginAtZero:true},
         },
       },
     });
@@ -214,47 +219,95 @@ function CoutCasement() {
   },[history,totalCost]);
 
   const inputStyle = {
-    border:"2px solid #E5E7EB", borderRadius:10, padding:"11px 14px",
-    fontFamily:"'Exo 2',sans-serif", fontSize:".92rem", outline:"none",
-    background:"white", color:"#111827", width:"100%",
-    transition:"border-color .25s,box-shadow .25s",
+    border:"1.5px solid #bbf7d0", borderRadius:10, padding:"11px 14px",
+    fontFamily:DASH_FONT, fontSize:13, outline:"none",
+    background:"#fff", color:"#111827", width:"100%",
+    transition:"border-color .22s,box-shadow .22s",
+    boxShadow:"0 1px 3px rgba(20,83,45,0.04),inset 0 1px 0 rgba(255,255,255,0.8)",
   };
   const labelStyle = {
-    fontSize:".8rem", fontWeight:600, color:"#374151",
-    letterSpacing:".5px", textTransform:"uppercase",
+    fontSize:10, fontWeight:700, color:"#9ca3af",
+    letterSpacing:".12em", textTransform:"uppercase",
     marginBottom:6, display:"block",
+    fontFamily:DASH_MONO,
   };
 
   return (
+    <>
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+      @keyframes acc-fadeUp  { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+      @keyframes acc-shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+      @keyframes acc-stripe  { from{background-position:0%} to{background-position:200%} }
+      .cout-table { width:100%; border-collapse:collapse; font-size:13px; font-family:'Plus Jakarta Sans',sans-serif; }
+      .cout-table thead tr { background:#15803d; }
+      .cout-table th { padding:11px 13px; text-align:left; font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:#fff; white-space:nowrap; font-family:'DM Mono',monospace; }
+      .cout-table tbody tr { border-bottom:1px solid #f0fdf4; transition:background .15s; }
+      .cout-table tbody tr:hover { background:#f0fdf4; }
+      .cout-table tbody tr:last-child { border-bottom:none; }
+      .cout-table td { padding:10px 13px; color:#374151; vertical-align:middle; white-space:nowrap; }
+      .cout-badge-green { background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+      .cout-badge-amber { background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+      .cout-badge-red   { background:#fee2e2;color:#b91c1c;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+      .cout-del-btn { display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1.5px solid #fecaca;background:rgba(239,68,68,0.06);color:#dc2626;cursor:pointer;transition:all .18s; }
+      .cout-del-btn:hover { background:#ef4444;color:#fff;border-color:#ef4444; }
+    `}</style>
     <div style={{
-      padding:"32px 36px", overflowY:"auto",
-      background:"linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%)",
+      padding:"32px 28px 60px", overflowY:"auto",
+      background:"#f0fdf4",
       minHeight:"100vh",
+      fontFamily:DASH_FONT,
+      color:"#14532d",
+      position:"relative",
     }}>
 
-      {/* ── Page Header ─────────────────────────────────────────────────── */}
-      <div className="page-header">
-        <h1 className="page-title">
-          Gestion des <span>Coûts</span> — Casement
-        </h1>
-        <div style={{
-          borderRadius:"50%", padding:3,
-          background:"conic-gradient(from 0deg,#16A34A,#22C55E,#F59E0B,#16A34A)",
-          animation:"rotateBorder 6s linear infinite",
-          boxShadow:"0 0 20px rgba(22,163,74,0.4), 0 0 40px rgba(22,163,74,0.15)",
-        }}>
-          <div style={{
-            width:60, height:60, borderRadius:"50%",
-            background:"linear-gradient(135deg,#064E3B,#16A34A)",
-            display:"flex", alignItems:"center", justifyContent:"center",
-            border:"3px solid #064E3B", color:"white",
-            boxShadow:"inset 0 2px 0 rgba(255,255,255,0.15)",
-          }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-            </svg>
+      {/* ── Page Header (Dashboard-style hero card) ───────────────────── */}
+      <div style={{
+        background:"#fff", border:"1.5px solid #bbf7d0", borderRadius:20,
+        padding:"28px 32px", marginBottom:24,
+        display:"flex", alignItems:"center", justifyContent:"space-between",
+        position:"relative", overflow:"hidden",
+        animation:"acc-fadeUp .7s cubic-bezier(0.16,1,0.3,1) .05s both",
+        boxShadow:"0 4px 24px rgba(22,163,74,0.07)",
+      }}>
+        {/* Stripe top */}
+        <div style={{position:"absolute",top:0,left:0,right:0,height:4,
+          background:"linear-gradient(90deg,#14532d,#16a34a,#10b981,#16a34a,#14532d)",
+          backgroundSize:"200% 100%",animation:"acc-stripe 4s linear infinite"}}/>
+        <div>
+          <div style={{fontFamily:DASH_MONO,fontSize:10,fontWeight:700,
+            letterSpacing:".22em",textTransform:"uppercase",color:"#16a34a",
+            display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+            <span style={{display:"inline-block",width:28,height:1.5,
+              background:"linear-gradient(90deg,#16a34a,transparent)"}}/>
+            Module Casement
           </div>
+          <h1 style={{
+            margin:0, fontSize:"clamp(1.6rem,3vw,2.2rem)", fontWeight:800,
+            color:"#14532d", lineHeight:1.1, fontFamily:DASH_FONT,
+          }}>
+            Gestion des{" "}
+            <span style={{background:"linear-gradient(135deg,#16a34a,#10b981)",
+              WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+              Coûts
+            </span>
+          </h1>
+          <p style={{margin:"6px 0 0",fontSize:14,color:"#6b7280",fontFamily:DASH_FONT}}>
+            Suivi budgétaire par coup — calcul mensuel et répartition annuelle.
+          </p>
+        </div>
+        <div style={{
+          width:56,height:56,borderRadius:16,flexShrink:0,
+          background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",
+          border:"1.5px solid rgba(134,239,172,0.7)",
+          display:"flex",alignItems:"center",justifyContent:"center",
+          color:"#16a34a",
+          boxShadow:"0 0 0 6px rgba(220,252,231,0.4),0 6px 20px rgba(22,163,74,0.15)",
+        }}>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
         </div>
       </div>
 
@@ -282,12 +335,12 @@ function CoutCasement() {
           </svg>
         </div>
         <div style={{flex:1}}>
-          <div style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#064E3B",fontSize:"1rem",letterSpacing:1}}>
+          <div style={{fontFamily:DASH_FONT,fontWeight:700,color:"#14532d",fontSize:"1rem"}}>
             {availableMonths.length>0
               ?`${availableMonths.length} mois disponible(s) dans les données`
               :"Aucune donnée — enregistrez d'abord des opérations dans Dashboard"}
           </div>
-          <div style={{fontSize:".8rem",color:"#6B7280",marginTop:2}}>
+          <div style={{fontSize:12,color:"#9ca3af",marginTop:4,fontFamily:DASH_FONT}}>
             {availableMonths.length>0
               ?availableMonths.join("  •  ")
               :"Les mois apparaîtront automatiquement après saisie"}
@@ -299,7 +352,17 @@ function CoutCasement() {
 
 
       {/* ── Form Card ───────────────────────────────────────────────────── */}
-      <div className="form-card">
+      <div style={{
+        background:"#fff", border:"1.5px solid #bbf7d0", borderRadius:20,
+        padding:"28px 28px", marginBottom:24,
+        position:"relative", overflow:"hidden",
+        boxShadow:"0 4px 24px rgba(22,163,74,0.07)",
+        animation:"acc-fadeUp .55s cubic-bezier(0.16,1,0.3,1) .15s both",
+      }}>
+        {/* shimmer bar */}
+        <div style={{position:"absolute",top:0,left:0,right:0,height:3,
+          background:"linear-gradient(90deg,#16a34a,#4ade80,#16a34a)",
+          backgroundSize:"200%",animation:"acc-shimmer 2.4s linear infinite"}}/>
         <div className="form-section-title" style={{display:"flex",alignItems:"center",gap:10}}>
           <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A",boxShadow:"0 0 0 4px rgba(220,252,231,0.4)"}}>
             <IcoCalc/>
@@ -311,7 +374,7 @@ function CoutCasement() {
 
           {/* Coût / coup  */}
           <div>
-            <label style={labelStyle}>Coût par Coup de  (MAD)</label>
+            <label style={labelStyle}>Coût par Mètre Carré (MAD)</label>
             <div style={{position:"relative"}}>
               <input type="number" value={coupCost} min="0" step="0.01"
                 placeholder="0.00"
@@ -363,32 +426,43 @@ function CoutCasement() {
 
         {/* Boutons */}
         <div style={{display:"flex",gap:12,marginTop:20,flexWrap:"wrap"}}>
-          <button className="btn-submit" onClick={calculateBudget}
+          <button onClick={calculateBudget}
             disabled={!coupCost||!annualCost||!selectedMonth}
-            style={{opacity:(!coupCost||!annualCost||!selectedMonth)?0.5:1}}>
-            <span style={{display:"inline-flex"}}><IcoCalc/></span> Calculer
+            style={{
+              display:"inline-flex",alignItems:"center",gap:8,
+              padding:"12px 24px",borderRadius:12,border:"none",
+              background:"linear-gradient(135deg,#15803d,#16a34a)",color:"#fff",
+              fontFamily:DASH_FONT,fontSize:14,fontWeight:700,cursor:"pointer",
+              opacity:(!coupCost||!annualCost||!selectedMonth)?0.5:1,
+              boxShadow:"0 4px 14px rgba(22,163,74,0.3)",
+              transition:"all .2s",
+            }}
+            onMouseEnter={e=>{if(coupCost&&annualCost&&selectedMonth)e.currentTarget.style.transform="translateY(-2px)";}}
+            onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
+          >
+            <IcoCalc/> Calculer
           </button>
           <button onClick={resetForm} style={{
-            background:"linear-gradient(135deg,#6B7280,#9CA3AF)",color:"white",
-            border:"none",borderRadius:50,padding:"13px 28px",
-            fontFamily:"'Rajdhani',sans-serif",fontSize:"1rem",fontWeight:700,
-            letterSpacing:"1px",cursor:"pointer",transition:"all .3s",
-            boxShadow:"0 4px 14px rgba(107,114,128,0.3)",
+            display:"inline-flex",alignItems:"center",gap:8,
+            padding:"11px 22px",borderRadius:12,
+            background:"#fff",color:"#15803d",
+            border:"1.5px solid #bbf7d0",
+            fontFamily:DASH_FONT,fontSize:14,fontWeight:600,
+            cursor:"pointer",transition:"all .2s",
           }}
-            onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
-            onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
-          >Réinitialiser Formulaire</button>
+            onMouseEnter={e=>{e.currentTarget.style.background="#f0fdf4";e.currentTarget.style.borderColor="#16a34a";e.currentTarget.style.transform="translateY(-1px)";}}
+            onMouseLeave={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.borderColor="#bbf7d0";e.currentTarget.style.transform="translateY(0)";}}
+          >Réinitialiser</button>
           {history.length>0&&(
             <button onClick={clearHistory} style={{
-              background:"linear-gradient(135deg,#991B1B,#EF4444)",color:"white",
-              border:"none",borderRadius:50,padding:"13px 28px",
-              fontFamily:"'Rajdhani',sans-serif",fontSize:"1rem",fontWeight:700,
-              letterSpacing:"1px",cursor:"pointer",transition:"all .3s",
-              boxShadow:"0 4px 14px rgba(239,68,68,0.3)",
-              display:"flex",alignItems:"center",gap:6,
+              display:"inline-flex",alignItems:"center",gap:8,
+              padding:"11px 22px",borderRadius:12,border:"1.5px solid #fecaca",
+              background:"rgba(239,68,68,0.06)",color:"#dc2626",
+              fontFamily:DASH_FONT,fontSize:14,fontWeight:600,
+              cursor:"pointer",transition:"all .2s",
             }}
-              onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
-              onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
+              onMouseEnter={e=>{e.currentTarget.style.background="#ef4444";e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#ef4444";e.currentTarget.style.transform="translateY(-1px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(239,68,68,0.06)";e.currentTarget.style.color="#dc2626";e.currentTarget.style.borderColor="#fecaca";e.currentTarget.style.transform="translateY(0)";}}
             >
               <IcoTrash/> Vider l'historique
             </button>
@@ -433,8 +507,8 @@ function CoutCasement() {
           </div>
           <div style={{
             background:"rgba(245,158,11,.15)",border:"1px solid rgba(245,158,11,.3)",
-            borderRadius:50,padding:"6px 18px",fontFamily:"'Rajdhani',sans-serif",
-            fontSize:".95rem",fontWeight:600,color:"#FCD34D",letterSpacing:1,
+            borderRadius:50,padding:"6px 18px",fontFamily:DASH_FONT,
+            fontSize:13,fontWeight:700,color:"#FCD34D",
           }}>
             {history.length} mois
           </div>
@@ -442,12 +516,17 @@ function CoutCasement() {
       )}
 
       {/* ── Chart Card ──────────────────────────────────────────────────── */}
-      <div className="chart-card" style={{marginBottom:28}}>
-        <div className="chart-card-title" style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A",boxShadow:"0 0 0 4px rgba(220,252,231,0.4)"}}>
+      <div style={{
+        background:"#fff", border:"1.5px solid #bbf7d0", borderRadius:20,
+        padding:"24px 24px", marginBottom:24,
+        boxShadow:"0 4px 24px rgba(22,163,74,0.07)",
+        animation:"acc-fadeUp .55s cubic-bezier(0.16,1,0.3,1) .25s both",
+      }}>
+        <div className="chart-card-title" style={{display:"flex",alignItems:"center",gap:10,marginBottom:18}}>
+          <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16a34a",boxShadow:"0 0 0 5px rgba(220,252,231,0.4)"}}>
             <IcoChart/>
           </div>
-          Répartition du Budget Annuel (%)
+          <span style={{fontFamily:DASH_FONT,fontWeight:700,fontSize:15,color:"#14532d"}}>Répartition du Budget Annuel (%)</span>
         </div>
         {history.length>0?(
           <div style={{position:"relative",height:320}}>
@@ -463,7 +542,7 @@ function CoutCasement() {
                 </svg>
               </div>
             </div>
-            <div style={{fontFamily:"'Rajdhani',sans-serif",letterSpacing:1}}>
+            <div style={{fontFamily:DASH_FONT}}>
               Ajoutez un calcul pour afficher le graphique
             </div>
           </div>
@@ -471,19 +550,24 @@ function CoutCasement() {
       </div>
 
       {/* ── Historique Table ────────────────────────────────────────────── */}
-      <div className="table-card" style={{animation:"fadeSlideUp .55s ease both"}}>
+      <div style={{
+        background:"#fff", border:"1.5px solid #bbf7d0", borderRadius:20,
+        padding:"24px 24px",
+        boxShadow:"0 4px 24px rgba(22,163,74,0.07)",
+        animation:"acc-fadeUp .55s cubic-bezier(0.16,1,0.3,1) .35s both",
+      }}>
         <div className="table-card-title" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <span style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16A34A",boxShadow:"0 0 0 4px rgba(220,252,231,0.4)"}}>
+            <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(145deg,#f0fdf4,#dcfce7)",border:"1.5px solid rgba(134,239,172,0.7)",display:"flex",alignItems:"center",justifyContent:"center",color:"#16a34a",boxShadow:"0 0 0 5px rgba(220,252,231,0.4)"}}>
               <IcoCalendar/>
             </div>
-            Historique des Calculs
+            <span style={{fontFamily:DASH_FONT,fontWeight:700,fontSize:15,color:"#14532d"}}>Historique des Calculs</span>
           </span>
           {history.length>0&&(
             <span style={{
               background:"rgba(22,163,74,0.08)",border:"1px solid rgba(22,163,74,0.2)",
               borderRadius:50,padding:"3px 14px",
-              fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#16A34A",fontSize:".85rem",
+              fontFamily:DASH_FONT,fontWeight:700,color:"#16A34A",fontSize:".85rem",
             }}>
               {history.length} entrée(s)
             </span>
@@ -500,11 +584,11 @@ function CoutCasement() {
                 </svg>
               </div>
             </div>
-            <div style={{fontFamily:"'Rajdhani',sans-serif",letterSpacing:1}}>Aucun calcul enregistré</div>
+            <div style={{fontFamily:DASH_FONT}}>Aucun calcul enregistré</div>
           </div>
         ):(
           <div style={{overflowX:"auto"}}>
-            <table className="mine-table">
+            <table className="cout-table">
               <thead>
                 <tr>
                   <th>#</th><th>Mois</th><th>Date</th>
@@ -521,24 +605,24 @@ function CoutCasement() {
                   const barW  = Math.min(pct*1.5,100);
                   return(
                     <tr key={i} style={{animation:`fadeSlideRight .4s ${i*0.05}s ease both`}}>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#9CA3AF"}}>{i+1}</td>
-                      <td><strong style={{fontFamily:"'Rajdhani',sans-serif"}}>{h.month}</strong></td>
+                      <td style={{fontWeight:700,color:"#9ca3af"}}>{i+1}</td>
+                      <td><strong style={{fontFamily:DASH_FONT}}>{h.month}</strong></td>
                       <td style={{fontSize:".82rem",color:"#6B7280"}}>{h.createdAt??"—"}</td>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.coupCost)} MAD</td>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.cout)} MAD</td>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:600}}>{fmt(h.annualCost)} MAD</td>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color:"#064E3B"}}>{fmt(h.cost)} MAD</td>
-                      <td style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,color}}>{pct.toFixed(1)}%</td>
+                      <td style={{fontFamily:DASH_FONT,fontWeight:600}}>{fmt(h.coupCost)} MAD</td>
+                      <td style={{fontFamily:DASH_FONT,fontWeight:600}}>{fmt(h.cout)} MAD</td>
+                      <td style={{fontFamily:DASH_FONT,fontWeight:600}}>{fmt(h.annualCost)} MAD</td>
+                      <td style={{fontFamily:DASH_FONT,fontWeight:700,color:"#064E3B"}}>{fmt(h.cost)} MAD</td>
+                      <td style={{fontFamily:DASH_FONT,fontWeight:700,color}}>{pct.toFixed(1)}%</td>
                       <td style={{minWidth:140}}>
                         <div style={{display:"flex",alignItems:"center",gap:8}}>
                           <div style={{flex:1,height:8,background:"#F3F4F6",borderRadius:999,overflow:"hidden"}}>
                             <div style={{height:"100%",width:`${barW}%`,background:color,borderRadius:999,transition:"width .6s cubic-bezier(.4,0,.2,1)"}}/>
                           </div>
-                          <span style={{fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:".85rem",color,minWidth:38,textAlign:"right"}}>{pct.toFixed(1)}%</span>
+                          <span style={{fontFamily:DASH_FONT,fontWeight:700,fontSize:".85rem",color,minWidth:38,textAlign:"right"}}>{pct.toFixed(1)}%</span>
                         </div>
                       </td>
                       <td>
-                        <button className="btn-del" onClick={()=>removeEntry(i)} title="Supprimer"><IcoTrash/></button>
+                        <button className="cout-del-btn" onClick={()=>removeEntry(i)} title="Supprimer"><IcoTrash/></button>
                       </td>
                     </tr>
                   );
@@ -549,6 +633,7 @@ function CoutCasement() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

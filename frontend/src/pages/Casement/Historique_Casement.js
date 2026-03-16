@@ -169,7 +169,8 @@ border-bottom:1px solid #f0fdf4;
 }
 
 .mine-table tr:hover{
-background:#f0fdf4;
+background: #f0fdf4;
+
 }
 
 .empty-row{

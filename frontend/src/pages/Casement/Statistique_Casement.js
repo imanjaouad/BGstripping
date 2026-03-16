@@ -15,6 +15,7 @@ import { Bar, Line, Doughnut } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import image from "../../images/image3.webp";
+import RapportCasement from "./Rapport_Casement";
 import "../../style/Casement.css"
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement,
@@ -23,6 +24,12 @@ ChartJS.register(
 
 // ─── CSS ─────────────────────────────────────────────────────────────────────
 const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+  @keyframes acc-fadeUp  { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes acc-shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+  @keyframes acc-stripe  { from{background-position:0%} to{background-position:200%} }
+  @keyframes acc-float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
 /* ── TOAST ALERTS ─────────────────────────────────────────────── */
 @keyframes csm-toastIn  { from { opacity:0; transform:translateX(110%); } to { opacity:1; transform:translateX(0); } }
 @keyframes csm-toastOut { from { opacity:1; transform:translateX(0);    } to { opacity:0; transform:translateX(110%); } }
@@ -108,6 +115,124 @@ const CSS = `
   box-shadow: 0 4px 14px rgba(220,38,38,0.3);
 }
 .csm-dlg-confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.4); }
+
+/* ── Form inputs aligned with Dashboard ── */
+.db-form-card {
+  background: #fff; border: 1.5px solid #bbf7d0; border-radius: 20px;
+  padding: 28px 28px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(22,163,74,0.07);
+  animation: acc-fadeUp .55s cubic-bezier(0.16,1,0.3,1) .1s both;
+}
+.db-form-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
+  background-size: 200%; animation: acc-shimmer 2.4s linear infinite;
+}
+.db-form-label {
+  font-family: 'DM Mono', monospace !important;
+  font-size: 10px !important; font-weight: 700 !important;
+  letter-spacing: .12em !important; text-transform: uppercase !important;
+  color: #9ca3af !important; display: flex; align-items: center; gap: 7px;
+  margin-bottom: 6px;
+}
+.db-form-input, .db-form-select {
+  width: 100%; box-sizing: border-box;
+  padding: 11px 14px;
+  background: #fff !important;
+  border: 1.5px solid #bbf7d0 !important;
+  border-radius: 10px !important;
+  color: #111827 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important; font-size: 13px !important;
+  outline: none !important;
+  transition: all .22s cubic-bezier(0.16,1,0.3,1) !important;
+  box-shadow: 0 1px 3px rgba(20,83,45,0.04), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+  -webkit-appearance: none; appearance: none;
+}
+.db-form-input:focus, .db-form-select:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.10), 0 2px 8px rgba(22,163,74,0.06) !important;
+  transform: translateY(-1px);
+  color: #14532d !important;
+}
+.db-form-input:hover:not(:focus), .db-form-select:hover:not(:focus) {
+  border-color: rgba(22,163,74,0.4) !important;
+  background: #f0fdf4 !important;
+}
+.db-auto-badge {
+  font-size: 8px; font-weight: 600; color: #16a34a;
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  padding: 1px 7px; border-radius: 20px;
+}
+.db-equip-chip {
+  padding: 8px 16px; border: 1.5px solid #bbf7d0; border-radius: 999px;
+  background: #fff; color: #6b7280;
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .2s; user-select: none;
+}
+.db-equip-chip:hover { border-color: #16a34a; color: #14532d; background: #f0fdf4; transform: translateY(-2px); }
+.db-equip-chip.selected {
+  background: linear-gradient(135deg,#15803d,#16a34a); border-color: #15803d;
+  color: #fff; font-weight: 700; box-shadow: 0 4px 14px rgba(21,128,61,0.3);
+}
+.db-equip-add {
+  padding: 8px 18px; border: none; border-radius: 999px;
+  background: linear-gradient(135deg,#15803d,#16a34a); color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  box-shadow: 0 4px 14px rgba(21,128,61,0.28);
+}
+.db-equip-add:hover { transform: translateY(-2px); background: linear-gradient(135deg,#16a34a,#10b981); }
+.db-rendement-banner {
+  background: linear-gradient(135deg,#14532d,#15803d,#16a34a);
+  border-radius: 14px; padding: 20px 24px;
+  display: flex; align-items: center; gap: 16px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 8px 28px rgba(21,128,61,0.25);
+}
+.db-rendement-value { font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1; }
+.db-rendement-label { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+.db-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg,#15803d,#16a34a); color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  box-shadow: 0 4px 14px rgba(22,163,74,0.28);
+}
+.db-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(22,163,74,0.35); }
+.db-btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 12px;
+  background: #fff; color: #15803d; border: 1.5px solid #bbf7d0;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.db-btn-secondary:hover { background: #f0fdf4; border-color: #16a34a; transform: translateY(-1px); }
+.db-btn-excel {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 12px;
+  background: #fff; color: #15803d; border: 1.5px solid #bbf7d0;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.db-btn-excel:hover { background: #f0fdf4; border-color: #16a34a; transform: translateY(-1px); }
+.db-btn-edit {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 8px; border: 1.5px solid #22c55e;
+  background: rgba(34,197,94,0.08); color: #15803d;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all .18s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.db-btn-edit:hover { background: #22c55e; color: #fff; }
+.db-btn-del {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 8px; border: 1.5px solid #fca5a5;
+  background: rgba(239,68,68,0.06); color: #dc2626;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all .18s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.db-btn-del:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
 `;
 
 // ─── Chart helpers (identiques Poussage) ─────────────────────────────────────
@@ -140,14 +265,14 @@ function makeBarOpts(delayOffset=0) {
       x:{ grid:{display:false}, border:{display:false}, ticks:baseTick },
       y:{ grid:baseGrid, border:{display:false},
         ticks:{...baseTick,callback:(v)=>v.toLocaleString()},
-        title:{display:true,text:"Volume (t)",color:PALETTE.muted,font:{size:10}}},
+        title:{display:true,text:"Volume (t)",color:"#6b7280",font:{size:10}}},
     },
   };
 }
 const doughnutOpts = {
   responsive:true, cutout:"68%", animation:{duration:1200,easing:"easeOutBack"},
   plugins:{
-    legend:{position:"bottom",labels:{color:PALETTE.muted,
+    legend:{position:"bottom",labels:{color:"#6b7280",
       font:{family:"'Plus Jakarta Sans',sans-serif",size:11},padding:14,usePointStyle:true,pointStyleWidth:7}},
     tooltip:{...baseTooltip,callbacks:{label:(c)=>` ${c.label}: ${c.parsed.toLocaleString()} t`}},
   },
@@ -172,7 +297,7 @@ function AnimCount({ target, duration=1100 }) {
 // ─── State initial casement ───────────────────────────────────────────────────
 const EMPTY_FORM = {
   date:"", panneau:"", tranchee:"", niveau:"",
-  volume_casse:"", granulometrie:"", type_roche:"", nombreCoups:"",
+  volume_saute:"", granulometrie:"", type_roche:"", nombreCoups:"",
   equipements:[], conducteur:"", matricule:"",
   heureDebut:"", heureFin:"", temps:"", poste:"",
   etatMachine:"En marche", typeArret:"",
@@ -263,7 +388,6 @@ function StatistiqueCasement() {
   // Navigation identique à DashboardComplet Poussage
   const activeTab = location.pathname.endsWith("historique") ? "historique"
     : location.pathname.endsWith("couts")      ? "couts"
-    : location.pathname.endsWith("rapport")    ? "rapport"
     : "overview";
 
   const [showForm,  setShowForm]  = useState(false);
@@ -349,26 +473,26 @@ function StatistiqueCasement() {
     setConfirmDlg({open:false, index:null, label:""});
   };
 
-  // Rendement instantané basé sur volume_casse
-  const rendement = formData.temps>0 ? (formData.volume_casse/formData.temps).toFixed(2) : 0;
+  // Rendement instantané basé sur volume_saute
+  const rendement = formData.temps>0 ? (formData.volume_saute/formData.temps).toFixed(2) : 0;
 
   // ── Statistiques ─────────────────────────────────────────────────────────
-  const totalVolume = casements.reduce((a,c)=>a+Number(c.volume_casse||0),0);
+  const totalVolume = casements.reduce((a,c)=>a+Number(c.volume_saute||0),0);
   const totalTemps  = casements.reduce((a,c)=>a+Number(c.temps||0),0);
   const totalCoups  = casements.reduce((a,c)=>a+Number(c.nombreCoups||0),0);
   const totalOps    = casements.length;
   const rendMoyen   = totalOps>0
     ? (casements.reduce((a,c)=>{
-        const v=Number(c.volume_casse||0),t=Number(c.temps||0);
+        const v=Number(c.volume_saute||0),t=Number(c.temps||0);
         return a+(t>0?v/t:0);
       },0)/totalOps).toFixed(2)
     : 0;
-  const enMarcheCnt = casements.filter(c=>c.etatMachine==="En marche").length;
+  const enMarcheCnt = casements.filter(c=>c.etatMachine==="marche").length;
 
   // Engins
   const enginStats = {};
   casements.forEach(c=>(c.equipements||[]).forEach(eq=>{
-    enginStats[eq]=(enginStats[eq]||0)+Number(c.volume_casse||0);
+    enginStats[eq]=(enginStats[eq]||0)+Number(c.volume_saute||0);
   }));
   const enginLabels  = Object.keys(enginStats);
   const enginVolumes = Object.values(enginStats);
@@ -379,7 +503,7 @@ function StatistiqueCasement() {
       label:"Volume (t)", data:enginVolumes,
       backgroundColor:(ctx)=>{
         const {chartArea,ctx:c}=ctx.chart;
-        if(!chartArea) return PALETTE.emerald;
+        if(!chartArea) return "#16a34a";
         const g=c.createLinearGradient(0,chartArea.top,0,chartArea.bottom);
         g.addColorStop(0,"#16a34a"); g.addColorStop(1,"#4ade80"); return g;
       },
@@ -403,7 +527,7 @@ function StatistiqueCasement() {
   });
   const trancheeKeys    = Object.keys(trancheeGroups);
   const trancheeVolumes = trancheeKeys.map(t=>
-    trancheeGroups[t].reduce((s,op)=>s+Number(op.volume_casse||0),0)
+    trancheeGroups[t].reduce((s,op)=>s+Number(op.volume_saute||0),0)
   );
   const trancheeBarData = {
     labels:trancheeKeys,
@@ -430,8 +554,8 @@ function StatistiqueCasement() {
       "Nb Coups BRH":c.nombreCoups,
       Équipements:c.equipements?.join(", "),
       Conducteur:c.conducteur, Matricule:c.matricule, Poste:c.poste,
-      "Volume Cassé(t)":c.volume_casse, "Heures Marche":c.temps,
-      Rendement:c.temps>0?(c.volume_casse/c.temps).toFixed(2):0,
+      "Volume Sauté(t)":c.volume_saute, "Heures Marche":c.temps,
+      Rendement:c.temps>0?(c.volume_saute/c.temps).toFixed(2):0,
       État:c.etatMachine, "Nature Arrêt":c.typeArret||"",
     }));
     const ws=XLSX.utils.json_to_sheet(data);
@@ -475,7 +599,7 @@ function StatistiqueCasement() {
               <td>{c.type_roche}</td>
               <td>{c.granulometrie}</td>
               <td><strong>{c.nombreCoups}</strong></td>
-              <td><strong>{Number(c.volume_casse).toLocaleString()}</strong></td>
+              <td><strong>{Number(c.volume_saute).toLocaleString()}</strong></td>
               <td style={{maxWidth:130,overflow:"hidden",textOverflow:"ellipsis"}}>
                 {c.equipements?.join(", ")}
               </td>
@@ -483,7 +607,7 @@ function StatistiqueCasement() {
               <td>{c.matricule}</td>
               <td>{c.poste}</td>
               <td>{c.temps} h</td>
-              <td>{c.temps>0?(c.volume_casse/c.temps).toFixed(2):0} t/h</td>
+              <td>{c.temps>0?(c.volume_saute/c.temps).toFixed(2):0} t/h</td>
               <td>
                 <span className={c.etatMachine==="En marche"?"badge-marche":"badge-arret"}>
                   {c.etatMachine}
@@ -560,9 +684,9 @@ function StatistiqueCasement() {
           <div><label className="db-form-label">Niveau</label>
             <input className="db-form-input" type="text" name="niveau"
               value={formData.niveau} onChange={handleChange}/></div>
-          <div><label className="db-form-label">Volume Cassé (t)</label>
-            <input className="db-form-input" type="number" name="volume_casse"
-              value={formData.volume_casse} onChange={handleChange} required/></div>
+          <div><label className="db-form-label">Volume Sauté (t)</label>
+            <input className="db-form-input" type="number" name="volume_saute"
+              value={formData.volume_saute} onChange={handleChange} required/></div>
           <div><label className="db-form-label">Granulométrie (mm)</label>
             <input className="db-form-input" type="number" name="granulometrie"
               value={formData.granulometrie} onChange={handleChange}/></div>
@@ -640,7 +764,11 @@ function StatistiqueCasement() {
 
         <div style={{display:"flex",gap:10,marginTop:20}}>
           <button type="submit" className="db-btn-primary">
-            {editIndex!==null?"💾 Mettre à jour":"✅ Enregistrer"}
+            {editIndex!==null?(
+              <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg> Mettre à jour</>
+            ):(
+              <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Enregistrer</>
+            )}
           </button>
           <button type="button" className="db-btn-secondary"
             onClick={()=>{setShowForm(false);resetForm();setEditIndex(null);}}>
@@ -664,29 +792,45 @@ function StatistiqueCasement() {
         onCancel={()=>setConfirmDlg({open:false,index:null,label:""})}
       />
       <div className="db-page" style={{
-        minHeight:"100vh", background:PALETTE.bg,
-        padding:"28px 24px 60px", color:PALETTE.text,
+        minHeight:"100vh", background:"#f0fdf4",
+        padding:"32px 28px 60px", color:"#14532d",
+        fontFamily:"'Plus Jakarta Sans', sans-serif",
       }}>
 
-        {/* ── HEADER ──────────────────────────────────────────────────────── */}
-        <div className="db-card" style={{
-          marginBottom:24, padding:"18px 24px",
+        {/* ── HEADER (Dashboard-style hero card) ────────────────────────── */}
+        <div style={{
+          background:"#fff", border:"1.5px solid #bbf7d0", borderRadius:20,
+          padding:"28px 32px", marginBottom:24,
           display:"flex", alignItems:"center", justifyContent:"space-between",
-          ...anim("0s").style,
+          position:"relative", overflow:"hidden",
+          animation:"acc-fadeUp .7s cubic-bezier(0.16,1,0.3,1) .05s both",
+          boxShadow:"0 4px 24px rgba(22,163,74,0.07)",
         }}>
+          <div style={{position:"absolute",top:0,left:0,right:0,height:4,
+            background:"linear-gradient(90deg,#14532d,#16a34a,#10b981,#16a34a,#14532d)",
+            backgroundSize:"200% 100%",animation:"acc-stripe 4s linear infinite"}}/>
           <div>
-            <div style={{fontSize:10,fontWeight:700,letterSpacing:".16em",
-              textTransform:"uppercase",color:PALETTE.muted,marginBottom:4}}>
-              Tableau de bord
-            </div>
-            <h1 style={{margin:0,fontSize:24,fontWeight:800,
-              background:"linear-gradient(135deg,#15803d,#22c55e)",
-              WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
-              Gestion Casement
+            <h1 style={{
+              margin:0, fontSize:"clamp(1.6rem,3vw,2.4rem)", fontWeight:800,
+              color:"#14532d", lineHeight:1.1,
+              fontFamily:"'Plus Jakarta Sans', sans-serif",
+            }}>
+              Gestion{" "}
+              <span style={{background:"linear-gradient(135deg,#16a34a,#10b981)",
+                WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+                Casement
+              </span>
             </h1>
+            <p style={{margin:"6px 0 0",fontSize:14,color:"#6b7280",
+              fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+              Statistiques, saisie et historique des opérations de décapage.
+            </p>
           </div>
           <img src={image} alt="logo" style={{
-            height:46,borderRadius:10,boxShadow:"0 4px 14px rgba(22,163,74,0.2)",
+            height:72, borderRadius:16,
+            border:"2px solid #bbf7d0",
+            boxShadow:"0 8px 32px rgba(22,163,74,0.15)",
+            animation:"acc-float 6s ease-in-out infinite",
           }}/>
         </div>
 
@@ -701,7 +845,7 @@ function StatistiqueCasement() {
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
                   ),
-                  label:"Volume Cassé", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
+                  label:"Volume Sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
                 },
                 {
                   icon:(
@@ -772,7 +916,7 @@ function StatistiqueCasement() {
             {trancheeKeys.length>0&&(
               <div className="db-card" {...anim("0.36s")} style={{marginBottom:20}}>
                 <p className="db-card-title">Volume Total par Tranchée</p>
-                <p className="db-card-sub">Comparaison globale des volumes cassés</p>
+                <p className="db-card-sub">Comparaison globale des volumes sautés</p>
                 <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
               </div>
             )}
@@ -803,8 +947,8 @@ function StatistiqueCasement() {
                       {recentCasements.map((c,i)=>(
                         <tr key={i} style={{animationDelay:`${i*0.06}s`}}>
                           <td>{c.date}</td><td>{c.panneau}</td><td>{c.tranchee}</td>
-                          <td><strong>{Number(c.volume_casse).toLocaleString()}</strong> t</td>
-                          <td>{c.temps>0?(c.volume_casse/c.temps).toFixed(2):0} t/h</td>
+                          <td><strong>{Number(c.volume_saute).toLocaleString()}</strong> t</td>
+                          <td>{c.temps>0?(c.volume_saute/c.temps).toFixed(2):0} t/h</td>
                           <td><span className={c.etatMachine==="En marche"?"badge-marche":"badge-arret"}>
                             {c.etatMachine}</span></td>
                           <td>
@@ -862,8 +1006,8 @@ function StatistiqueCasement() {
         {activeTab==="saisie"&&(
           <>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-              <h2 style={{margin:0,fontSize:17,fontWeight:700,color:PALETTE.text}}>
-                {editIndex!==null?"✏️ Modifier le casement":"➕ Nouveau casement"}
+              <h2 style={{margin:0,fontSize:17,fontWeight:700,color:"#14532d",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+                {editIndex!==null?"Modifier le casement":"Nouveau casement"}
               </h2>
               {!showForm&&(
                 <button className="db-btn-primary" onClick={()=>setShowForm(true)}>
@@ -885,8 +1029,8 @@ function StatistiqueCasement() {
         {activeTab==="historique"&&(
           <>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-              <h2 style={{margin:0,fontSize:17,fontWeight:700,color:PALETTE.text}}>
-                Historique Casement — {casements.length} enregistrement{casements.length!==1?"s":""}
+              <h2 style={{margin:0,fontSize:17,fontWeight:700,color:"#14532d",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+                Historique Casement
               </h2>
               <div style={{display:"flex",gap:8}}>
                 {!showForm&&(
@@ -917,7 +1061,7 @@ function StatistiqueCasement() {
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
                   ),
-                  label:"Volume Cassé", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
+                  label:"Volume Sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
                 },
                 {
                   icon:(
@@ -961,7 +1105,7 @@ function StatistiqueCasement() {
               <div className="db-card" {...anim("0.18s")}>
                 <div className="db-card-header">
                   <div><p className="db-card-title">Volume par Engin</p>
-                    <p className="db-card-sub">Répartition cumulative du volume cassé</p></div>
+                    <p className="db-card-sub">Répartition cumulative du volume sauté</p></div>
                   {enginLabels.length>0&&<span className="db-pill">{enginLabels.length} engins</span>}
                 </div>
                 {enginLabels.length>0?<Bar data={enginBarData} options={makeBarOpts(300)}/>
@@ -980,7 +1124,7 @@ function StatistiqueCasement() {
             {trancheeKeys.length>0&&(
               <div className="db-card" {...anim("0.32s")} style={{marginBottom:20}}>
                 <p className="db-card-title">Volume Total par Tranchée</p>
-                <p className="db-card-sub">Comparaison globale des volumes cassés</p>
+                <p className="db-card-sub">Comparaison globale des volumes sautés</p>
                 <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
               </div>
             )}
@@ -989,7 +1133,7 @@ function StatistiqueCasement() {
                 const ops   = trancheeGroups[tranchee];
                 const color = TRANCHEE_COLORS[idx%TRANCHEE_COLORS.length];
                 const labels  = ops.map((_,i)=>`Op ${i+1}`);
-                const volumes = ops.map(op=>Number(op.volume_casse||0));
+                const volumes = ops.map(op=>Number(op.volume_saute||0));
                 const lineData = {
                   labels,
                   datasets:[{
@@ -1095,7 +1239,7 @@ function StatistiqueCasement() {
           return(
             <>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-                <h2 style={{margin:0,fontSize:17,fontWeight:700,color:"#14532d"}}>Suivi des Coûts Casement</h2>
+                <h2 style={{margin:0,fontSize:17,fontWeight:700,color:"#14532d",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Suivi des Coûts Casement</h2>
               </div>
 
               {/* KPI coûts */}
@@ -1180,7 +1324,7 @@ function StatistiqueCasement() {
                         {[...casements].reverse().map((c,i)=>{
                           const coups  = Number(c.nombreCoups||0);
                           const coutOp = coups*costSaved.meterCost;
-                          const vol    = Number(c.volume_casse||0);
+                          const vol    = Number(c.volume_saute||0);
                           const coutT  = vol>0?(coutOp/vol).toFixed(2):"—";
                           return(
                             <tr key={i} style={{animationDelay:`${i*0.03}s`}}>
@@ -1203,6 +1347,13 @@ function StatistiqueCasement() {
             </>
           );
         })()}
+
+        {/* ══ RAPPORT — affiché en bas de page sur tous les onglets ══════ */}
+        {activeTab==="overview"&&(
+          <div style={{marginTop:8}}>
+            <RapportCasement embedded={true}/>
+          </div>
+        )}
 
       </div>
     </>
