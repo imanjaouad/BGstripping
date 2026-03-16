@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import "../../style/Home.css";
 
 const operations = [
@@ -85,6 +84,7 @@ function AnimatedCard({ op, index }) {
     >
       <a href={op.href} className="ops-card-link">
         <div className="ops-card">
+
           <div className="ops-card-img-wrap">
             {op.images.map((src, i) => (
               <img
@@ -118,6 +118,7 @@ function AnimatedCard({ op, index }) {
               <span className="ops-cta-arrow">→</span>
             </div>
           </div>
+
         </div>
       </a>
     </div>
@@ -125,10 +126,14 @@ function AnimatedCard({ op, index }) {
 }
 
 export default function OperationsSection() {
-  const navigate = useNavigate();
   const [titleVisible, setTitleVisible] = useState(false);
   const titleRef = useRef(null);
-
+  // toggleTheme dans ton Header
+const toggleTheme = () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  html.setAttribute("data-theme", isDark ? "light" : "dark");
+};
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setTitleVisible(true); },
@@ -142,6 +147,7 @@ export default function OperationsSection() {
     <section className="ops-section">
       <div className="ops-container">
         <div ref={titleRef} className={`ops-header ${titleVisible ? "visible" : ""}`}>
+          
           <h2 className="ops-title">Nos Trois Opérations Clés</h2>
           <p className="ops-subtitle">
             Gérez l'intégralité de votre chaîne de production avec nos modules spécialisés.

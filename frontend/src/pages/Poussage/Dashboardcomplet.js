@@ -52,7 +52,7 @@ const CSS = `
   .db-kpi {
     background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
     padding:20px 22px; position:relative; overflow:hidden;
-    opacity:0; animation:db-fadeUp .5s ease forwards;
+
     transition:transform .2s,box-shadow .2s; cursor:default;
   }
 .db-kpi:hover {
