@@ -300,7 +300,7 @@ const EMPTY_FORM = {
   volume_saute:"", granulometrie:"", type_roche:"", nombreCoups:"",
   equipements:[], conducteur:"", matricule:"",
   heureDebut:"", heureFin:"", temps:"", poste:"",
-  etatMachine:"En marche", typeArret:"",
+  etatMachine:"marche", typeArret:"",
   heureDebutArret:"", heureFinArret:"",
 };
 
@@ -487,7 +487,7 @@ function StatistiqueCasement() {
         return a+(t>0?v/t:0);
       },0)/totalOps).toFixed(2)
     : 0;
-  const enMarcheCnt = casements.filter(c=>c.etatMachine==="En marche").length;
+  const enMarcheCnt = casements.filter(c=>c.etatMachine==="marche").length;
 
   // Engins
   const enginStats = {};
@@ -609,7 +609,7 @@ function StatistiqueCasement() {
               <td>{c.temps} h</td>
               <td>{c.temps>0?(c.volume_saute/c.temps).toFixed(2):0} t/h</td>
               <td>
-                <span className={c.etatMachine==="En marche"?"badge-marche":"badge-arret"}>
+                <span className={c.etatMachine==="marche"?"badge-marche":"badge-arret"}>
                   {c.etatMachine}
                 </span>
               </td>
@@ -949,7 +949,7 @@ function StatistiqueCasement() {
                           <td>{c.date}</td><td>{c.panneau}</td><td>{c.tranchee}</td>
                           <td><strong>{Number(c.volume_saute).toLocaleString()}</strong> t</td>
                           <td>{c.temps>0?(c.volume_saute/c.temps).toFixed(2):0} t/h</td>
-                          <td><span className={c.etatMachine==="En marche"?"badge-marche":"badge-arret"}>
+                          <td><span className={c.etatMachine==="marche"?"badge-marche":"badge-arret"}>
                             {c.etatMachine}</span></td>
                           <td>
                             <div style={{display:"flex",gap:5,justifyContent:"center"}}>
@@ -1334,7 +1334,7 @@ function StatistiqueCasement() {
                               <td><strong style={{color:"#15803d"}}>{coutOp.toLocaleString()}</strong> MAD</td>
                               <td>{vol.toLocaleString()} t</td>
                               <td>{coutT!=="—"?`${coutT} MAD/t`:"—"}</td>
-                              <td><span className={c.etatMachine==="En marche"?"badge-marche":"badge-arret"}>
+                              <td><span className={c.etatMachine==="marche"?"badge-marche":"badge-arret"}>
                                 {c.etatMachine}</span></td>
                             </tr>
                           );
