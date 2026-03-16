@@ -201,41 +201,42 @@ const CSS = `
 
 // ─── Chart config ─────────────────────────────────────────────────────────────
 const PALETTE = {
-  emerald:"#16a34a", sky:"#22c55e", amber:"#4ade80",
-  violet:"#15803d",  rose:"#86efac",
-  bg:"#f0fdf4", card:"#fff", border:"#bbf7d0",
-  text:"#14532d", muted:"#6b7280",
+  emerald: "#16a34a", sky: "#22c55e", amber: "#4ade80",
+  violet: "#15803d", rose: "#86efac",
+  bg: "#f0fdf4", card: "#fff", border: "#bbf7d0",
+  text: "#14532d", muted: "#6b7280",
 };
 const TRANCHEE_COLORS = [
-  {main:"#16a34a",dim:"rgba(22,163,74,0.15)"},
-  {main:"#22c55e",dim:"rgba(34,197,94,0.15)"},
-  {main:"#4ade80",dim:"rgba(74,222,128,0.15)"},
-  {main:"#86efac",dim:"rgba(134,239,172,0.15)"},
-  {main:"#15803d",dim:"rgba(21,128,61,0.15)"},
+  { main: "#16a34a", dim: "rgba(22,163,74,0.15)" },
+  { main: "#22c55e", dim: "rgba(34,197,94,0.15)" },
+  { main: "#4ade80", dim: "rgba(74,222,128,0.15)" },
+  { main: "#86efac", dim: "rgba(134,239,172,0.15)" },
+  { main: "#15803d", dim: "rgba(21,128,61,0.15)" },
 ];
 const baseTooltip = {
-  backgroundColor:"#fff", borderColor:"#bbf7d0", borderWidth:1.5,
-  titleColor:"#14532d", bodyColor:"#6b7280", padding:12, cornerRadius:10,
+  backgroundColor: "#fff", borderColor: "#bbf7d0", borderWidth: 1.5,
+  titleColor: "#14532d", bodyColor: "#6b7280", padding: 12, cornerRadius: 10,
 };
-const baseGrid = { color:"rgba(22,163,74,0.07)", drawBorder:false };
-const baseTick = { color:"#9ca3af", font:{family:"'Plus Jakarta Sans',sans-serif", size:11} };
+const baseGrid = { color: "rgba(22,163,74,0.07)", drawBorder: false };
+const baseTick = { color: "#9ca3af", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 } };
 
 function makeBarOpts(delayOffset = 0) {
   return {
     responsive: true,
     animation: {
       duration: 900, easing: "easeOutQuart",
-      delay(ctx) { return ctx.type==="data"&&ctx.mode==="default" ? ctx.dataIndex*80+delayOffset : 0; },
+      delay(ctx) { return ctx.type === "data" && ctx.mode === "default" ? ctx.dataIndex * 80 + delayOffset : 0; },
     },
     plugins: {
       legend: { display: false },
       tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` } },
     },
     scales: {
-      x: { grid:{display:false}, border:{display:false}, ticks:baseTick },
-      y: { grid:baseGrid, border:{display:false},
-        ticks: { ...baseTick, callback:(v)=>v.toLocaleString() },
-        title: { display:true, text:"Volume (t)", color:PALETTE.muted, font:{size:10} },
+      x: { grid: { display: false }, border: { display: false }, ticks: baseTick },
+      y: {
+        grid: baseGrid, border: { display: false },
+        ticks: { ...baseTick, callback: (v) => v.toLocaleString() },
+        title: { display: true, text: "Volume (t)", color: PALETTE.muted, font: { size: 10 } },
       },
     },
   };
@@ -243,12 +244,16 @@ function makeBarOpts(delayOffset = 0) {
 
 const doughnutOpts = {
   responsive: true, cutout: "68%",
-  animation: { duration:1200, easing:"easeOutBack" },
+  animation: { duration: 1200, easing: "easeOutBack" },
   plugins: {
-    legend: { position:"bottom", labels:{ color:PALETTE.muted,
-      font:{family:"'Plus Jakarta Sans',sans-serif",size:11}, padding:14,
-      usePointStyle:true, pointStyleWidth:7 }},
-    tooltip: { ...baseTooltip, callbacks:{ label:(c)=>` ${c.label}: ${c.parsed.toLocaleString()} t` }},
+    legend: {
+      position: "bottom", labels: {
+        color: PALETTE.muted,
+        font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 }, padding: 14,
+        usePointStyle: true, pointStyleWidth: 7
+      }
+    },
+    tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.label}: ${c.parsed.toLocaleString()} t` } },
   },
 };
 
@@ -271,10 +276,10 @@ function AnimCount({ target, duration = 1100 }) {
 
 // ─── Initial form state ───────────────────────────────────────────────────────
 const EMPTY_FORM = {
-  date:"", panneau:"", tranchee:"", niveau:"", volume_soté:"",
-  profendeur:"", equipements:[], conducteur:"", matricule:"",
-  heureDebut:"", heureFin:"", temps:"",
-  etatMachine:"En marche", typeArret:"",
+  date: "", panneau: "", tranchee: "", niveau: "", volume_soté: "",
+  profendeur: "", equipements: [], conducteur: "", matricule: "",
+  heureDebut: "", heureFin: "", temps: "",
+  etatMachine: "En marche", typeArret: "",
 };
 
 // ─── Calc heures from time strings ────────────────────────────────────────────
@@ -293,20 +298,20 @@ function Statistique() {
   const poussages = useSelector((s) => s.poussage?.list || []);
 
   const location = useLocation();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const activeTab = location.pathname === "/statistique" ? "stats"
     : location.pathname === "/historique" ? "historique"
-    : location.pathname === "/couts"      ? "couts"
-    : "overview";
-  const [showForm,  setShowForm]  = useState(false);
+      : location.pathname === "/couts" ? "couts"
+        : "overview";
+  const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  const [equipOpts, setEquipOpts] = useState(["T1","T2","T3","T4","T5","T6","T7"]);
-  const [formData,  setFormData]  = useState(EMPTY_FORM);
+  const [equipOpts, setEquipOpts] = useState(["T1", "T2", "T3", "T4", "T5", "T6", "T7"]);
+  const [formData, setFormData] = useState(EMPTY_FORM);
 
   // ── Cost state ───────────────────────────────────────────────────────────────
-  const [annualCost,  setAnnualCost]  = useState(500000);
-  const [meterCost,   setMeterCost]   = useState(120);
-  const [costSaved,   setCostSaved]   = useState({ annualCost:500000, meterCost:120 });
+  const [annualCost, setAnnualCost] = useState(500000);
+  const [meterCost, setMeterCost] = useState(120);
+  const [costSaved, setCostSaved] = useState({ annualCost: 500000, meterCost: 120 });
 
   const resetForm = () => setFormData(EMPTY_FORM);
 
@@ -316,7 +321,7 @@ function Statistique() {
     const updated = { ...formData, [name]: value };
     if (name === "heureDebut" || name === "heureFin") {
       const debut = name === "heureDebut" ? value : formData.heureDebut;
-      const fin   = name === "heureFin"   ? value : formData.heureFin;
+      const fin = name === "heureFin" ? value : formData.heureFin;
       updated.temps = calcTemps(debut, fin);
     }
     setFormData(updated);
@@ -363,13 +368,13 @@ function Statistique() {
 
   // ── Stats ────────────────────────────────────────────────────────────────────
   const totalVolume = poussages.reduce((a, p) => a + Number(p.volume_soté || 0), 0);
-  const totalTemps  = poussages.reduce((a, p) => a + Number(p.temps || 0), 0);
-  const totalOps    = poussages.length;
-  const rendMoyen   = totalOps > 0
+  const totalTemps = poussages.reduce((a, p) => a + Number(p.temps || 0), 0);
+  const totalOps = poussages.length;
+  const rendMoyen = totalOps > 0
     ? (poussages.reduce((a, p) => {
-        const v = Number(p.volume_soté || 0), t = Number(p.temps || 0);
-        return a + (t > 0 ? v / t : 0);
-      }, 0) / totalOps).toFixed(2)
+      const v = Number(p.volume_soté || 0), t = Number(p.temps || 0);
+      return a + (t > 0 ? v / t : 0);
+    }, 0) / totalOps).toFixed(2)
     : 0;
   const enMarcheCnt = poussages.filter(p => p.etatMachine === "En marche").length;
 
@@ -378,7 +383,7 @@ function Statistique() {
   poussages.forEach(p => (p.equipements || []).forEach(eq => {
     enginStats[eq] = (enginStats[eq] || 0) + Number(p.volume_soté || 0);
   }));
-  const enginLabels  = Object.keys(enginStats);
+  const enginLabels = Object.keys(enginStats);
   const enginVolumes = Object.values(enginStats);
 
   const enginBarData = {
@@ -391,15 +396,17 @@ function Statistique() {
         const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
         g.addColorStop(0, "#16a34a"); g.addColorStop(1, "#4ade80"); return g;
       },
-      borderRadius: { topLeft:8, topRight:8 }, borderSkipped: false,
+      borderRadius: { topLeft: 8, topRight: 8 }, borderSkipped: false,
       barPercentage: 0.6, categoryPercentage: 0.7,
     }],
   };
   const enginDoughnutData = {
     labels: enginLabels,
-    datasets: [{ data: enginVolumes,
-      backgroundColor: ["#16a34a","#22c55e","#4ade80","#86efac","#15803d"],
-      borderWidth: 0, hoverOffset: 10 }],
+    datasets: [{
+      data: enginVolumes,
+      backgroundColor: ["#16a34a", "#22c55e", "#4ade80", "#86efac", "#15803d"],
+      borderWidth: 0, hoverOffset: 10
+    }],
   };
 
   // Tranchées
@@ -409,7 +416,7 @@ function Statistique() {
     if (!trancheeGroups[t]) trancheeGroups[t] = [];
     trancheeGroups[t].push(p);
   });
-  const trancheeKeys    = Object.keys(trancheeGroups);
+  const trancheeKeys = Object.keys(trancheeGroups);
   const trancheeVolumes = trancheeKeys.map(t =>
     trancheeGroups[t].reduce((s, op) => s + Number(op.volume_soté || 0), 0)
   );
@@ -423,7 +430,7 @@ function Statistique() {
         const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
         g.addColorStop(0, "#22c55e"); g.addColorStop(1, "#86efac"); return g;
       },
-      borderRadius: { topLeft:8, topRight:8 }, borderSkipped: false,
+      borderRadius: { topLeft: 8, topRight: 8 }, borderSkipped: false,
       barPercentage: 0.55, categoryPercentage: 0.7,
     }],
   };
@@ -443,14 +450,15 @@ function Statistique() {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Historique");
-    saveAs(new Blob([XLSX.write(wb, { bookType:"xlsx", type:"array" })], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+    saveAs(new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    }),
       "historique_poussage.xlsx");
   };
 
   const anim = (delay) => ({
     style: { animationDelay: delay },
-    ref:   (el) => { if (el) el.style.animationDelay = delay; },
+    ref: (el) => { if (el) el.style.animationDelay = delay; },
   });
 
   // ─── Full table (Saisie + Historique) ────────────────────────────────────────
@@ -482,7 +490,7 @@ function Statistique() {
               <td>{p.tranchee}</td>
               <td>{p.profendeur}</td>
               <td><strong>{Number(p.volume_soté).toLocaleString()}</strong></td>
-              <td style={{ maxWidth:130, overflow:"hidden", textOverflow:"ellipsis" }}>
+              <td style={{ maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis" }}>
                 {p.equipements?.join(", ")}
               </td>
               <td>{p.conducteur}</td>
@@ -532,18 +540,22 @@ function Statistique() {
           ...anim("0s").style,
         }}>
           <div>
-            <div style={{ fontSize:10, fontWeight:700, letterSpacing:".16em",
-              textTransform:"uppercase", color:PALETTE.muted, marginBottom:4 }}>
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: ".16em",
+              textTransform: "uppercase", color: PALETTE.muted, marginBottom: 4
+            }}>
               Tableau de bord
             </div>
-            <h1 style={{ margin:0, fontSize:24, fontWeight:800,
-              background:"linear-gradient(135deg,#15803d,#22c55e)",
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-              Gestion Décapage <span style={{ WebkitTextFillColor:"#16a34a" }}>ZD11</span>
+            <h1 style={{
+              margin: 0, fontSize: 24, fontWeight: 800,
+              background: "linear-gradient(135deg,#15803d,#22c55e)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
+            }}>
+              Gestion Décapage <span style={{ WebkitTextFillColor: "#16a34a" }}>ZD11</span>
             </h1>
           </div>
           <img src={image} alt="logo" style={{
-            height:46, borderRadius:10, boxShadow:"0 4px 14px rgba(22,163,74,0.2)",
+            height: 46, borderRadius: 10, boxShadow: "0 4px 14px rgba(22,163,74,0.2)",
           }} />
         </div>
 
@@ -553,27 +565,27 @@ function Statistique() {
         ══════════════════════════════════════════════════════════════════════ */}
         {activeTab === "overview" && (
           <>
-            <div className="db-grid3" style={{ marginBottom:24 }}>
+            <div className="db-grid3" style={{ marginBottom: 24 }}>
               {[
-                { icon:"⛏️", label:"Volume Total",    value:totalVolume,          unit:"t",   accent:"#16a34a", delay:"0.08s" },
-                { icon:"⏱️", label:"Temps Total",     value:totalTemps,           unit:"h",   accent:"#15803d", delay:"0.16s" },
-                { icon:"📈", label:"Rendement Moyen", value:parseFloat(rendMoyen),unit:"t/h", accent:"#22c55e", delay:"0.24s" },
-                { icon:"🔢", label:"Opérations",      value:totalOps,             unit:"op",  accent:"#4ade80", delay:"0.32s" },
-                { icon:"✅", label:"En Marche",       value:enMarcheCnt,          unit:"",    accent:"#86efac", delay:"0.40s" },
+                { icon: "⛏️", label: "Volume Total", value: totalVolume, unit: "t", accent: "#16a34a", delay: "0.08s" },
+                { icon: "⏱️", label: "Temps Total", value: totalTemps, unit: "h", accent: "#15803d", delay: "0.16s" },
+                { icon: "📈", label: "Rendement Moyen", value: parseFloat(rendMoyen), unit: "t/h", accent: "#22c55e", delay: "0.24s" },
+                { icon: "🔢", label: "Opérations", value: totalOps, unit: "op", accent: "#4ade80", delay: "0.32s" },
+                { icon: "✅", label: "En Marche", value: enMarcheCnt, unit: "", accent: "#86efac", delay: "0.40s" },
               ].map(({ icon, label, value, unit, accent, delay }) => (
-                <div key={label} className="db-kpi" style={{ animationDelay:delay }}>
-                  <div className="db-kpi-shimmer"/>
+                <div key={label} className="db-kpi" style={{ animationDelay: delay }}>
+                  <div className="db-kpi-shimmer" />
                   <div className="db-kpi-icon">{icon}</div>
                   <div className="db-kpi-label">{label}</div>
-                  <div className="db-kpi-value" style={{ color:accent, animationDelay:delay }}>
-                    <AnimCount target={value}/>
+                  <div className="db-kpi-value" style={{ color: accent, animationDelay: delay }}>
+                    <AnimCount target={value} />
                     <span className="db-kpi-unit">{unit}</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="db-grid2" style={{ marginBottom:20 }}>
+            <div className="db-grid2" style={{ marginBottom: 20 }}>
               <div className="db-card" {...anim("0.18s")}>
                 <div className="db-card-header">
                   <div>
@@ -585,7 +597,7 @@ function Statistique() {
                   )}
                 </div>
                 {enginLabels.length > 0
-                  ? <Bar data={enginBarData} options={makeBarOpts(300)}/>
+                  ? <Bar data={enginBarData} options={makeBarOpts(300)} />
                   : <div className="db-empty">Aucune donnée</div>}
               </div>
               <div className="db-card" {...anim("0.28s")}>
@@ -596,37 +608,39 @@ function Statistique() {
                   </div>
                 </div>
                 {enginLabels.length > 0
-                  ? <div style={{ maxWidth:280, margin:"0 auto" }}>
-                      <Doughnut data={enginDoughnutData} options={doughnutOpts}/>
-                    </div>
+                  ? <div style={{ maxWidth: 280, margin: "0 auto" }}>
+                    <Doughnut data={enginDoughnutData} options={doughnutOpts} />
+                  </div>
                   : <div className="db-empty">Aucune donnée</div>}
               </div>
             </div>
 
             {trancheeKeys.length > 0 && (
-              <div className="db-card" {...anim("0.36s")} style={{ marginBottom:20 }}>
+              <div className="db-card" {...anim("0.36s")} style={{ marginBottom: 20 }}>
                 <p className="db-card-title">Volume Total par Tranchée</p>
                 <p className="db-card-sub">Comparaison globale des volumes soutirés</p>
-                <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
+                <Bar data={trancheeBarData} options={makeBarOpts(200)} />
               </div>
             )}
 
             <div className="db-section">Dernières opérations</div>
             <div className="db-card" {...anim("0.42s")}>
-              <div style={{ display:"flex", justifyContent:"space-between",
-                alignItems:"center", marginBottom:16 }}>
-                <p className="db-card-title" style={{ margin:0 }}>
+              <div style={{
+                display: "flex", justifyContent: "space-between",
+                alignItems: "center", marginBottom: 16
+              }}>
+                <p className="db-card-title" style={{ margin: 0 }}>
                   {recentPoussages.length} opération{recentPoussages.length !== 1 ? "s" : ""} récentes
                 </p>
-                <div style={{ display:"flex", gap:8 }}>
+                <div style={{ display: "flex", gap: 8 }}>
                   <button className="db-btn-secondary"
                     onClick={() => navigate("/historique")}
-                    style={{ fontSize:12, padding:"6px 12px" }}>
+                    style={{ fontSize: 12, padding: "6px 12px" }}>
                     Voir tout →
                   </button>
                   <button className="db-btn-primary"
                     onClick={() => { navigate("/"); setShowForm(true); }}
-                    style={{ fontSize:12, padding:"6px 12px" }}>
+                    style={{ fontSize: 12, padding: "6px 12px" }}>
                     + Ajouter
                   </button>
                 </div>
@@ -640,7 +654,7 @@ function Statistique() {
                     </tr></thead>
                     <tbody>
                       {recentPoussages.map((p, i) => (
-                        <tr key={i} style={{ animationDelay:`${i * 0.06}s` }}>
+                        <tr key={i} style={{ animationDelay: `${i * 0.06}s` }}>
                           <td>{p.date}</td>
                           <td>{p.panneau}</td>
                           <td>{p.tranchee}</td>
@@ -668,9 +682,11 @@ function Statistique() {
         ══════════════════════════════════════════════════════════════════════ */}
         {activeTab === "saisie" && (
           <>
-            <div style={{ display:"flex", justifyContent:"space-between",
-              alignItems:"center", marginBottom:16 }}>
-              <h2 style={{ margin:0, fontSize:17, fontWeight:700, color:PALETTE.text }}>
+            <div style={{
+              display: "flex", justifyContent: "space-between",
+              alignItems: "center", marginBottom: 16
+            }}>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: PALETTE.text }}>
                 {editIndex !== null ? "✏️ Modifier le poussage" : "➕ Nouveau poussage"}
               </h2>
               {!showForm && (
@@ -689,81 +705,65 @@ function Statistique() {
                     <div>
                       <label className="db-form-label">Date</label>
                       <input className="db-form-input" type="date" name="date"
-                        value={formData.date} onChange={handleChange} required/>
+                        value={formData.date} onChange={handleChange} required />
                     </div>
 
                     {/* Panneau */}
                     <div>
                       <label className="db-form-label">Panneau</label>
                       <input className="db-form-input" type="text" name="panneau"
-                        value={formData.panneau} onChange={handleChange}/>
+                        value={formData.panneau} onChange={handleChange} />
                     </div>
 
                     {/* Tranchée */}
                     <div>
                       <label className="db-form-label">Tranchée</label>
                       <input className="db-form-input" type="text" name="tranchee"
-                        value={formData.tranchee} onChange={handleChange}/>
+                        value={formData.tranchee} onChange={handleChange} />
                     </div>
 
                     {/* Profondeur */}
                     <div>
                       <label className="db-form-label">Profondeur</label>
                       <input className="db-form-input" type="text" name="profendeur"
-                        value={formData.profendeur} onChange={handleChange}/>
+                        value={formData.profendeur} onChange={handleChange} />
                     </div>
 
                     {/* Volume */}
                     <div>
                       <label className="db-form-label">Volume Soté (t)</label>
                       <input className="db-form-input" type="number" name="volume_soté"
-                        value={formData.volume_soté} onChange={handleChange} required/>
+                        value={formData.volume_soté} onChange={handleChange} required />
                     </div>
 
                     {/* Heure début */}
                     <div>
                       <label className="db-form-label">Heure de Début</label>
                       <input className="db-form-input" type="time" name="heureDebut"
-                        value={formData.heureDebut} onChange={handleChange}/>
+                        value={formData.heureDebut} onChange={handleChange} />
                     </div>
 
                     {/* Heure fin */}
                     <div>
                       <label className="db-form-label">Heure de Fin</label>
                       <input className="db-form-input" type="time" name="heureFin"
-                        value={formData.heureFin} onChange={handleChange}/>
+                        value={formData.heureFin} onChange={handleChange} />
                     </div>
 
-                    {/* Heures de marche — auto */}
-                    <div>
-                      <label className="db-form-label">
-                        Heures de Marche
-                        <span className="db-auto-badge">AUTO</span>
-                      </label>
-                      <input
-                        className="db-form-input"
-                        type="number"
-                        name="temps"
-                        value={formData.temps}
-                        onChange={handleChange}
-                        placeholder="Calculé automatiquement"
-                        readOnly={!!(formData.heureDebut && formData.heureFin)}
-                        required
-                      />
-                    </div>
+
 
                     {/* Conducteur */}
                     <div>
                       <label className="db-form-label">Conducteur</label>
                       <input className="db-form-input" type="text" name="conducteur"
-                        value={formData.conducteur} onChange={handleChange}/>
+                        value={formData.conducteur} onChange={handleChange} />
                     </div>
 
                     {/* Matricule */}
                     <div>
                       <label className="db-form-label">Matricule</label>
                       <input className="db-form-input" type="text" name="matricule"
-                        value={formData.matricule} onChange={handleChange}/>
+                        value={formData.matricule} onChange={handleChange} />
                     </div>
 
                     {/* État machine */}
@@ -781,14 +781,14 @@ function Statistique() {
                       <div>
                         <label className="db-form-label">Nature d'arrêt</label>
                         <input className="db-form-input" type="text" name="typeArret"
-                          value={formData.typeArret} onChange={handleChange}/>
+                          value={formData.typeArret} onChange={handleChange} />
                       </div>
                     )}
 
                   </div>
 
                   {/* Équipements */}
-                  <div style={{ marginTop:18 }}>
+                  <div style={{ marginTop: 18 }}>
                     <label className="db-form-label">Équipements</label>
                     <div className="db-equip-grid">
                       {equipOpts.map((eq, i) => (
@@ -804,14 +804,20 @@ function Statistique() {
                     </div>
                   </div>
 
-                  {/* Rendement banner */}
-                  <div className="db-rendement-banner" style={{ marginTop:20 }}>
-                    <div className="db-rendement-value">{rendement}</div>
-                    <div className="db-rendement-label">t/h — Rendement instantané</div>
+                  {/* Bannière de calculs (Rendement + Heures) */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginTop: 20 }}>
+                    <div className="db-rendement-banner" style={{ margin: 0 }}>
+                      <div className="db-rendement-value">{formData.temps || 0}</div>
+                      <div className="db-rendement-label">h — Heures de marche</div>
+                    </div>
+                    <div className="db-rendement-banner" style={{ margin: 0 }}>
+                      <div className="db-rendement-value">{rendement}</div>
+                      <div className="db-rendement-label">t/h — Rendement instantané</div>
+                    </div>
                   </div>
 
                   {/* Submit */}
-                  <div style={{ display:"flex", gap:10, marginTop:20 }}>
+                  <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
                     <button type="submit" className="db-btn-primary">
                       {editIndex !== null ? "💾 Mettre à jour" : "✅ Enregistrer"}
                     </button>
@@ -828,7 +834,7 @@ function Statistique() {
             <div className="db-section">Liste des poussages</div>
             <div className="db-card" {...anim("0.1s")}>
               {poussages.length > 0 ? (
-                <FullTable data={poussages} showActions={true}/>
+                <FullTable data={poussages} showActions={true} />
               ) : (
                 <div className="db-empty">
                   Aucun poussage enregistré. Cliquez sur "Ajouter les données" pour commencer.
@@ -843,9 +849,11 @@ function Statistique() {
         ══════════════════════════════════════════════════════════════════════ */}
         {activeTab === "historique" && (
           <>
-            <div style={{ display:"flex", justifyContent:"space-between",
-              alignItems:"center", marginBottom:20 }}>
-              <h2 style={{ margin:0, fontSize:17, fontWeight:700, color:PALETTE.text }}>
+            <div style={{
+              display: "flex", justifyContent: "space-between",
+              alignItems: "center", marginBottom: 20
+            }}>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: PALETTE.text }}>
                 Historique Décapage — {poussages.length} enregistrement{poussages.length !== 1 ? "s" : ""}
               </h2>
               <button className="db-btn-excel" onClick={exportExcel}>
@@ -854,7 +862,7 @@ function Statistique() {
             </div>
             <div className="db-card" {...anim("0.1s")}>
               {poussages.length > 0 ? (
-                <FullTable data={[...poussages].reverse()} showActions={false}/>
+                <FullTable data={[...poussages].reverse()} showActions={false} />
               ) : (
                 <div className="db-empty">Aucun historique disponible.</div>
               )}
@@ -867,18 +875,18 @@ function Statistique() {
         ══════════════════════════════════════════════════════════════════════ */}
         {activeTab === "stats" && (
           <>
-            <div className="db-grid3" style={{ marginBottom:24 }}>
+            <div className="db-grid3" style={{ marginBottom: 24 }}>
               {[
-                { icon:"⛏️", label:"Volume Total",    value:totalVolume,          unit:"t",   accent:"#16a34a", delay:"0.08s" },
-                { icon:"⏱️", label:"Temps Total",     value:totalTemps,           unit:"h",   accent:"#15803d", delay:"0.16s" },
-                { icon:"📈", label:"Rendement Moyen", value:parseFloat(rendMoyen),unit:"t/h", accent:"#22c55e", delay:"0.24s" },
+                { icon: "⛏️", label: "Volume Total", value: totalVolume, unit: "t", accent: "#16a34a", delay: "0.08s" },
+                { icon: "⏱️", label: "Temps Total", value: totalTemps, unit: "h", accent: "#15803d", delay: "0.16s" },
+                { icon: "📈", label: "Rendement Moyen", value: parseFloat(rendMoyen), unit: "t/h", accent: "#22c55e", delay: "0.24s" },
               ].map(({ icon, label, value, unit, accent, delay }) => (
-                <div key={label} className="db-kpi" style={{ animationDelay:delay }}>
-                  <div className="db-kpi-shimmer"/>
+                <div key={label} className="db-kpi" style={{ animationDelay: delay }}>
+                  <div className="db-kpi-shimmer" />
                   <div className="db-kpi-icon">{icon}</div>
                   <div className="db-kpi-label">{label}</div>
-                  <div className="db-kpi-value" style={{ color:accent, animationDelay:delay }}>
-                    <AnimCount target={value}/>
+                  <div className="db-kpi-value" style={{ color: accent, animationDelay: delay }}>
+                    <AnimCount target={value} />
                     <span className="db-kpi-unit">{unit}</span>
                   </div>
                 </div>
@@ -886,7 +894,7 @@ function Statistique() {
             </div>
 
             <div className="db-section">Analyse par Engin</div>
-            <div className="db-grid2" style={{ marginBottom:20 }}>
+            <div className="db-grid2" style={{ marginBottom: 20 }}>
               <div className="db-card" {...anim("0.18s")}>
                 <div className="db-card-header">
                   <div>
@@ -898,34 +906,34 @@ function Statistique() {
                   )}
                 </div>
                 {enginLabels.length > 0
-                  ? <Bar data={enginBarData} options={makeBarOpts(300)}/>
+                  ? <Bar data={enginBarData} options={makeBarOpts(300)} />
                   : <div className="db-empty">Aucune donnée disponible</div>}
               </div>
               <div className="db-card" {...anim("0.28s")}>
                 <p className="db-card-title">Part de Volume par Engin</p>
                 <p className="db-card-sub">Distribution proportionnelle</p>
                 {enginLabels.length > 0
-                  ? <div style={{ maxWidth:300, margin:"0 auto" }}>
-                      <Doughnut data={enginDoughnutData} options={doughnutOpts}/>
-                    </div>
+                  ? <div style={{ maxWidth: 300, margin: "0 auto" }}>
+                    <Doughnut data={enginDoughnutData} options={doughnutOpts} />
+                  </div>
                   : <div className="db-empty">Aucune donnée disponible</div>}
               </div>
             </div>
 
             <div className="db-section">Analyse par Tranchée</div>
             {trancheeKeys.length > 0 && (
-              <div className="db-card" {...anim("0.32s")} style={{ marginBottom:20 }}>
+              <div className="db-card" {...anim("0.32s")} style={{ marginBottom: 20 }}>
                 <p className="db-card-title">Volume Total par Tranchée</p>
                 <p className="db-card-sub">Comparaison globale des volumes soutirés</p>
-                <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
+                <Bar data={trancheeBarData} options={makeBarOpts(200)} />
               </div>
             )}
 
             <div className="db-grid2">
               {trancheeKeys.map((tranchee, idx) => {
-                const ops     = trancheeGroups[tranchee];
-                const color   = TRANCHEE_COLORS[idx % TRANCHEE_COLORS.length];
-                const labels  = ops.map((_, i) => `Op ${i + 1}`);
+                const ops = trancheeGroups[tranchee];
+                const color = TRANCHEE_COLORS[idx % TRANCHEE_COLORS.length];
+                const labels = ops.map((_, i) => `Op ${i + 1}`);
                 const volumes = ops.map(op => Number(op.volume_soté || 0));
                 const lineData = {
                   labels,
@@ -939,13 +947,17 @@ function Statistique() {
                 };
                 const lineOpts = {
                   responsive: true,
-                  animation: { duration:1000, easing:"easeOutQuart",
-                    delay(ctx) { return ctx.type==="data"&&ctx.mode==="default" ? ctx.dataIndex*60+idx*100 : 0; }},
-                  plugins: { legend:{ display:false },
-                    tooltip: { ...baseTooltip, callbacks:{ label:(c)=>` ${c.parsed.y.toLocaleString()} t` }}},
+                  animation: {
+                    duration: 1000, easing: "easeOutQuart",
+                    delay(ctx) { return ctx.type === "data" && ctx.mode === "default" ? ctx.dataIndex * 60 + idx * 100 : 0; }
+                  },
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` } }
+                  },
                   scales: {
-                    x: { grid:{display:false}, border:{display:false}, ticks:baseTick },
-                    y: { grid:baseGrid, border:{display:false}, ticks:baseTick },
+                    x: { grid: { display: false }, border: { display: false }, ticks: baseTick },
+                    y: { grid: baseGrid, border: { display: false }, ticks: baseTick },
                   },
                 };
                 return (
@@ -953,21 +965,21 @@ function Statistique() {
                     ref={(el) => { if (el) el.style.animationDelay = `${0.36 + idx * 0.1}s`; }}>
                     <div className="db-card-header">
                       <div>
-                        <p className="db-card-title" style={{ color:color.main }}>Tranchée {tranchee}</p>
+                        <p className="db-card-title" style={{ color: color.main }}>Tranchée {tranchee}</p>
                         <p className="db-card-sub">
                           {ops.length} opération{ops.length > 1 ? "s" : ""} · courbe d'évolution
                         </p>
                       </div>
-                      <span className="db-pill" style={{ background:color.dim, color:color.main }}>
+                      <span className="db-pill" style={{ background: color.dim, color: color.main }}>
                         {volumes.reduce((a, b) => a + b, 0).toLocaleString()} t
                       </span>
                     </div>
-                    <Line data={lineData} options={lineOpts}/>
+                    <Line data={lineData} options={lineOpts} />
                   </div>
                 );
               })}
               {trancheeKeys.length === 0 && (
-                <div className="db-empty" style={{ gridColumn:"1/-1" }}>
+                <div className="db-empty" style={{ gridColumn: "1/-1" }}>
                   Aucune donnée de tranchée disponible
                 </div>
               )}
@@ -981,32 +993,32 @@ function Statistique() {
         {activeTab === "couts" && (
           <>
             {/* Page title */}
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-              <h2 style={{ margin:0, fontSize:17, fontWeight:700, color:"#14532d" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#14532d" }}>
                 Suivi des Coûts
               </h2>
             </div>
 
             {/* ── KPI Summary ─────────────────────────────────────────────────── */}
             {(() => {
-              const totalMeters   = poussages.reduce((a, p) => a + Number(p.profendeur || 0), 0);
-              const coutForage    = totalMeters * costSaved.meterCost;
-              const coutAnnuel    = costSaved.annualCost;
-              const coutTotal     = coutAnnuel + coutForage;
-              const pct           = Math.min((coutTotal / (coutAnnuel * 1.5)) * 100, 100);
-              const coutParTonne  = totalVolume > 0 ? (coutTotal / totalVolume).toFixed(2) : 0;
+              const totalMeters = poussages.reduce((a, p) => a + Number(p.profendeur || 0), 0);
+              const coutForage = totalMeters * costSaved.meterCost;
+              const coutAnnuel = costSaved.annualCost;
+              const coutTotal = coutAnnuel + coutForage;
+              const pct = Math.min((coutTotal / (coutAnnuel * 1.5)) * 100, 100);
+              const coutParTonne = totalVolume > 0 ? (coutTotal / totalVolume).toFixed(2) : 0;
 
               // Monthly breakdown for chart
               const monthlyMap = {};
               poussages.forEach(p => {
                 const m = p.date ? p.date.slice(0, 7) : "N/A";
-                if (!monthlyMap[m]) monthlyMap[m] = { forages:0, meters:0 };
+                if (!monthlyMap[m]) monthlyMap[m] = { forages: 0, meters: 0 };
                 monthlyMap[m].forages += 1;
-                monthlyMap[m].meters  += Number(p.profendeur || 0);
+                monthlyMap[m].meters += Number(p.profendeur || 0);
               });
-              const monthLabels   = Object.keys(monthlyMap).sort();
-              const monthCosts    = monthLabels.map(m => monthlyMap[m].meters * costSaved.meterCost);
-              const monthFixed    = monthLabels.map(() => coutAnnuel / 12);
+              const monthLabels = Object.keys(monthlyMap).sort();
+              const monthCosts = monthLabels.map(m => monthlyMap[m].meters * costSaved.meterCost);
+              const monthFixed = monthLabels.map(() => coutAnnuel / 12);
 
               const chartData = {
                 labels: monthLabels.length > 0 ? monthLabels : ["Aucune donnée"],
@@ -1020,7 +1032,7 @@ function Statistique() {
                       const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
                       g.addColorStop(0, "#16a34a"); g.addColorStop(1, "#4ade80"); return g;
                     },
-                    borderRadius: { topLeft:8, topRight:8 },
+                    borderRadius: { topLeft: 8, topRight: 8 },
                     borderSkipped: false,
                     barPercentage: 0.55,
                     categoryPercentage: 0.7,
@@ -1029,7 +1041,7 @@ function Statistique() {
                     label: "Coût Fixe Mensuel (MAD)",
                     data: monthFixed.length > 0 ? monthFixed : [0],
                     backgroundColor: "rgba(134,239,172,0.55)",
-                    borderRadius: { topLeft:8, topRight:8 },
+                    borderRadius: { topLeft: 8, topRight: 8 },
                     borderSkipped: false,
                     barPercentage: 0.55,
                     categoryPercentage: 0.7,
@@ -1040,14 +1052,16 @@ function Statistique() {
               const chartOpts = {
                 responsive: true,
                 plugins: {
-                  legend: { position:"bottom", labels:{ color:"#6b7280", font:{ size:11 }, padding:14, usePointStyle:true } },
-                  tooltip: { ...baseTooltip, callbacks:{ label:(c) => ` ${c.parsed.y.toLocaleString()} MAD` } },
+                  legend: { position: "bottom", labels: { color: "#6b7280", font: { size: 11 }, padding: 14, usePointStyle: true } },
+                  tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} MAD` } },
                 },
                 scales: {
-                  x: { grid:{ display:false }, border:{ display:false }, ticks:baseTick },
-                  y: { grid:baseGrid, border:{ display:false },
-                    ticks:{ ...baseTick, callback:(v) => `${(v/1000).toFixed(0)}k` },
-                    title:{ display:true, text:"MAD", color:"#9ca3af", font:{ size:10 } } },
+                  x: { grid: { display: false }, border: { display: false }, ticks: baseTick },
+                  y: {
+                    grid: baseGrid, border: { display: false },
+                    ticks: { ...baseTick, callback: (v) => `${(v / 1000).toFixed(0)}k` },
+                    title: { display: true, text: "MAD", color: "#9ca3af", font: { size: 10 } }
+                  },
                 },
               };
 
@@ -1056,36 +1070,36 @@ function Statistique() {
                   {/* KPI row */}
                   <div className="db-cost-summary">
                     {[
-                      { label:"Coût Total",      value:(coutTotal/1000).toFixed(1), unit:"k MAD",  delay:"0.08s" },
-                      { label:"Coût Forage",     value:(coutForage/1000).toFixed(1),unit:"k MAD",  delay:"0.14s" },
-                      { label:"Coût / Tonne",    value:coutParTonne,                unit:"MAD/t",  delay:"0.20s" },
-                      { label:"Mètres Forés",    value:totalMeters.toLocaleString(),unit:"m",      delay:"0.26s" },
+                      { label: "Coût Total", value: (coutTotal / 1000).toFixed(1), unit: "k MAD", delay: "0.08s" },
+                      { label: "Coût Forage", value: (coutForage / 1000).toFixed(1), unit: "k MAD", delay: "0.14s" },
+                      { label: "Coût / Tonne", value: coutParTonne, unit: "MAD/t", delay: "0.20s" },
+                      { label: "Mètres Forés", value: totalMeters.toLocaleString(), unit: "m", delay: "0.26s" },
                     ].map(({ label, value, unit, delay }) => (
-                      <div key={label} className="db-cost-stat" style={{ animationDelay:delay }}>
+                      <div key={label} className="db-cost-stat" style={{ animationDelay: delay }}>
                         <div className="db-cost-stat-label">{label}</div>
                         <div className="db-cost-stat-value">
                           {value}
                           <span className="db-cost-stat-unit">{unit}</span>
                         </div>
                         <div className="db-cost-progress-wrap">
-                          <div className="db-cost-progress-bar" style={{ width:`${pct}%` }} />
+                          <div className="db-cost-progress-bar" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Params + Chart */}
-                  <div className="db-grid2" style={{ marginBottom:20 }}>
+                  <div className="db-grid2" style={{ marginBottom: 20 }}>
 
                     {/* Paramètres */}
-                    <div className="db-card" style={{ animationDelay:"0.12s" }}>
-                      <div className="db-card-header" style={{ marginBottom:16 }}>
+                    <div className="db-card" style={{ animationDelay: "0.12s" }}>
+                      <div className="db-card-header" style={{ marginBottom: 16 }}>
                         <div>
                           <p className="db-card-title">⚙️ Paramètres de Coût</p>
                           <p className="db-card-sub">Définissez les bases de calcul</p>
                         </div>
                       </div>
-                      <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                         <div>
                           <label className="db-cost-label">Anticipation coût annuel (MAD)</label>
                           <input
@@ -1104,36 +1118,40 @@ function Statistique() {
                             onChange={(e) => setMeterCost(Number(e.target.value))}
                           />
                         </div>
-                        <div style={{ paddingTop:4 }}>
+                        <div style={{ paddingTop: 4 }}>
                           <button
                             className="db-btn-primary"
                             onClick={() => setCostSaved({ annualCost, meterCost })}
-                            style={{ width:"100%", justifyContent:"center" }}>
+                            style={{ width: "100%", justifyContent: "center" }}>
                             ✅ Mettre à jour les calculs
                           </button>
                         </div>
                         {/* Live preview */}
-                        <div style={{ background:"#f0fdf4", borderRadius:12, padding:"14px 16px",
-                          border:"1.5px solid #bbf7d0", marginTop:4 }}>
-                          <div style={{ fontSize:10, fontWeight:700, letterSpacing:".1em",
-                            textTransform:"uppercase", color:"#9ca3af", marginBottom:8 }}>
+                        <div style={{
+                          background: "#f0fdf4", borderRadius: 12, padding: "14px 16px",
+                          border: "1.5px solid #bbf7d0", marginTop: 4
+                        }}>
+                          <div style={{
+                            fontSize: 10, fontWeight: 700, letterSpacing: ".1em",
+                            textTransform: "uppercase", color: "#9ca3af", marginBottom: 8
+                          }}>
                             Aperçu en direct
                           </div>
-                          <div style={{ display:"flex", justifyContent:"space-between", fontSize:13, color:"#374151", marginBottom:4 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#374151", marginBottom: 4 }}>
                             <span>Coût mensuel estimé</span>
-                            <strong style={{ color:"#15803d" }}>{(annualCost/12).toLocaleString(undefined,{maximumFractionDigits:0})} MAD</strong>
+                            <strong style={{ color: "#15803d" }}>{(annualCost / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })} MAD</strong>
                           </div>
-                          <div style={{ display:"flex", justifyContent:"space-between", fontSize:13, color:"#374151" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#374151" }}>
                             <span>Coût forage total ({totalMeters} m)</span>
-                            <strong style={{ color:"#15803d" }}>{(totalMeters * meterCost).toLocaleString()} MAD</strong>
+                            <strong style={{ color: "#15803d" }}>{(totalMeters * meterCost).toLocaleString()} MAD</strong>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Chart */}
-                    <div className="db-card" style={{ animationDelay:"0.22s" }}>
-                      <div className="db-card-header" style={{ marginBottom:16 }}>
+                    <div className="db-card" style={{ animationDelay: "0.22s" }}>
+                      <div className="db-card-header" style={{ marginBottom: 16 }}>
                         <div>
                           <p className="db-card-title">📊 Évolution Mensuelle des Coûts</p>
                           <p className="db-card-sub">Coût forage vs coût fixe mensuel</p>
@@ -1143,7 +1161,7 @@ function Statistique() {
                         )}
                       </div>
                       {monthLabels.length > 0
-                        ? <Bar data={chartData} options={chartOpts}/>
+                        ? <Bar data={chartData} options={chartOpts} />
                         : <div className="db-empty">Aucune donnée — ajoutez des poussages</div>
                       }
                     </div>
@@ -1152,7 +1170,7 @@ function Statistique() {
 
                   {/* Détail par opération */}
                   <div className="db-section">Détail des coûts par opération</div>
-                  <div className="db-card" style={{ animationDelay:"0.28s" }}>
+                  <div className="db-card" style={{ animationDelay: "0.28s" }}>
                     {poussages.length > 0 ? (
                       <div className="db-table-wrap">
                         <table className="db-table">
@@ -1168,17 +1186,17 @@ function Statistique() {
                           </tr></thead>
                           <tbody>
                             {[...poussages].reverse().map((p, i) => {
-                              const meters    = Number(p.profendeur || 0);
-                              const coutOp    = meters * costSaved.meterCost;
-                              const vol       = Number(p.volume_soté || 0);
+                              const meters = Number(p.profendeur || 0);
+                              const coutOp = meters * costSaved.meterCost;
+                              const vol = Number(p.volume_soté || 0);
                               const coutTonne = vol > 0 ? (coutOp / vol).toFixed(2) : "—";
                               return (
-                                <tr key={i} style={{ animationDelay:`${i * 0.03}s` }}>
+                                <tr key={i} style={{ animationDelay: `${i * 0.03}s` }}>
                                   <td>{p.date}</td>
                                   <td>{p.panneau}</td>
                                   <td>{p.tranchee}</td>
                                   <td><strong>{meters}</strong> m</td>
-                                  <td><strong style={{ color:"#15803d" }}>{coutOp.toLocaleString()}</strong> MAD</td>
+                                  <td><strong style={{ color: "#15803d" }}>{coutOp.toLocaleString()}</strong> MAD</td>
                                   <td>{vol.toLocaleString()} t</td>
                                   <td>{coutTonne !== "—" ? `${coutTonne} MAD/t` : "—"}</td>
                                   <td>
