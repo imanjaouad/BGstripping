@@ -270,7 +270,7 @@ function Dashboard() {
           </div>
           <div>
             <label className="db-form-label">HTP</label>
-            <input type="number" step="0.01" min="0" max="8" className="db-form-input" name="htp"
+            <input type="number" step="01" min="0" max="8" className="db-form-input" name="htp"
               value={formData.htp} onChange={handleChange} placeholder="Saisir le htp" />
           </div>
 
