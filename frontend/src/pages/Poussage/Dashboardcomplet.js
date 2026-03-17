@@ -706,7 +706,7 @@ function CostEvolution() {
 
 // ─── Initial form state ───────────────────────────────────────────────────────
 const EMPTY_FORM = {
-  date:"", panneau:"", tranchee:"", niveau:"", volume_soté:"",
+  date:"", panneau:"", tranchee:"", niveau:"", htp:"", volume_soté:"",
   profendeur:"", equipements:[], conducteur:"", matricule:"",
   heureDebut:"", heureFin:"", temps:"",
   etatMachine:"En marche", typeArret:"",
@@ -1078,6 +1078,7 @@ function DashboardComplet() {
                         <th>Date</th>
                         <th>Panneau</th>
                         <th>Tranchée</th>
+                        <th>HTP</th>
                         <th>Volume</th>
                         <th>Rendement</th>
                         <th>État</th>
@@ -1091,6 +1092,7 @@ function DashboardComplet() {
                           <td>{p.date}</td>
                           <td>{p.panneau}</td>
                           <td>{p.tranchee}</td>
+                          <td>{p.HTP || "—"}</td>
                           <td><strong>{Number(p.volume_soté).toLocaleString()}</strong> t</td>
                           <td>{p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0} t/h</td>
                           <td>

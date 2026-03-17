@@ -61,10 +61,10 @@ function Historique() {
       Date: p.date,
       Panneau: p.panneau,
       Tranchee: p.tranchee,
-      Profendeur: p.profendeur,
       Equipements: p.equipements?.join(", "),
       Conducteur: p.conducteur,
       Matricule: p.matricule,
+      "HTP": p.HTP,
       Volume: p.volume_soté,
 
       Temps: p.temps,
@@ -187,10 +187,10 @@ function Historique() {
               <th>Date</th>
               <th>Panneau</th>
               <th>Tranchée</th>
-              <th>Profendeur</th>
               <th>Équipements</th>
               <th>Conducteur</th>
               <th>Matricule</th>
+              <th>HTP</th>
               <th>Volume</th>
 
               <th>Heures</th>
@@ -205,10 +205,10 @@ function Historique() {
                   <td>{p.date}</td>
                   <td>{p.panneau}</td>
                   <td>{p.tranchee}</td>
-                  <td>{p.profendeur}</td>
                   <td>{p.equipements?.join(", ")}</td>
                   <td>{p.conducteur}</td>
                   <td>{p.matricule}</td>
+                  <td>{p.HTP || "—"}</td>
                   <td>{p.volume_soté}</td>
 
                   <td>{p.temps}</td>
