@@ -13,7 +13,7 @@ function Dashboard() {
   }, [dispatch]);
 
   const [editIndex, setEditIndex] = useState(null);
-  const [editId, setEditId]       = useState(null);
+  const [editId, setEditId] = useState(null);
 
   const [equipementOptions, setEquipementOptions] = useState([
     "T1", "T2", "T3", "T4", "T5", "T6", "T7",
@@ -21,26 +21,27 @@ function Dashboard() {
 
   // Noms de champs = exactement les clés attendues par la validation Laravel
   const emptyForm = {
-    date:            "",
-    panneau:         "",
-    tranchee:        "",
-    niveau:          "",
-    volume_sote:     "",    // ← clé corrigée (était volume_soté)
-    profondeur:      "",    // ← clé corrigée (était profendeur)
-    equipements:     [],
-    conducteur:      "",
-    matricule:       "",
-    machine_id:      "",    // ← ajouté (requis par le backend)
-    heureDebut:      "",
-    heureFin:        "",
-    temps:           "",
-    compteur_debut:  "",    // ← clé corrigée (était compteurDebut)
-    compteur_fin:    "",    // ← clé corrigée (était compteurFin)
-    poste:           "",
-    etat_machine:    "En marche",   // ← clé corrigée (était etatMachine)
-    type_arret:      "",            // ← clé corrigée (était typeArret)
+    date: "",
+    panneau: "",
+    tranchee: "",
+    niveau: "",
+    volume_sote: "",    // ← clé corrigée (était volume_soté)
+    profondeur: "",    // ← clé corrigée (était profendeur)
+    equipements: [],
+    conducteur: "",
+    matricule: "",
+    machine_id: "",    // ← ajouté (requis par le backend)
+    heureDebut: "",
+    heureFin: "",
+    temps: "",
+    compteur_debut: "",    // ← clé corrigée (était compteurDebut)
+    compteur_fin: "",    // ← clé corrigée (était compteurFin)
+    poste: "",
+    etat_machine: "En marche",   // ← clé corrigée (était etatMachine)
+    type_arret: "",            // ← clé corrigée (était typeArret)
     heureDebutArret: "",
-    heureFinArret:   "",
+    heureFinArret: "",
+    htp: "",    // ← ajouté
   };
 
   const [formData, setFormData] = useState(emptyForm);
@@ -61,15 +62,15 @@ function Dashboard() {
 
     if (name === "heureDebut" || name === "heureFin") {
       const debut = name === "heureDebut" ? value : formData.heureDebut;
-      const fin   = name === "heureFin"   ? value : formData.heureFin;
+      const fin = name === "heureFin" ? value : formData.heureFin;
       updated.temps = calcTemps(debut, fin);
     }
 
     // Réinitialiser les champs d'arrêt quand on repasse à "En marche"
     if (name === "etat_machine" && value === "En marche") {
-      updated.type_arret       = "";
-      updated.heureDebutArret  = "";
-      updated.heureFinArret    = "";
+      updated.type_arret = "";
+      updated.heureDebutArret = "";
+      updated.heureFinArret = "";
     }
 
     setFormData(updated);
@@ -266,6 +267,11 @@ function Dashboard() {
             <label className="db-form-label">Niveau</label>
             <input type="text" className="db-form-input" name="niveau"
               value={formData.niveau} onChange={handleChange} placeholder="Ex: N1" />
+          </div>
+          <div>
+            <label className="db-form-label">HTP</label>
+            <input type="number" step="0.01" min="0" max="8" className="db-form-input" name="htp"
+              value={formData.htp} onChange={handleChange} placeholder="Saisir le htp" />
           </div>
 
           {/* ROW 2 — Mesures */}
