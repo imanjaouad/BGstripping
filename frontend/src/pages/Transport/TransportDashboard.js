@@ -19,7 +19,7 @@ import { Bar } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import image from "../../images/ocpLogo.png";
-import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa";
+import { FaArrowLeft, FaCalendarAlt, FaBolt, FaCalendarCheck, FaHardHat, FaFileExcel, FaTruck, FaTruckLoading, FaTruckMonster, FaInbox, FaWarehouse, FaShuttleVan, FaMapMarkerAlt, FaLayerGroup, FaRulerVertical } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import TransportSidebar from "./TransportSidebar";
 
@@ -211,7 +211,7 @@ function AnimCount({ target, duration = 1100 }) {
 
 // ─── Company Section Component ────────────────────────────────────────────────
 // ─── Company Section Component ────────────────────────────────────────────────
-function CompanySection({ name, icon, color, filteredPoussages, selectedDate, transportData, dispatch, isLimited = false }) {
+function CompanySection({ name, icon, color, filteredPoussages, selectedDate, transportData, dispatch, isLimited = false, onVolumeDecapeChange }) {
   const entrepriseKey = name.toLowerCase();
   const [activeTab, setActiveTab] = useState("petits");
 
@@ -252,10 +252,10 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
     }, 800);
   }, [selectedDate, entrepriseKey, dispatch]);
 
-  const handleVoyagesPetits = (v) => { setVoyagesPetits(v); autoSave("petits", v, capacitePetits); };
-  const handleCapacitePetits = (v) => { setCapacitePetits(v); autoSave("petits", voyagesPetits, v); };
-  const handleVoyagesGrands = (v) => { setVoyagesGrands(v); autoSave("grands", v, capaciteGrands); };
-  const handleCapaciteGrands = (v) => { setCapaciteGrands(v); autoSave("grands", voyagesGrands, v); };
+  const handleVoyagesPetits = (v) => { setVoyagesPetits(v); autoSave("petits", v, capacitePetits); onVolumeDecapeChange?.(v * capacitePetits + voyagesGrands * capaciteGrands); };
+  const handleCapacitePetits = (v) => { setCapacitePetits(v); autoSave("petits", voyagesPetits, v); onVolumeDecapeChange?.(voyagesPetits * v + voyagesGrands * capaciteGrands); };
+  const handleVoyagesGrands = (v) => { setVoyagesGrands(v); autoSave("grands", v, capaciteGrands); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + v * capaciteGrands); };
+  const handleCapaciteGrands = (v) => { setCapaciteGrands(v); autoSave("grands", voyagesGrands, v); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + voyagesGrands * v); };
 
   // Volume sauté total pour la date sélectionnée (tous conducteurs)
   const volumeSaute = filteredPoussages.reduce(
@@ -267,7 +267,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
   const volumeDecapeTotal = volumeDecapePetits + volumeDecapeGrands;
 
   return (
-    <div className="company-block" style={{ animationDelay: "0.2s" }}>
+    <div className="company-block" style={{ animationDelay: "0.2s", borderColor: color, borderTopWidth: 3 }}>
       <div className="company-header">
         <div className="company-icon" style={{ background: color + "22" }}>
           {icon}
@@ -287,24 +287,133 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
         </div>
       </div>
 
-      {/* Volume Sauté from Poussage */}
-      <div className="volume-saute-row">
-        <div className="volume-saute-icon">💥</div>
-        <div>
-          <div className="volume-saute-label">Volume Sauté (depuis Poussage)</div>
-          <div className="volume-saute-value">
-            {volumeSaute.toLocaleString()} <span style={{ fontSize: 14, color: "#6b7280", fontWeight: 500 }}>t</span>
+      {/* Volume Sauté dynamique — diminue selon les voyages */}
+      {(() => {
+        const volumeRestant = volumeSaute - volumeDecapeTotal;
+        const pct = volumeSaute > 0 ? Math.min((volumeDecapeTotal / volumeSaute) * 100, 100) : 0;
+        const isOver = volumeRestant < 0;
+        const isDone = volumeRestant === 0 && volumeSaute > 0;
+        const barColor = isOver ? "#ef4444" : pct > 80 ? "#f59e0b" : "#16a34a";
+        const restantColor = isOver ? "#dc2626" : pct > 80 ? "#d97706" : "#15803d";
+        return (
+          <div style={{
+            background: "linear-gradient(135deg,#f0fdf4,#dcfce7)",
+            border: "1.5px solid #bbf7d0", borderRadius: 12,
+            padding: "14px 18px", marginBottom: 14,
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <FaBolt size={20} style={{ color: "#16a34a" }} />
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".1em" }}>
+                    Volume Sauté Initial
+                  </div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "#15803d" }}>
+                    {volumeSaute.toLocaleString()} <span style={{ fontSize: 12, color: "#9ca3af", fontWeight: 500 }}>t</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".1em" }}>
+                  Volume Sauté Restant
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: restantColor, lineHeight: 1.1 }}>
+                  {isOver ? "−" : ""}{Math.abs(volumeRestant).toLocaleString()}
+                  <span style={{ fontSize: 12, color: "#9ca3af", fontWeight: 500, marginLeft: 3 }}>t</span>
+                </div>
+                {isOver && (
+                  <div style={{ fontSize: 10, color: "#dc2626", fontWeight: 700, marginTop: 2 }}>
+                    ⚠ Dépassé de {Math.abs(volumeRestant).toLocaleString()} t
+                  </div>
+                )}
+                {isDone && (
+                  <div style={{ fontSize: 10, color: "#16a34a", fontWeight: 700, marginTop: 2 }}>
+                    ✅ Tout transporté !
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Barre de progression */}
+            <div style={{ marginTop: 4 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#9ca3af", marginBottom: 4 }}>
+                <span>Transporté : <strong style={{ color: "#2563eb" }}>{volumeDecapeTotal.toLocaleString()} t</strong></span>
+                <span>{pct.toFixed(1)}%</span>
+              </div>
+              <div style={{ background: "#e2e8f0", borderRadius: 20, height: 8, overflow: "hidden" }}>
+                <div style={{
+                  height: "100%", borderRadius: 20,
+                  width: `${pct}%`,
+                  background: `linear-gradient(90deg, ${barColor}, ${barColor}aa)`,
+                  transition: "width 0.5s cubic-bezier(.4,0,.2,1)",
+                }} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
+
+      {/* ── Données Sautage : Panneau / Tranchée / Niveau ── */}
+      {filteredPoussages.length > 0 && (() => {
+        const panneaux = [...new Set(filteredPoussages.map(p => p.panneau).filter(Boolean))];
+        const tranchees = [...new Set(filteredPoussages.map(p => p.tranchee).filter(Boolean))];
+        const niveaux = [...new Set(filteredPoussages.map(p => p.niveau).filter(Boolean))];
+        const chip = (val, bg, color) => (
+          <span key={val} style={{
+            background: bg, color, fontWeight: 700, fontSize: 11,
+            padding: "3px 10px", borderRadius: 20, whiteSpace: "nowrap",
+          }}>{val}</span>
+        );
+        return (
+          <div style={{
+            background: "#f8fffe", border: "1.5px solid #bbf7d0", borderRadius: 12,
+            padding: "12px 16px", marginBottom: 14,
+            display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12,
+          }}>
+            {/* Panneau */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6, display: "flex", alignItems: "center", gap: 5 }}>
+                <FaMapMarkerAlt style={{ color: "#16a34a" }} /> Panneau
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {panneaux.length > 0
+                  ? panneaux.map(v => chip(v, "#dcfce7", "#15803d"))
+                  : <span style={{ color: "#d1d5db", fontSize: 11 }}>—</span>}
+              </div>
+            </div>
+            {/* Tranchée */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6, display: "flex", alignItems: "center", gap: 5 }}>
+                <FaLayerGroup style={{ color: "#2563eb" }} /> Tranchée
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {tranchees.length > 0
+                  ? tranchees.map(v => chip(v, "#dbeafe", "#1e40af"))
+                  : <span style={{ color: "#d1d5db", fontSize: 11 }}>—</span>}
+              </div>
+            </div>
+            {/* Niveau */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6, display: "flex", alignItems: "center", gap: 5 }}>
+                <FaRulerVertical style={{ color: "#d97706" }} /> Niveau
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {niveaux.length > 0
+                  ? niveaux.map(v => chip(v, "#fef3c7", "#92400e"))
+                  : <span style={{ color: "#d1d5db", fontSize: 11 }}>—</span>}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Tabs */}
       <div className="moyen-tab">
-        <button className={activeTab === "petits" ? "active" : ""} onClick={() => setActiveTab("petits")}>
-          🚛 Petits Moyens
+        <button className={activeTab === "petits" ? "active" : ""} onClick={() => setActiveTab("petits")} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <FaTruck size={13} /> Petits Moyens
         </button>
-        <button className={activeTab === "grands" ? "active" : ""} onClick={() => setActiveTab("grands")}>
-          🚚 Grands Moyens
+        <button className={activeTab === "grands" ? "active" : ""} onClick={() => setActiveTab("grands")} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <FaTruckMonster size={13} /> Grands Moyens
         </button>
       </div>
 
@@ -430,6 +539,8 @@ export default function TransportDashboard() {
   const [selectedDate, setSelectedDate] = useState(() => {
     return new Date().toISOString().split("T")[0]; // default: today
   });
+  const [volumeDecapeProcaneq, setVolumeDecapeProcaneq] = useState(0);
+  const [volumeDecapeTranswine, setVolumeDecapeTranswine] = useState(0);
 
   useEffect(() => {
     dispatch(fetchPoussages());
@@ -445,6 +556,7 @@ export default function TransportDashboard() {
   const totalVolumeSaute = filteredPoussages.reduce(
     (sum, p) => sum + Number(p.volume_soté || 0), 0
   );
+  const totalVolumeRestant = Math.max(0, totalVolumeSaute - volumeDecapeProcaneq - volumeDecapeTranswine);
   const totalOps = filteredPoussages.length;
 
   const anim = (delay) => ({ style: { animationDelay: delay } });
@@ -543,203 +655,214 @@ export default function TransportDashboard() {
           className="db-page"
           style={{ flex: 1, minHeight: "100vh", background: PALETTE.bg, padding: "28px 24px 60px", overflowY: "auto" }}
         >
-        {/* ── HEADER ──────────────────────────────────────────────────────────── */}
-        <div
-          className="db-card"
-          style={{
-            marginBottom: 24, padding: "18px 24px",
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            ...anim("0s").style,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <button className="db-btn-back" onClick={() => navigate("/")}>
-              <FaArrowLeft /> Retour
-            </button>
-            <div>
-              <div
-                style={{
-                  fontSize: 10, fontWeight: 700, letterSpacing: ".16em",
-                  textTransform: "uppercase", color: PALETTE.muted, marginBottom: 4,
-                }}
-              >
-                Logistique & Transport
-              </div>
-              <h1
-                style={{
-                  margin: 0, fontSize: 24, fontWeight: 800,
-                  background: "linear-gradient(135deg,#15803d,#22c55e)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                }}
-              >
-                Tableau de Bord{" "}
-                <span style={{ WebkitTextFillColor: "#16a34a" }}>Transport</span>
-              </h1>
-            </div>
-          </div>
-
-          {/* Date Input */}
-          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <FaCalendarAlt style={{ color: "#16a34a", fontSize: 16 }} />
-              <label
-                style={{
-                  fontSize: 11, fontWeight: 700, color: "#14532d",
-                  textTransform: "uppercase", letterSpacing: ".1em",
-                }}
-              >
-                Date
-              </label>
-              <input
-                className="date-input"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
-            </div>
-            <img
-              src={image}
-              alt="logo"
-              style={{ height: 46, borderRadius: 10, boxShadow: "0 4px 14px rgba(22,163,74,0.2)" }}
-            />
-          </div>
-        </div>
-
-        {/* ── KPIs ──────────────────────────────────────────────────────────────── */}
-        <div className="db-grid3" style={{ marginBottom: 24 }}>
-          <div className="db-kpi" style={{ animationDelay: "0.05s" }}>
-            <div className="db-kpi-shimmer" />
-            <div className="db-kpi-icon">💥</div>
-            <div className="db-kpi-label">Volume Sauté du Jour</div>
-            <div className="db-kpi-value">
-              <AnimCount target={totalVolumeSaute} />
-              <span className="db-kpi-unit">t</span>
-            </div>
-          </div>
-          <div className="db-kpi" style={{ animationDelay: "0.10s" }}>
-            <div className="db-kpi-shimmer" />
-            <div className="db-kpi-icon">📅</div>
-            <div className="db-kpi-label">Date Sélectionnée</div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#15803d", marginTop: 6 }}>
-              {selectedDate
-                ? new Date(selectedDate + "T00:00:00").toLocaleDateString("fr-MA", {
-                    weekday: "long", year: "numeric", month: "long", day: "numeric",
-                  })
-                : "—"}
-            </div>
-          </div>
-          <div className="db-kpi" style={{ animationDelay: "0.15s" }}>
-            <div className="db-kpi-shimmer" />
-            <div className="db-kpi-icon">🏗️</div>
-            <div className="db-kpi-label">Opérations du Jour</div>
-            <div className="db-kpi-value">
-              <AnimCount target={totalOps} />
-              <span className="db-kpi-unit">ops</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── VOLUME SAUTÉ PAR JOUR chart ──────────────────────────────────────── */}
-        <div className="db-card" {...anim("0.20s")} style={{ marginBottom: 24 }}>
-          <div className="db-card-header">
-            <div>
-              <p className="db-card-title">Volume Sauté par Jour</p>
-              <p className="db-card-sub">7 derniers jours — données depuis le formulaire Poussage</p>
-            </div>
-            <span className="db-pill">📊 Poussage</span>
-          </div>
-          <div style={{ height: 280 }}>
-            <Bar data={barData} options={barOpts} />
-          </div>
-        </div>
-
-        {/* ── COMPANIES ─────────────────────────────────────────────────────────── */}
-        <div className="db-section" style={{ marginTop: 8 }}>
-          Entreprises Sous-traitantes OCP
-        </div>
-
-        {/* PROCANEQ */}
-        <div id="section-procaneq">
-          <CompanySection
-            name="Procaneq"
-            icon="🚚"
-            color="#f59e0b"
-            filteredPoussages={filteredPoussages}
-            selectedDate={selectedDate}
-            transportData={transportData}
-            dispatch={dispatch}
-            isLimited={isLimited}
-          />
-        </div>
-
-        {/* TRANSWINE */}
-        <div id="section-transwine">
-          <CompanySection
-            name="Transwine"
-            icon="🚛"
-            color="#3b82f6"
-            filteredPoussages={filteredPoussages}
-            selectedDate={selectedDate}
-            transportData={transportData}
-            dispatch={dispatch}
-            isLimited={isLimited}
-          />
-        </div>
-
-        {/* ── POUSSAGE TABLE for selected day ─────────────────────────────────── */}
-        <div className="db-section">Détail Poussage — {selectedDate || "Tout l'historique"}</div>
-        <div className="db-card" {...anim("0.45s")}>
+          {/* ── HEADER ──────────────────────────────────────────────────────────── */}
           <div
+            className="db-card"
             style={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              marginBottom: 16,
+              marginBottom: 24, padding: "18px 24px",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              ...anim("0s").style,
             }}
           >
-            <p className="db-card-title" style={{ margin: 0 }}>
-              {filteredPoussages.length} opération(s) ce jour
-            </p>
-            <button className="db-btn-excel" onClick={exportExcel}>
-              📥 Exporter Excel
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+              <button className="db-btn-back" onClick={() => navigate("/")}>
+                <FaArrowLeft /> Retour
+              </button>
+              <div>
+                <div
+                  style={{
+                    fontSize: 10, fontWeight: 700, letterSpacing: ".16em",
+                    textTransform: "uppercase", color: PALETTE.muted, marginBottom: 4,
+                  }}
+                >
+                  Logistique & Transport
+                </div>
+                <h1
+                  style={{
+                    margin: 0, fontSize: 24, fontWeight: 800,
+                    background: "linear-gradient(135deg,#15803d,#22c55e)",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  Tableau de Bord{" "}
+                  <span style={{ WebkitTextFillColor: "#16a34a" }}>Transport</span>
+                </h1>
+              </div>
+            </div>
+
+            {/* Date Input */}
+            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <FaCalendarAlt style={{ color: "#16a34a", fontSize: 16 }} />
+                <label
+                  style={{
+                    fontSize: 11, fontWeight: 700, color: "#14532d",
+                    textTransform: "uppercase", letterSpacing: ".1em",
+                  }}
+                >
+                  Date
+                </label>
+                <input
+                  className="date-input"
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                />
+              </div>
+              <img
+                src={image}
+                alt="logo"
+                style={{ height: 46, borderRadius: 10, boxShadow: "0 4px 14px rgba(22,163,74,0.2)" }}
+              />
+            </div>
           </div>
 
-          {filteredPoussages.length > 0 ? (
-            <div className="db-table-wrap">
-              <table className="db-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Conducteur</th>
-                    <th>Panneau</th>
-                    <th>Tranchée</th>
-                    <th>Niveau</th>
-                    <th>Volume Sauté (t)</th>
-                    <th>Poste</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPoussages.map((p, i) => (
-                    <tr key={p.id || i} style={{ animationDelay: `${i * 0.04}s` }}>
-                      <td>{p.date || "—"}</td>
-                      <td>{p.conducteur || "—"}</td>
-                      <td>{p.panneau || "—"}</td>
-                      <td>{p.tranchee || "—"}</td>
-                      <td>{p.niveau || "—"}</td>
-                      <td style={{ color: "#16a34a", fontWeight: 700 }}>
-                        {Number(p.volume_soté || 0).toLocaleString()} t
-                      </td>
-                      <td>{p.poste || "—"}</td>
+          {/* ── KPIs ──────────────────────────────────────────────────────────────── */}
+          <div className="db-grid3" style={{ marginBottom: 24 }}>
+            {/* KPI 1 — Volume Sauté Restant — VERT */}
+            <div className="db-kpi" style={{ animationDelay: "0.05s", borderColor: "#16a34a" }}>
+              <div className="db-kpi-shimmer" />
+              <div className="db-kpi-icon" style={{ background: "#dcfce7", color: "#16a34a" }}><FaBolt /></div>
+              <div className="db-kpi-label">Volume Sauté Restant</div>
+              <div className="db-kpi-value" style={{ color: "#15803d" }}>
+                <AnimCount target={totalVolumeRestant} />
+                <span className="db-kpi-unit">t</span>
+              </div>
+              <div style={{ fontSize: 9, color: "#9ca3af", marginTop: 4 }}>
+                Initial : {totalVolumeSaute.toLocaleString()} t
+              </div>
+            </div>
+
+            {/* KPI 2 — Date Sélectionnée — BLEU */}
+            <div className="db-kpi" style={{ animationDelay: "0.10s", borderColor: "#3b82f6" }}>
+              <div className="db-kpi-shimmer" />
+              <div className="db-kpi-icon" style={{ background: "#dbeafe", color: "#2563eb" }}><FaCalendarCheck /></div>
+              <div className="db-kpi-label" style={{ color: "#1e40af" }}>Date Sélectionnée</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#1d4ed8", marginTop: 6 }}>
+                {selectedDate
+                  ? new Date(selectedDate + "T00:00:00").toLocaleDateString("fr-MA", {
+                    weekday: "long", year: "numeric", month: "long", day: "numeric",
+                  })
+                  : "—"}
+              </div>
+            </div>
+
+            {/* KPI 3 — Opérations du Jour — AMBRE */}
+            <div className="db-kpi" style={{ animationDelay: "0.15s", borderColor: "#f59e0b" }}>
+              <div className="db-kpi-shimmer" />
+              <div className="db-kpi-icon" style={{ background: "#fef3c7", color: "#d97706" }}><FaHardHat /></div>
+              <div className="db-kpi-label" style={{ color: "#92400e" }}>Opérations du Jour</div>
+              <div className="db-kpi-value" style={{ color: "#b45309" }}>
+                <AnimCount target={totalOps} />
+                <span className="db-kpi-unit">ops</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── VOLUME SAUTÉ PAR JOUR chart ──────────────────────────────────────── */}
+          <div className="db-card" {...anim("0.20s")} style={{ marginBottom: 24 }}>
+            <div className="db-card-header">
+              <div>
+                <p className="db-card-title">Volume Sauté par Jour</p>
+                <p className="db-card-sub">7 derniers jours — données depuis le formulaire Poussage</p>
+              </div>
+              <span className="db-pill">📊 Poussage</span>
+            </div>
+            <div style={{ height: 280 }}>
+              <Bar data={barData} options={barOpts} />
+            </div>
+          </div>
+
+          {/* ── COMPANIES ─────────────────────────────────────────────────────────── */}
+          <div className="db-section" style={{ marginTop: 8 }}>
+            Entreprises Sous-traitantes OCP
+          </div>
+
+          {/* PROCANEQ */}
+          <div id="section-procaneq">
+            <CompanySection
+              name="Procaneq"
+              icon={<FaWarehouse style={{ color: "#f59e0b", fontSize: 22 }} />}
+              color="#f59e0b"
+              filteredPoussages={filteredPoussages}
+              selectedDate={selectedDate}
+              transportData={transportData}
+              dispatch={dispatch}
+              isLimited={isLimited}
+              onVolumeDecapeChange={setVolumeDecapeProcaneq}
+            />
+          </div>
+
+          {/* TRANSWINE */}
+          <div id="section-transwine">
+            <CompanySection
+              name="Transwine"
+              icon={<FaShuttleVan style={{ color: "#3b82f6", fontSize: 22 }} />}
+              color="#3b82f6"
+              filteredPoussages={filteredPoussages}
+              selectedDate={selectedDate}
+              transportData={transportData}
+              dispatch={dispatch}
+              isLimited={isLimited}
+              onVolumeDecapeChange={setVolumeDecapeTranswine}
+            />
+          </div>
+
+          {/* ── POUSSAGE TABLE for selected day ─────────────────────────────────── */}
+          <div className="db-section">Détail Poussage — {selectedDate || "Tout l'historique"}</div>
+          <div className="db-card" {...anim("0.45s")}>
+            <div
+              style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
+              <p className="db-card-title" style={{ margin: 0 }}>
+                {filteredPoussages.length} opération(s) ce jour
+              </p>
+              <button className="db-btn-excel" onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <FaFileExcel /> Exporter Excel
+              </button>
+            </div>
+
+            {filteredPoussages.length > 0 ? (
+              <div className="db-table-wrap">
+                <table className="db-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Conducteur</th>
+                      <th>Panneau</th>
+                      <th>Tranchée</th>
+                      <th>Niveau</th>
+                      <th>Volume Sauté (t)</th>
+                      <th>Poste</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="db-empty">
-              📭 Aucune opération de poussage pour le {selectedDate}
-            </div>
-          )}
-        </div>
+                  </thead>
+                  <tbody>
+                    {filteredPoussages.map((p, i) => (
+                      <tr key={p.id || i} style={{ animationDelay: `${i * 0.04}s` }}>
+                        <td>{p.date || "—"}</td>
+                        <td>{p.conducteur || "—"}</td>
+                        <td>{p.panneau || "—"}</td>
+                        <td>{p.tranchee || "—"}</td>
+                        <td>{p.niveau || "—"}</td>
+                        <td style={{ color: "#16a34a", fontWeight: 700 }}>
+                          {Number(p.volume_soté || 0).toLocaleString()} t
+                        </td>
+                        <td>{p.poste || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="db-empty" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                <FaInbox size={36} style={{ color: "#d1fae5" }} />
+                Aucune opération de poussage pour le {selectedDate}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>
