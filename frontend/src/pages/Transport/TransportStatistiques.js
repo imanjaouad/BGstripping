@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTransportJournaliers } from "../../features/transportSlice";
+import { fetchPoussages } from "../../features/poussageSlice";
+import { FaBolt, FaHardHat, FaTruck, FaTruckLoading, FaChartBar, FaFileExcel, FaInbox, FaSpinner } from "react-icons/fa";
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend, Filler, ArcElement,
@@ -131,13 +133,17 @@ function AnimCount({ target, duration = 1100 }) {
 export default function TransportStatistiques() {
   const dispatch = useDispatch();
   const transportData = useSelector((s) => s.transport?.list || []);
+  const poussages = useSelector((s) => s.poussage?.list || []);
   const loading = useSelector((s) => s.transport?.loading);
 
   const [period, setPeriod] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
-  useEffect(() => { dispatch(fetchTransportJournaliers()); }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchTransportJournaliers());
+    dispatch(fetchPoussages());
+  }, [dispatch]);
 
   // ─── Filter by period ──────────────────────────────────────────────────────
   const filtered = transportData.filter((r) => {
@@ -163,10 +169,34 @@ export default function TransportStatistiques() {
   });
 
   // ─── KPIs ──────────────────────────────────────────────────────────────────
-  const totalVoyages     = filtered.reduce((s, r) => s + r.nombre_voyages, 0);
+  const totalVoyages      = filtered.reduce((s, r) => s + r.nombre_voyages, 0);
   const totalVolumeDecape = filtered.reduce((s, r) => s + r.volume_decape, 0);
-  const totalOps         = filtered.length;
-  const avgCapacite      = totalOps > 0 ? (filtered.reduce((s, r) => s + r.capacite_camion, 0) / totalOps).toFixed(1) : 0;
+  const totalOps          = filtered.length;
+  const avgCapacite       = totalOps > 0 ? (filtered.reduce((s, r) => s + r.capacite_camion, 0) / totalOps).toFixed(1) : 0;
+
+  // Volume sauté depuis Sautage (Poussage), filtré par la même période
+  const filteredPoussages = poussages.filter((p) => {
+    if (!p.date) return false;
+    const now = new Date();
+    const d = p.date;
+    if (period === "today") return d === now.toISOString().split("T")[0];
+    if (period === "week") {
+      const w = new Date(now); w.setDate(w.getDate() - 7);
+      return d >= w.toISOString().split("T")[0];
+    }
+    if (period === "month") {
+      return d >= new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+    }
+    if (period === "year") {
+      return d >= new Date(now.getFullYear(), 0, 1).toISOString().split("T")[0];
+    }
+    if (period === "custom") {
+      if (dateFrom && d < dateFrom) return false;
+      if (dateTo && d > dateTo) return false;
+    }
+    return true;
+  });
+  const totalVolumeSaute = filteredPoussages.reduce((s, p) => s + Number(p.volume_soté || 0), 0);
 
   // ─── Volume décapé par entreprise ─────────────────────────────────────────
   const procaneqData  = filtered.filter((r) => r.entreprise === "procaneq");
@@ -296,23 +326,23 @@ export default function TransportStatistiques() {
 
           {/* Loading */}
           {loading && (
-            <div style={{ textAlign: "center", padding: 40, color: "#16a34a", fontWeight: 700 }}>
-              ⏳ Chargement des données transport...
+            <div style={{ textAlign: "center", padding: 40, color: "#16a34a", fontWeight: 700, display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+              <FaSpinner style={{animation:"spin 1s linear infinite"}}/> Chargement des données transport...
             </div>
           )}
 
           {/* KPIs */}
           <div className="ts-grid4" style={{ marginBottom: 24 }}>
             {[
-              { icon: "🚛", label: "Total Voyages", value: totalVoyages, unit: "voyages", color: "#16a34a", delay: "0.05s" },
-              { icon: "⛏️", label: "Volume Décapé Total", value: Math.round(totalVolumeDecape), unit: "t", color: "#2563eb", delay: "0.10s" },
-              { icon: "📦", label: "Enregistrements", value: totalOps, unit: "ops", color: "#15803d", delay: "0.15s" },
-              { icon: "🚚", label: "Capacité Moy. Camion", value: parseFloat(avgCapacite), unit: "t", color: "#f59e0b", delay: "0.20s" },
+              { icon: <FaBolt/>,        label: "Volume Sauté",        value: Math.round(totalVolumeSaute),    unit: "t",       color: "#16a34a", delay: "0.05s" },
+              { icon: <FaHardHat/>,      label: "Volume Décapé Total",  value: Math.round(totalVolumeDecape),   unit: "t",       color: "#2563eb", delay: "0.10s" },
+              { icon: <FaTruck/>,        label: "Nombre de Voyages",    value: totalVoyages,                    unit: "voyages", color: "#15803d", delay: "0.15s" },
+              { icon: <FaTruckLoading/>, label: "Capacité Moy. Camion", value: parseFloat(avgCapacite),         unit: "t",       color: "#f59e0b", delay: "0.20s" },
             ].map(({ icon, label, value, unit, color, delay }) => (
-              <div key={label} className="ts-kpi" style={{ animationDelay: delay }}>
+              <div key={label} className="ts-kpi" style={{ animationDelay: delay, borderColor: color, borderTopWidth: 3 }}>
                 <div className="ts-kpi-shimmer" />
-                <div className="ts-kpi-icon">{icon}</div>
-                <div className="ts-kpi-label">{label}</div>
+                <div className="ts-kpi-icon" style={{ background: color + "20", color }}>{icon}</div>
+                <div className="ts-kpi-label" style={{ color: color + "cc" }}>{label}</div>
                 <div className="ts-kpi-value" style={{ color }}>
                   <AnimCount target={value} />
                   <span className="ts-kpi-unit">{unit}</span>
@@ -328,7 +358,7 @@ export default function TransportStatistiques() {
                 <p className="ts-card-title">Volume Décapé par Jour</p>
                 <p className="ts-card-sub">Évolution sur les 30 derniers jours (toutes entreprises)</p>
               </div>
-              <span className="ts-pill">📈 Tendance</span>
+              <span className="ts-pill" style={{display:"flex",alignItems:"center",gap:5}}><FaChartBar size={10}/> Tendance</span>
             </div>
             <div style={{ height: 280 }}>
               <Line
@@ -458,7 +488,9 @@ export default function TransportStatistiques() {
               <p className="ts-card-title" style={{ margin: 0 }}>
                 {filtered.length} enregistrement(s)
               </p>
-              <button className="ts-btn-excel" onClick={exportExcel}>📥 Exporter Excel</button>
+            <button className="ts-btn-excel" onClick={exportExcel} style={{display:"flex",alignItems:"center",gap:7}}>
+              <FaFileExcel/> Exporter Excel
+            </button>
             </div>
             {filtered.length > 0 ? (
               <div className="ts-table-wrap">
@@ -496,7 +528,10 @@ export default function TransportStatistiques() {
                 </table>
               </div>
             ) : (
-              <div className="ts-empty">📭 Aucune donnée transport pour la période sélectionnée</div>
+              <div className="ts-empty" style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
+                <FaInbox size={38} style={{color:"#d1fae5"}}/>
+                Aucune donnée transport pour la période sélectionnée
+              </div>
             )}
           </div>
 

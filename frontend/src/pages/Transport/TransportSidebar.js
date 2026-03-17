@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaArrowLeft, FaTachometerAlt, FaChartLine } from "react-icons/fa";
+import { FaArrowLeft, FaTruck, FaChartBar, FaWarehouse, FaShuttleVan } from "react-icons/fa";
 import image from "../../images/image.jpeg";
 
 // ─── CSS injected once ─────────────────────────────────────────────────────────
@@ -183,7 +183,7 @@ function TransportSidebar() {
                 isActive ? "tr-link active" : "tr-link"
               }
             >
-              <span className="tr-link-icon"><FaTachometerAlt /></span>
+              <span className="tr-link-icon"><FaTruck /></span>
               <span>Tableau de Bord</span>
               <span className="tr-link-indicator" />
             </NavLink>
@@ -197,7 +197,7 @@ function TransportSidebar() {
                 isActive ? "tr-link active" : "tr-link"
               }
             >
-              <span className="tr-link-icon"><FaChartLine /></span>
+              <span className="tr-link-icon"><FaChartBar /></span>
               <span>Statistiques</span>
               <span className="tr-link-indicator" />
             </NavLink>
@@ -214,7 +214,7 @@ function TransportSidebar() {
                 document.getElementById("section-procaneq")?.scrollIntoView({ behavior: "smooth", block: "start" })
               }
             >
-              <span className="tr-link-icon">🟧</span>
+              <span className="tr-link-icon"><FaWarehouse style={{color:"#f59e0b"}} /></span>
               <span>Procaneq</span>
             </button>
           </li>
@@ -225,7 +225,7 @@ function TransportSidebar() {
                 document.getElementById("section-transwine")?.scrollIntoView({ behavior: "smooth", block: "start" })
               }
             >
-              <span className="tr-link-icon">🟦</span>
+              <span className="tr-link-icon"><FaShuttleVan style={{color:"#3b82f6"}} /></span>
               <span>Transwine</span>
             </button>
           </li>

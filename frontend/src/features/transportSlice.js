@@ -12,8 +12,8 @@ export const fetchTransportJournaliers = createAsyncThunk(
   async (date = null, { rejectWithValue }) => {
     try {
       const res = await fetchTransportJournaliersAPI(date);
-      // res is already the parsed JSON array (from the request() wrapper)
-      return Array.isArray(res) ? res : res.data || res;
+      // res.data is the JSON array for this specific controller
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.message);
     }
@@ -29,7 +29,7 @@ export const saveTransportJournalier = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const res = await createTransportJournalierAPI(payload);
-      return res.data || res;
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.data || err.message);
     }
