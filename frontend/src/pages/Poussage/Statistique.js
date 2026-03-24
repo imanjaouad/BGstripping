@@ -52,7 +52,6 @@ const CSS = `
   .db-kpi {
     background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
     padding:20px 22px; position:relative; overflow:hidden;
-   
     transition:transform .2s,box-shadow .2s; cursor:default;
   }
 .db-kpi:hover {
@@ -239,6 +238,43 @@ const CSS = `
 
   .db-cost-evo-empty { text-align:center; padding:36px 0; color:#9ca3af; font-size:13px; }
 
+  /* ── OEE / TU / TD ── */
+  .db-oee-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:20px; }
+  .db-oee-card {
+    background:#fff; border-radius:16px; padding:20px 22px;
+    position:relative; overflow:hidden;
+    transition:transform .2s,box-shadow .2s; cursor:default;
+    opacity:0; animation:db-fadeUp .55s ease forwards;
+  }
+  .db-oee-card:hover { transform:translateY(-4px); box-shadow:0 12px 28px rgba(0,0,0,0.12); }
+  .db-oee-card::before { content:''; position:absolute; top:0;left:0;right:0;height:4px; border-radius:16px 16px 0 0; }
+  .db-oee-card.oee  { border:1.5px solid #bfdbfe; }
+  .db-oee-card.oee::before  { background:linear-gradient(90deg,#3b82f6,#60a5fa); }
+  .db-oee-card.tu   { border:1.5px solid #a7f3d0; }
+  .db-oee-card.tu::before   { background:linear-gradient(90deg,#16a34a,#4ade80); }
+  .db-oee-card.td   { border:1.5px solid #fde68a; }
+  .db-oee-card.td::before   { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
+  .db-oee-card.arret { border:1.5px solid #fecaca; }
+  .db-oee-card.arret::before { background:linear-gradient(90deg,#ef4444,#f87171); }
+  .db-oee-icon { width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px; }
+  .db-oee-icon.oee   { background:#eff6ff; }
+  .db-oee-icon.tu    { background:#dcfce7; }
+  .db-oee-icon.td    { background:#fef3c7; }
+  .db-oee-icon.arret { background:#fef2f2; }
+  .db-oee-label { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;margin-bottom:6px; }
+  .db-oee-value { font-size:32px;font-weight:800;line-height:1; animation:db-countUp .55s cubic-bezier(.34,1.56,.64,1) both; }
+  .db-oee-value.oee   { color:#2563eb; }
+  .db-oee-value.tu    { color:#15803d; }
+  .db-oee-value.td    { color:#d97706; }
+  .db-oee-value.arret { color:#dc2626; }
+  .db-oee-unit { font-size:13px;font-weight:500;color:#9ca3af;margin-left:3px; }
+  .db-oee-gauge-wrap { height:8px;background:#f1f5f9;border-radius:20px;overflow:hidden;margin-top:10px; }
+  .db-oee-gauge-bar  { height:100%;border-radius:20px;transition:width 1s cubic-bezier(.4,0,.2,1); }
+  .db-oee-gauge-bar.oee   { background:linear-gradient(90deg,#3b82f6,#60a5fa); }
+  .db-oee-gauge-bar.tu    { background:linear-gradient(90deg,#16a34a,#4ade80); }
+  .db-oee-gauge-bar.td    { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
+  .db-oee-gauge-bar.arret { background:linear-gradient(90deg,#ef4444,#f87171); }
+
   .db-cost-last-compare {
     background:linear-gradient(135deg,#15803d,#22c55e);
     border-radius:14px; padding:16px 20px;
@@ -336,7 +372,7 @@ function CostEvolution() {
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
-
+const [poussages, setPoussages] = useState([]);
   useEffect(() => {
     const onStorage = () => {
       try {
@@ -378,6 +414,14 @@ function CostEvolution() {
     if (p > 20) return { bg:"rgba(245,158,11,0.75)", border:"#F59E0B" };
     return            { bg:"rgba(22,163,74,0.75)",   border:"#16A34A" };
   }
+useEffect(() => {
+  fetch("http://127.0.0.1:8000/api/poussages")
+    .then(res => res.json())
+    .then(data => {
+      console.log("API:", data);
+      setPoussages(data.data); 
+    });
+}, []);
 
   // ── Chart.js ──
   useEffect(() => {
@@ -710,6 +754,8 @@ const EMPTY_FORM = {
   profendeur:"", equipements:[], conducteur:"", matricule:"",
   heureDebut:"", heureFin:"", temps:"",
   etatMachine:"En marche", typeArret:"",
+   htp: "",
+  heures_arret: "",
 };
 
 // ─── Calc heures from time strings ────────────────────────────────────────────
@@ -742,6 +788,17 @@ function Statistique() {
   const [annualCost, setAnnualCost] = useState(500000);
   const [meterCost,  setMeterCost]  = useState(120);
   const [costSaved,  setCostSaved]  = useState({ annualCost:500000, meterCost:120 });
+
+  // 🔍 AJOUT: Débogage pour voir les données
+  useEffect(() => {
+    console.log("📊 Données des poussages (brutes):", poussages);
+    console.log("📊 Volumes individuels:", poussages.map(p => ({
+      id: p.id,
+      volume: p.volume_soté,
+      volumeNumber: Number(p.volume_soté),
+      type: typeof p.volume_soté
+    })));
+  }, [poussages]);
 
   const resetForm = () => setFormData(EMPTY_FORM);
 
@@ -801,18 +858,26 @@ function Statistique() {
   const totalTemps  = poussages.reduce((a, p) => a + Number(p.temps || 0), 0);
   const enMarcheCnt = poussages.filter(p => p.etatMachine === "En marche").length;
  const enArret = poussages.filter(p => p.etatMachine === "En arrêt").length;
+  
+  // ✅ CORRECTION: Calcul du volume total avec gestion des valeurs nulles
+  const totalVolume = poussages.reduce((a, p) => {
+    // Convertir en nombre et s'assurer que c'est un nombre valide
+    const vol = Number(p.volume_soté);
+    // Si c'est NaN, null, undefined, on ajoute 0
+    return a + (isNaN(vol) ? 0 : vol);
+  }, 0);
+
+  // ✅ AJOUT: Afficher le total calculé dans la console
+  useEffect(() => {
+    console.log("📊 Volume total calculé:", totalVolume);
+  }, [totalVolume]);
+
   const rendMoyen = totalOps > 0
     ? (poussages.reduce((a, p) => {
         const v = Number(p.volume_soté || 0), t = Number(p.temps || 0);
         return a + (t > 0 ? v / t : 0);
       }, 0) / totalOps).toFixed(2)
     : 0;
-
-  const totalVolume = (() => {
-    const rawVolume = poussages.reduce((a, p) => a + Number(p.volume_soté || 0), 0);
-    const ajustement = totalTemps > 0 ? parseFloat(rendMoyen) / totalTemps : 0;
-    return Math.max(0, Math.round(rawVolume - ajustement));
-  })();
 
   // Engins
   const enginStats = {};
@@ -872,16 +937,92 @@ function Statistique() {
 
   const recentPoussages = [...poussages].slice(-5).reverse();
 
+  // ── Helper : plage horaire totale (heureDebut → heureFin) ────────────────────
+  // Utilisé comme base HTP quand htp n'est pas saisi (= 0)
+  function calcPlage(p) {
+    const debut = (p.heureDebut || "").substring(0, 5); // "HH:MM"
+    const fin   = (p.heureFin   || "").substring(0, 5);
+    if (!debut || !fin) return 0;
+    const [dh, dm] = debut.split(":").map(Number);
+    const [fh, fm] = fin.split(":").map(Number);
+    let mins = (fh * 60 + fm) - (dh * 60 + dm);
+    if (mins < 0) mins += 24 * 60;
+    return parseFloat((mins / 60).toFixed(2));
+  }
+
+  // ── OEE / TU / TD ────────────────────────────────────────────────────────────
+  // Base HTP par enregistrement : htp saisi OU plage heureDebut→heureFin
+  const totalHTP = poussages.reduce((a, p) => {
+    const htp = Number(p.htp || 0);
+    return a + (htp > 0 ? htp : calcPlage(p));
+  }, 0);
+  const totalHeuresArret = poussages.reduce((a, p) => a + Number(p.heures_arret || 0), 0);
+
+  // TU  = Heures marche  / Base × 100
+  const avgTU = totalHTP > 0 ? ((totalTemps / totalHTP) * 100).toFixed(1) : "0.0";
+  // TD  = Heures arrêt   / Base × 100
+  const avgTD = totalHTP > 0 ? ((totalHeuresArret / totalHTP) * 100).toFixed(1) : "0.0";
+  // OEE = TU × (1 − TD/100)
+  const avgOEE = totalHTP > 0
+    ? (parseFloat(avgTU) * (1 - parseFloat(avgTD) / 100)).toFixed(1)
+    : "0.0";
+
+  // OEE / TU / TD par date pour graphes
+  const oeeByDate = {};
+  poussages.forEach(p => {
+    const d      = p.date || "N/A";
+    const htpRaw = Number(p.htp || 0);
+    const htp    = htpRaw > 0 ? htpRaw : calcPlage(p); // fallback plage
+    const tm     = Number(p.temps || 0);
+    const ha     = Number(p.heures_arret || 0);
+    if (!oeeByDate[d]) oeeByDate[d] = { htp: 0, temps: 0, arret: 0 };
+    oeeByDate[d].htp   += htp;
+    oeeByDate[d].temps += tm;
+    oeeByDate[d].arret += ha;
+  });
+  const oeeDates = Object.keys(oeeByDate).sort();
+  const tuValues = oeeDates.map(d => {
+    const { htp, temps } = oeeByDate[d];
+    return htp > 0 ? parseFloat(((temps / htp) * 100).toFixed(1)) : 0;
+  });
+  const tdValues = oeeDates.map(d => {
+    const { htp, arret } = oeeByDate[d];
+    return htp > 0 ? parseFloat(((arret / htp) * 100).toFixed(1)) : 0;
+  });
+  // OEE par date = TU × (1 − TD/100)
+  const oeeValues = oeeDates.map((_, i) =>
+    parseFloat((tuValues[i] * (1 - tdValues[i] / 100)).toFixed(1))
+  );
+  const arretValues = oeeDates.map(d => oeeByDate[d].arret);
+
   // Excel export
   const exportExcel = () => {
-    const data = poussages.map(p => ({
-      Date: p.date, Panneau: p.panneau, Tranchée: p.tranchee,
-      Profondeur: p.profendeur, Équipements: p.equipements?.join(", "),
-      Conducteur: p.conducteur, Matricule: p.matricule,
-      Volume: p.volume_soté, "Heures Marche": p.temps,
-      Rendement: p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0,
-      État: p.etatMachine, "Nature Arrêt": p.typeArret || "",
-    }));
+    const data = poussages.map(p => {
+      const htpRaw = Number(p.htp || 0);
+      const htp  = htpRaw > 0 ? htpRaw : calcPlage(p);
+      const tm   = Number(p.temps || 0);
+      const ha   = Number(p.heures_arret || 0);
+      const oeeV = htp > 0 ? parseFloat((( htp / 24)*100).toFixed(1)) : 0;
+      const tuV  = htp > 0 ? parseFloat(((oeeV / 24) * 100).toFixed(1)) : 0;
+ const heuresArret = parseFloat(formData.heures_arret) || 0;
+      const tempsFonctionnement = htp - heuresArret;
+
+// 3. Taux de disponibilité (TD)
+const tdV = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
+     
+      
+      return {
+        Date: p.date, Panneau: p.panneau, Tranchée: p.tranchee,
+        Profondeur: p.profendeur, Équipements: p.equipements?.join(", "),
+        Conducteur: p.conducteur, Matricule: p.matricule,
+        Volume: p.volume_soté, "Heures Marche": p.temps,
+        HTP: htpRaw > 0 ? htpRaw : `${calcPlage(p)}h (auto)`,
+        "Heures Arrêt": ha,
+        "OEE (%)": oeeV, "TU (%)": tuV, "TD Arrêt (%)": tdV,
+        Rendement: p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0,
+        État: p.etatMachine, "Nature Arrêt": p.typeArret || "",
+      };
+    });
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Historique");
@@ -895,7 +1036,6 @@ function Statistique() {
     ref:   (el) => { if (el) el.style.animationDelay = delay; },
   });
 
-  // ─── Full table ───────────────────────────────────────────────────────────────
   const FullTable = ({ data, showActions = false }) => (
     <div className="db-table-wrap">
       <table className="db-table">
@@ -903,46 +1043,65 @@ function Statistique() {
           <tr>
             <th>Date</th><th>Panneau</th><th>Tranchée</th>
             <th>Profondeur</th><th>Volume (t)</th><th>Équipements</th>
-            <th>Conducteur</th><th>Matricule</th><th>Heures</th>
+            <th>Conducteur</th><th>Matricule</th><th>HTP</th><th>Heures</th>
+            <th>H. Arrêt</th><th>OEE</th><th>TU</th><th>TD</th>
             <th>Rendement</th><th>État</th><th>Arrêt</th>
             {showActions && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
-          {data.map((p, i) => (
-            <tr key={i} style={{ animationDelay: `${i * 0.04}s` }}>
-              <td>{p.date}</td>
-              <td>{p.panneau}</td>
-              <td>{p.tranchee}</td>
-              <td>{p.profendeur}</td>
-              <td><strong>{Number(p.volume_soté).toLocaleString()}</strong></td>
-              <td style={{ maxWidth:130, overflow:"hidden", textOverflow:"ellipsis" }}>
-                {p.equipements?.join(", ")}
-              </td>
-              <td>{p.conducteur}</td>
-              <td>{p.matricule}</td>
-              <td>{p.temps} h</td>
-              <td>{p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0} t/h</td>
-              <td>
-                <span className={p.etatMachine === "En marche" ? "badge-marche" : "badge-arret"}>
-                  {p.etatMachine}
-                </span>
-              </td>
-              <td style={{ color:"#9ca3af", fontSize:12 }}>{p.typeArret || "—"}</td>
-              {showActions && (
-                <td>
-                  <button className="db-btn-edit"
-                    onClick={() => handleEdit(p, poussages.indexOf(p))}>
-                    ✏️ Modifier
-                  </button>
-                  <button className="db-btn-del"
-                    onClick={() => handleDelete(poussages.indexOf(p))}>
-                    🗑️ Supprimer
-                  </button>
+          {data.map((p, i) => {
+            const htpRaw = Number(p.htp || 0);
+            const htp = htpRaw > 0 ? htpRaw : calcPlage(p);
+            const tm  = Number(p.temps || 0);
+            const ha  = Number(p.heures_arret || 0);
+             const oeeV = htp > 0 ? parseFloat(( (htp/ 24)*100).toFixed(1)) : 0;
+            const tuV  = htp > 0 ? parseFloat(((tm / htp) * 100).toFixed(1)) : 0;
+            const tdV  = htp > 0 ? parseFloat(((ha / htp) * 100).toFixed(1)) : 0;
+           
+            const oee = htp > 0 ? oeeV + "%" : "—";
+            const tu  = htp > 0 ? tuV  + "%" : "—";
+            const td  = htp > 0 ? tdV  + "%" : "—";
+            return (
+              <tr key={i} style={{ animationDelay: `${i * 0.04}s` }}>
+                <td>{p.date}</td>
+                <td>{p.panneau}</td>
+                <td>{p.tranchee}</td>
+                <td>{p.profendeur}</td>
+                <td><strong>{Number(p.volume_soté).toLocaleString()}</strong></td>
+                <td style={{ maxWidth:130, overflow:"hidden", textOverflow:"ellipsis" }}>
+                  {p.equipements?.join(", ")}
                 </td>
-              )}
-            </tr>
-          ))}
+                <td>{p.conducteur}</td>
+                <td>{p.matricule}</td>
+                <td style={{ fontWeight:600, color:"#15803d" }}>{htpRaw > 0 ? htpRaw : <span style={{color:"#9ca3af",fontSize:11}}>auto {htp}h</span>}</td>
+                <td>{p.temps} h</td>
+                <td style={{ color: ha > 0 ? "#dc2626" : "#9ca3af", fontWeight: ha > 0 ? 700 : 400 }}>{ha > 0 ? ha + " h" : "—"}</td>
+                <td><span style={{ background:"#eff6ff", color:"#2563eb", padding:"2px 8px", borderRadius:20, fontSize:11, fontWeight:700 }}>{oee}</span></td>
+                <td><span style={{ background:"#dcfce7", color:"#15803d", padding:"2px 8px", borderRadius:20, fontSize:11, fontWeight:700 }}>{tu}</span></td>
+                <td><span style={{ background: ha > 0 ? "#fef3c7" : "#f3f4f6", color: ha > 0 ? "#92400e" : "#9ca3af", padding:"2px 8px", borderRadius:20, fontSize:11, fontWeight:700 }}>{td}</span></td>
+                <td>{p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0} t/h</td>
+                <td>
+                  <span className={p.etatMachine === "En marche" ? "badge-marche" : "badge-arret"}>
+                    {p.etatMachine}
+                  </span>
+                </td>
+                <td style={{ color:"#9ca3af", fontSize:12 }}>{p.typeArret || "—"}</td>
+                {showActions && (
+                  <td>
+                    <button className="db-btn-edit"
+                      onClick={() => handleEdit(p, poussages.indexOf(p))}>
+                      ✏️ Modifier
+                    </button>
+                    <button className="db-btn-del"
+                      onClick={() => handleDelete(poussages.indexOf(p))}>
+                      🗑️ Supprimer
+                    </button>
+                  </td>
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -992,13 +1151,18 @@ function Statistique() {
                 { icon:"📈", label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", delay:"0.24s" },
                 { icon:"🔢", label:"En arret",      value:enArret,              unit:"op",  accent:"#4ade80", delay:"0.32s" },
                 { icon:"✅", label:"En Marche",       value:enMarcheCnt,           unit:"",    accent:"#86efac", delay:"0.40s" },
+                { icon:"⚙️", label:"OEE",              value: parseFloat(avgOEE), unit:"%", accent:"#3b82f6", delay:"0.48s" },
+                { icon:"📊", label:"TU",               value: parseFloat(avgTU),  unit:"%", accent:"#16a34a", delay:"0.56s" },
+                { icon:"⏸️", label:"TD Arrêt",         value: parseFloat(avgTD),  unit:"%", accent:"#f59e0b", delay:"0.64s" },
+                { icon:"🛑", label:"H. Arrêt Total",   value: Math.round(totalHeuresArret * 10) / 10,   unit:"h", accent:"#ef4444", delay:"0.72s" },
               ].map(({ icon, label, value, unit, accent, delay }) => (
                 <div key={label} className="db-kpi" style={{ animationDelay:delay }}>
                   <div className="db-kpi-shimmer"/>
                   <div className="db-kpi-icon">{icon}</div>
                   <div className="db-kpi-label">{label}</div>
                   <div className="db-kpi-value" style={{ color:accent}}>
-                    <AnimCount target={value}/>
+                    {/* ✅ CORRECTION: S'assurer que value est un nombre valide */}
+                    <AnimCount target={isNaN(value) ? 0 : value}/>
                     <span className="db-kpi-unit">{unit}</span>
                   </div>
                 </div>
@@ -1044,7 +1208,244 @@ function Statistique() {
               </div>
             )}
 
-            {/* ══ État de la Machine ══ */}
+            {/* ══ Performance OEE / TU / TD ══ */}
+            <div className="db-section">Performance OEE · TU · TD</div>
+
+            {/* KPI Cards OEE */}
+            <div className="db-oee-grid" style={{ marginBottom:20 }}>
+              {[
+                { cls:"oee",   icon:"⚙️", label:"OEE — Efficacité Globale",   value: avgOEE, unit:"%", gauge: parseFloat(avgOEE), delay:"0.08s" },
+                { cls:"tu",    icon:"✅", label:"TU — Taux d'Utilisation",     value: avgTU,  unit:"%", gauge: parseFloat(avgTU),  delay:"0.16s" },
+                { cls:"td",    icon:"⚠️", label:"TD — Taux de Disponibilité",  value: (100 - parseFloat(avgTD)).toFixed(1), unit:"%", gauge: 100 - parseFloat(avgTD), delay:"0.24s" },
+                { cls:"arret", icon:"🛑", label:"Heures d'Arrêt Total",        value: totalHeuresArret.toFixed(1), unit:"h", gauge: totalHTP > 0 ? Math.min((totalHeuresArret / totalHTP) * 100, 100) : 0, delay:"0.32s" },
+              ].map(({ cls, icon, label, value, unit, gauge, delay }) => (
+                <div key={label} className={`db-oee-card ${cls}`} style={{ animationDelay: delay }}>
+                  <div className={`db-oee-icon ${cls}`}>{icon}</div>
+                  <div className="db-oee-label">{label}</div>
+                  <div className={`db-oee-value ${cls}`}>
+                    {value}<span className="db-oee-unit">{unit}</span>
+                  </div>
+                  <div className="db-oee-gauge-wrap">
+                    <div className={`db-oee-gauge-bar ${cls}`} style={{ width:`${Math.min(gauge, 100)}%` }}/>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Graphes OEE / TU / TD par date */}
+            {oeeDates.length > 0 && (
+              <>
+                {/* Graphe OEE + TU + TD — Line chart */}
+                <div className="db-card" {...anim("0.36s")} style={{ marginBottom:20 }}>
+                  <div className="db-card-header">
+                    <div>
+                      <p className="db-card-title">Évolution OEE · TU · TD par Date</p>
+                      <p className="db-card-sub">Tendance journalière des indicateurs de performance (%)</p>
+                    </div>
+                    <span className="db-pill">{oeeDates.length} jour{oeeDates.length > 1 ? "s" : ""}</span>
+                  </div>
+                  <Line
+                    data={{
+                      labels: oeeDates,
+                      datasets: [
+                        {
+                          label: "OEE (%)",
+                          data: oeeValues,
+                          borderColor: "#3b82f6", backgroundColor: "rgba(59,130,246,0.12)",
+                          borderWidth: 2.5, tension: 0.4, fill: true,
+                          pointBackgroundColor: "#3b82f6", pointRadius: 5, pointHoverRadius: 7,
+                        },
+                        {
+                          label: "TU (%)",
+                          data: tuValues,
+                          borderColor: "#16a34a", backgroundColor: "rgba(22,163,74,0.08)",
+                          borderWidth: 2, tension: 0.4, fill: false,
+                          pointBackgroundColor: "#16a34a", pointRadius: 4, pointHoverRadius: 6,
+                          borderDash: [5, 3],
+                        },
+                        {
+                          label: "TD Arrêt (%)",
+                          data: tdValues,
+                          borderColor: "#f59e0b", backgroundColor: "rgba(245,158,11,0.08)",
+                          borderWidth: 2, tension: 0.4, fill: false,
+                          pointBackgroundColor: "#f59e0b", pointRadius: 4, pointHoverRadius: 6,
+                        },
+                      ],
+                    }}
+                    options={{
+                      responsive: true,
+                      animation: { duration: 900, easing: "easeOutQuart" },
+                      interaction: { mode: "index", intersect: false },
+                      plugins: {
+                        legend: {
+                          position: "bottom",
+                          labels: { color: "#6b7280", font: { family: "'Plus Jakarta Sans',sans-serif", size: 12 }, padding: 16, usePointStyle: true },
+                        },
+                        tooltip: {
+                          ...baseTooltip,
+                          callbacks: { label: (c) => ` ${c.dataset.label} : ${c.parsed.y}%` },
+                        },
+                      },
+                      scales: {
+                        x: { grid: { display: false }, border: { display: false }, ticks: baseTick },
+                        y: {
+                          grid: baseGrid, border: { display: false },
+                          ticks: { ...baseTick, callback: v => v + "%" },
+                          title: { display: true, text: "Pourcentage (%)", color: "#9ca3af", font: { size: 10 } },
+                          min: 0, max: 100,
+                        },
+                      },
+                    }}
+                  />
+                </div>
+
+                {/* Graphe Barres OEE groupé */}
+                <div className="db-grid2" style={{ marginBottom: 20 }}>
+                  <div className="db-card" {...anim("0.42s")}>
+                    <div className="db-card-header">
+                      <div>
+                        <p className="db-card-title">OEE & TU par Date</p>
+                        <p className="db-card-sub">Comparaison barres groupées</p>
+                      </div>
+                    </div>
+                    <Bar
+                      data={{
+                        labels: oeeDates,
+                        datasets: [
+                          {
+                            label: "OEE (%)",
+                            data: oeeValues,
+                            backgroundColor: "rgba(59,130,246,0.82)",
+                            borderColor: "#3b82f6", borderWidth: 1.5,
+                            borderRadius: { topLeft: 6, topRight: 6 }, borderSkipped: false,
+                            barPercentage: 0.6, categoryPercentage: 0.7,
+                          },
+                          {
+                            label: "TU (%)",
+                            data: tuValues,
+                            backgroundColor: "rgba(22,163,74,0.82)",
+                            borderColor: "#16a34a", borderWidth: 1.5,
+                            borderRadius: { topLeft: 6, topRight: 6 }, borderSkipped: false,
+                            barPercentage: 0.6, categoryPercentage: 0.7,
+                          },
+                        ],
+                      }}
+                      options={{
+                        responsive: true,
+                        animation: { duration: 900, easing: "easeOutQuart", delay: (ctx) => ctx.type === "data" && ctx.mode === "default" ? ctx.dataIndex * 60 : 0 },
+                        plugins: {
+                          legend: { position: "bottom", labels: { color: "#6b7280", font: { family: "'Plus Jakarta Sans',sans-serif", size: 12 }, padding: 14, usePointStyle: true } },
+                          tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.dataset.label} : ${c.parsed.y}%` } },
+                        },
+                        scales: {
+                          x: { grid: { display: false }, border: { display: false }, ticks: baseTick },
+                          y: { grid: baseGrid, border: { display: false }, ticks: { ...baseTick, callback: v => v + "%" }, min: 0, max: 100 },
+                        },
+                      }}
+                    />
+                  </div>
+
+                  {/* Graphe Heures d'Arrêt */}
+                  <div className="db-card" {...anim("0.50s")}>
+                    <div className="db-card-header">
+                      <div>
+                        <p className="db-card-title">Heures d'Arrêt par Date</p>
+                        <p className="db-card-sub">Durée cumulée des arrêts journaliers</p>
+                      </div>
+                      <span className="db-pill" style={{ background:"#fef2f2", color:"#dc2626" }}>
+                        {totalHeuresArret.toFixed(1)} h total
+                      </span>
+                    </div>
+                    <Bar
+                      data={{
+                        labels: oeeDates,
+                        datasets: [{
+                          label: "Heures d'Arrêt (h)",
+                          data: arretValues,
+                          backgroundColor: (ctx) => {
+                            const { chartArea, ctx: c } = ctx.chart;
+                            if (!chartArea) return "#ef4444";
+                            const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            g.addColorStop(0, "#ef4444"); g.addColorStop(1, "#fca5a5"); return g;
+                          },
+                          borderRadius: { topLeft: 8, topRight: 8 }, borderSkipped: false,
+                          barPercentage: 0.6, categoryPercentage: 0.7,
+                        }],
+                      }}
+                      options={{
+                        responsive: true,
+                        animation: { duration: 900, easing: "easeOutQuart", delay: (ctx) => ctx.type === "data" && ctx.mode === "default" ? ctx.dataIndex * 70 : 0 },
+                        plugins: {
+                          legend: { display: false },
+                          tooltip: { ...baseTooltip, callbacks: { label: (c) => ` Arrêt : ${c.parsed.y} h` } },
+                        },
+                        scales: {
+                          x: { grid: { display: false }, border: { display: false }, ticks: baseTick },
+                          y: {
+                            grid: baseGrid, border: { display: false },
+                            ticks: { ...baseTick, callback: v => v + " h" },
+                            title: { display: true, text: "Heures", color: "#9ca3af", font: { size: 10 } },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Doughnut TD vs TU */}
+                <div className="db-card" {...anim("0.58s")} style={{ marginBottom: 20 }}>
+                  <div className="db-card-header">
+                    <div>
+                      <p className="db-card-title">Répartition Globale : Marche / Arrêt / Inactif</p>
+                      <p className="db-card-sub">Sur la base du HTP total saisi</p>
+                    </div>
+                    <span className="db-pill">{totalHTP} h HTP total</span>
+                  </div>
+                  {totalHTP > 0 ? (() => {
+                    const marche  = Math.max(0, totalTemps);
+                    const arret   = Math.max(0, totalHeuresArret);
+                    const inactif = Math.max(0, totalHTP - marche - arret);
+                    const dData = {
+                      labels: ["En Marche", "En Arrêt", "Inactif"],
+                      datasets: [{
+                        data: [marche.toFixed(1), arret.toFixed(1), inactif.toFixed(1)],
+                        backgroundColor: ["#16a34a", "#f59e0b", "#e5e7eb"],
+                        borderColor:     ["#15803d", "#d97706", "#d1d5db"],
+                        borderWidth: 2, hoverOffset: 12,
+                      }],
+                    };
+                    return (
+                      <div style={{ display:"flex", alignItems:"center", gap:24, flexWrap:"wrap" }}>
+                        <div style={{ maxWidth:260, flex:"0 0 260px" }}>
+                          <Doughnut data={dData} options={{
+                            responsive: true, cutout: "65%",
+                            animation: { duration: 1200, easing: "easeOutBack" },
+                            plugins: {
+                              legend: { position: "bottom", labels: { color: "#6b7280", font: { family: "'Plus Jakarta Sans',sans-serif", size: 12 }, padding: 16, usePointStyle: true } },
+                              tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.label} : ${c.parsed} h (${((c.parsed / totalHTP) * 100).toFixed(1)}%)` } },
+                            },
+                          }} />
+                        </div>
+                        <div style={{ flex:1, display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:12 }}>
+                          {[
+                            { label:"En Marche", val:`${marche.toFixed(1)} h`, pct:`${totalHTP > 0 ? ((marche/totalHTP)*100).toFixed(1) : 0}%`, bg:"#dcfce7", color:"#15803d", border:"#bbf7d0" },
+                            { label:"En Arrêt",  val:`${arret.toFixed(1)} h`,  pct:`${totalHTP > 0 ? ((arret/totalHTP)*100).toFixed(1) : 0}%`,  bg:"#fef3c7", color:"#92400e", border:"#fde68a" },
+                            { label:"Inactif",   val:`${inactif.toFixed(1)} h`,pct:`${totalHTP > 0 ? ((inactif/totalHTP)*100).toFixed(1) : 0}%`,bg:"#f3f4f6", color:"#6b7280", border:"#e5e7eb" },
+                          ].map(({ label, val, pct, bg, color, border }) => (
+                            <div key={label} style={{ background:bg, border:`1.5px solid ${border}`, borderRadius:12, padding:"14px 16px", textAlign:"center" }}>
+                              <div style={{ fontSize:22, fontWeight:800, color, lineHeight:1 }}>{pct}</div>
+                              <div style={{ fontSize:13, fontWeight:700, color, marginTop:4 }}>{val}</div>
+                              <div style={{ fontSize:10, fontWeight:600, color, opacity:.7, marginTop:2, textTransform:"uppercase", letterSpacing:".06em" }}>{label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })() : <div className="db-empty">Saisir les HTP dans le formulaire pour afficher la répartition</div>}
+                </div>
+              </>
+            )}
+
             <div className="db-section">État de la Machine</div>
             <div className="db-grid2" style={{ marginBottom:20 }}>
 
@@ -1169,8 +1570,6 @@ function Statistique() {
 
             </div>
           </>  )}
-      
-
       </div>
     </>
   );

@@ -228,15 +228,40 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
   const [voyagesGrands, setVoyagesGrands] = useState(savedGrands?.nombre_voyages || 0);
   const [capaciteGrands, setCapaciteGrands] = useState(savedGrands?.capacite_camion || 50);
 
+  // États d'erreur pour chaque champ
+  const [errVoyagesPetits, setErrVoyagesPetits] = useState("");
+  const [errCapacitePetits, setErrCapacitePetits] = useState("");
+  const [errVoyagesGrands, setErrVoyagesGrands] = useState("");
+  const [errCapaciteGrands, setErrCapaciteGrands] = useState("");
+
+  // Règles de validation
+  const MAX_VOYAGES = 9999; // plafond raisonnable par jour
+  const MAX_CAPACITE = 500; // tonnes max par camion
+
+  function validateVoyages(v) {
+    if (v <= 0) return "Le nombre de voyages doit être > 0";
+    if (v > MAX_VOYAGES) return `Le nombre de voyages ne peut pas dépasser ${MAX_VOYAGES}`;
+    return "";
+  }
+
+  function validateCapacite(v) {
+    if (v <= 0) return "La capacité doit être supérieure à 0 t";
+    if (v > MAX_CAPACITE) return `La capacité ne peut pas dépasser ${MAX_CAPACITE} t`;
+    return "";
+  }
+
   // Sync when date or saved data changes
   useEffect(() => {
     setVoyagesPetits(savedPetits?.nombre_voyages || 0);
     setCapacitePetits(savedPetits?.capacite_camion || 20);
     setVoyagesGrands(savedGrands?.nombre_voyages || 0);
     setCapaciteGrands(savedGrands?.capacite_camion || 50);
+    // Réinitialise les erreurs quand la date change
+    setErrVoyagesPetits(""); setErrCapacitePetits("");
+    setErrVoyagesGrands(""); setErrCapaciteGrands("");
   }, [selectedDate, savedPetits?.nombre_voyages, savedPetits?.capacite_camion, savedGrands?.nombre_voyages, savedGrands?.capacite_camion]);
 
-  // Debounced auto-save
+  // Sauvegarde automatique avec délai (debounce)
   const timerRef = useRef(null);
   const autoSave = useCallback((typeMoyen, voyages, capacite) => {
     if (!selectedDate) return;
@@ -252,10 +277,31 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
     }, 800);
   }, [selectedDate, entrepriseKey, dispatch]);
 
-  const handleVoyagesPetits = (v) => { setVoyagesPetits(v); autoSave("petits", v, capacitePetits); onVolumeDecapeChange?.(v * capacitePetits + voyagesGrands * capaciteGrands); };
-  const handleCapacitePetits = (v) => { setCapacitePetits(v); autoSave("petits", voyagesPetits, v); onVolumeDecapeChange?.(voyagesPetits * v + voyagesGrands * capaciteGrands); };
-  const handleVoyagesGrands = (v) => { setVoyagesGrands(v); autoSave("grands", v, capaciteGrands); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + v * capaciteGrands); };
-  const handleCapaciteGrands = (v) => { setCapaciteGrands(v); autoSave("grands", voyagesGrands, v); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + voyagesGrands * v); };
+  // Gestionnaires de changement avec validation intégrée
+  const handleVoyagesPetits = (v) => {
+    setVoyagesPetits(v);
+    const err = validateVoyages(v);
+    setErrVoyagesPetits(err);
+    if (!err) { autoSave("petits", v, capacitePetits); onVolumeDecapeChange?.(v * capacitePetits + voyagesGrands * capaciteGrands); }
+  };
+  const handleCapacitePetits = (v) => {
+    setCapacitePetits(v);
+    const err = validateCapacite(v);
+    setErrCapacitePetits(err);
+    if (!err) { autoSave("petits", voyagesPetits, v); onVolumeDecapeChange?.(voyagesPetits * v + voyagesGrands * capaciteGrands); }
+  };
+  const handleVoyagesGrands = (v) => {
+    setVoyagesGrands(v);
+    const err = validateVoyages(v);
+    setErrVoyagesGrands(err);
+    if (!err) { autoSave("grands", v, capaciteGrands); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + v * capaciteGrands); }
+  };
+  const handleCapaciteGrands = (v) => {
+    setCapaciteGrands(v);
+    const err = validateCapacite(v);
+    setErrCapaciteGrands(err);
+    if (!err) { autoSave("grands", voyagesGrands, v); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + voyagesGrands * v); }
+  };
 
   // Volume sauté total pour la date sélectionnée (tous conducteurs)
   const volumeSaute = filteredPoussages.reduce(
@@ -425,8 +471,21 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
               {isLimited ? (
                 <div className="camion-value">{voyagesPetits}</div>
               ) : (
-                <input className="input-camion" type="number" min="0" value={voyagesPetits}
-                  onChange={(e) => handleVoyagesPetits(Number(e.target.value))} placeholder="0" />
+                <>
+                  <input
+                    className="input-camion"
+                    type="number"
+                    value={voyagesPetits}
+                    style={errVoyagesPetits ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
+                    onChange={(e) => handleVoyagesPetits(Number(e.target.value))}
+                    placeholder="0"
+                  />
+                  {errVoyagesPetits && (
+                    <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                      ⚠ {errVoyagesPetits}
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <div>
@@ -434,8 +493,21 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
               {isLimited ? (
                 <div className="camion-value">{capacitePetits}</div>
               ) : (
-                <input className="input-camion" type="number" min="0" value={capacitePetits}
-                  onChange={(e) => handleCapacitePetits(Number(e.target.value))} placeholder="20" />
+                <>
+                  <input
+                    className="input-camion"
+                    type="number"
+                    value={capacitePetits}
+                    style={errCapacitePetits ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
+                    onChange={(e) => handleCapacitePetits(Number(e.target.value))}
+                    placeholder="20"
+                  />
+                  {errCapacitePetits && (
+                    <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                      ⚠ {errCapacitePetits}
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <div>
@@ -460,8 +532,21 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
               {isLimited ? (
                 <div className="camion-value">{voyagesGrands}</div>
               ) : (
-                <input className="input-camion" type="number" min="0" value={voyagesGrands}
-                  onChange={(e) => handleVoyagesGrands(Number(e.target.value))} placeholder="0" />
+                <>
+                  <input
+                    className="input-camion"
+                    type="number"
+                    value={voyagesGrands}
+                    style={errVoyagesGrands ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
+                    onChange={(e) => handleVoyagesGrands(Number(e.target.value))}
+                    placeholder="0"
+                  />
+                  {errVoyagesGrands && (
+                    <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                      ⚠ {errVoyagesGrands}
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <div>
@@ -469,8 +554,21 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
               {isLimited ? (
                 <div className="camion-value">{capaciteGrands}</div>
               ) : (
-                <input className="input-camion" type="number" min="0" value={capaciteGrands}
-                  onChange={(e) => handleCapaciteGrands(Number(e.target.value))} placeholder="50" />
+                <>
+                  <input
+                    className="input-camion"
+                    type="number"
+                    value={capaciteGrands}
+                    style={errCapaciteGrands ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
+                    onChange={(e) => handleCapaciteGrands(Number(e.target.value))}
+                    placeholder="50"
+                  />
+                  {errCapaciteGrands && (
+                    <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                      ⚠ {errCapaciteGrands}
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <div>

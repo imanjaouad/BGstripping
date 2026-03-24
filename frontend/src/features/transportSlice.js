@@ -4,16 +4,35 @@ import {
   createTransportJournalierAPI,
 } from "../services/api";
 
-// ─── Async Thunks ─────────────────────────────────────────────────────────────
+// ─── Fonction utilitaire ───────────────────────────────────────────────────────
+// Convertit un enregistrement brut venant du backend en objet propre.
+// Retourne null si l'enregistrement est invalide (protection contre les crashes).
+function mapRecord(r) {
+  if (!r || typeof r !== "object") return null;
+  return {
+    id: r.id ?? null,
+    // operation_date peut contenir une heure (ex: "2024-03-17T00:00:00"), on garde juste la date
+    date: r.operation_date
+      ? String(r.operation_date).split("T")[0]
+      : r.date || "",
+    entreprise: r.entreprise || "",
+    type_moyen: r.type_moyen || "",
+    nombre_voyages: Number(r.nombre_voyages) || 0,
+    capacite_camion: Number(r.capacite_camion) || 0,
+    volume_decape: Number(r.volume_decape) || 0,
+  };
+}
 
-/** Fetch all transport records (optionally filtered by date) */
+// ─── Actions asynchrones (Thunks) ─────────────────────────────────────────────
+
+/** Récupère tous les enregistrements de transport (filtrés par date si fournie) */
 export const fetchTransportJournaliers = createAsyncThunk(
   "transport/fetchAll",
   async (date = null, { rejectWithValue }) => {
     try {
       const res = await fetchTransportJournaliersAPI(date);
-      // res.data is the JSON array for this specific controller
-      return res.data;
+      // api.js retourne directement le JSON parsé (pas un objet axios avec .data)
+      return Array.isArray(res) ? res : [];
     } catch (err) {
       return rejectWithValue(err.message);
     }
@@ -21,28 +40,33 @@ export const fetchTransportJournaliers = createAsyncThunk(
 );
 
 /**
- * Upsert a transport record.
- * The backend uses updateOrCreate on (date, entreprise, type_moyen).
+ * Crée ou met à jour un enregistrement de transport (upsert).
+ * Le backend utilise updateOrCreate sur (date, entreprise, type_moyen).
+ * Après la sauvegarde, on recharge la liste pour la même date.
  */
 export const saveTransportJournalier = createAsyncThunk(
   "transport/save",
-  async (payload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue, dispatch }) => {
     try {
       const res = await createTransportJournalierAPI(payload);
-      return res.data;
+      // Important : le payload contient "operation_date" et non "date"
+      // Si on passe payload?.date, ça vaut undefined → le filtre backend plante
+      const dateParam = payload?.operation_date || null;
+      await dispatch(fetchTransportJournaliers(dateParam));
+      return res;
     } catch (err) {
       return rejectWithValue(err.data || err.message);
     }
   }
 );
 
-// ─── Slice ────────────────────────────────────────────────────────────────────
+// ─── Slice Redux ───────────────────────────────────────────────────────────────
 
 const initialState = {
-  list: [],
-  loading: false,
-  saving: false,
-  error: null,
+  list: [],       // liste des enregistrements chargés
+  loading: false, // chargement en cours (fetch)
+  saving: false,  // sauvegarde en cours (save)
+  error: null,    // message d'erreur éventuel
 };
 
 const transportSlice = createSlice({
@@ -51,53 +75,31 @@ const transportSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // ── Fetch : chargement de la liste ──────────────────────────────────────
       .addCase(fetchTransportJournaliers.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchTransportJournaliers.fulfilled, (state, action) => {
         state.loading = false;
-        state.list = (action.payload || []).map((r) => ({
-          id: r.id,
-          date: r.operation_date ? String(r.operation_date).split("T")[0] : "",
-          entreprise: r.entreprise,
-          type_moyen: r.type_moyen,
-          nombre_voyages: Number(r.nombre_voyages) || 0,
-          capacite_camion: Number(r.capacite_camion) || 0,
-          volume_decape: Number(r.volume_decape) || 0,
-        }));
+        const data = Array.isArray(action.payload) ? action.payload : [];
+        // On filtre les éléments null (enregistrements invalides rejetés par mapRecord)
+        state.list = data.map(mapRecord).filter(Boolean);
       })
       .addCase(fetchTransportJournaliers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
+      // ── Save : sauvegarde d'un enregistrement ───────────────────────────────
       .addCase(saveTransportJournalier.pending, (state) => {
         state.saving = true;
+        state.error = null;
       })
-      .addCase(saveTransportJournalier.fulfilled, (state, action) => {
+      .addCase(saveTransportJournalier.fulfilled, (state) => {
+        // La liste est déjà mise à jour par le fetchTransportJournaliers
+        // appelé à l'intérieur du thunk saveTransportJournalier
         state.saving = false;
-        const r = action.payload;
-        const mapped = {
-          id: r.id,
-          date: r.operation_date ? String(r.operation_date).split("T")[0] : "",
-          entreprise: r.entreprise,
-          type_moyen: r.type_moyen,
-          nombre_voyages: Number(r.nombre_voyages) || 0,
-          capacite_camion: Number(r.capacite_camion) || 0,
-          volume_decape: Number(r.volume_decape) || 0,
-        };
-        const idx = state.list.findIndex(
-          (x) =>
-            x.date === mapped.date &&
-            x.entreprise === mapped.entreprise &&
-            x.type_moyen === mapped.type_moyen
-        );
-        if (idx !== -1) {
-          state.list[idx] = mapped;
-        } else {
-          state.list.push(mapped);
-        }
       })
       .addCase(saveTransportJournalier.rejected, (state, action) => {
         state.saving = false;

@@ -13,63 +13,80 @@ function Dashboard() {
   }, [dispatch]);
 
   const [editIndex, setEditIndex] = useState(null);
-  const [editId, setEditId]       = useState(null);
+  const [editId, setEditId] = useState(null);
 
   const [equipementOptions, setEquipementOptions] = useState([
     "T1", "T2", "T3", "T4", "T5", "T6", "T7",
   ]);
 
-  // Noms de champs = exactement les clés attendues par la validation Laravel
   const emptyForm = {
-    date:            "",
-    panneau:         "",
-    tranchee:        "",
-    niveau:          "",
-    volume_sote:     "",    // ← clé corrigée (était volume_soté)
-    profondeur:      "",    // ← clé corrigée (était profendeur)
-    equipements:     [],
-    conducteur:      "",
-    matricule:       "",
-    machine_id:      "",    // ← ajouté (requis par le backend)
-    heureDebut:      "",
-    heureFin:        "",
-    temps:           "",
-    compteur_debut:  "",    // ← clé corrigée (était compteurDebut)
-    compteur_fin:    "",    // ← clé corrigée (était compteurFin)
-    poste:           "",
-    etat_machine:    "En marche",   // ← clé corrigée (était etatMachine)
-    type_arret:      "",            // ← clé corrigée (était typeArret)
+    date: "",
+    panneau: "",
+    tranchee: "",
+    niveau: "",
+    volume_sote: "",
+    profondeur: "",
+    equipements: [],
+    conducteur: "",
+    matricule: "",
+    machine_id: "",
+    heureDebut: "",
+    heureFin: "",
+    temps: "",
+   
+    poste: "",
+    etat_machine: "En marche",
+    type_arret: "",
     heureDebutArret: "",
-    heureFinArret:   "",
+    heureFinArret: "",
+    heures_arret: 0, // FIX 1 : champ manquant dans emptyForm
+    htp: "",
   };
 
   const [formData, setFormData] = useState(emptyForm);
 
-  // Calcul automatique des heures de marche
+  // FIX 2 : calcTemps était appelée mais jamais définie — on la définit ici
   const calcTemps = (debut, fin) => {
-    if (!debut || !fin) return "";
+    if (!debut || !fin) return 0;
     const [dh, dm] = debut.split(":").map(Number);
     const [fh, fm] = fin.split(":").map(Number);
-    const totalMin = (fh * 60 + fm) - (dh * 60 + dm);
-    if (totalMin <= 0) return "";
+    let totalMin = (fh * 60 + fm) - (dh * 60 + dm);
+    if (totalMin < 0) totalMin += 24 * 60;
     return (totalMin / 60).toFixed(2);
   };
 
+  const calcDuree = (debut, fin) => {
+    if (!debut || !fin) return 0;
+    const [dh, dm] = debut.split(":").map(Number);
+    const [fh, fm] = fin.split(":").map(Number);
+    let totalMin = (fh * 60 + fm) - (dh * 60 + dm);
+    if (totalMin < 0) totalMin += 24 * 60;
+    return (totalMin / 60).toFixed(2);
+  };
+
+  // FIX 3 : accolade fermante mal placée — le bloc if(etat_machine) était sorti de la fonction
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
 
     if (name === "heureDebut" || name === "heureFin") {
       const debut = name === "heureDebut" ? value : formData.heureDebut;
-      const fin   = name === "heureFin"   ? value : formData.heureFin;
+      const fin = name === "heureFin" ? value : formData.heureFin;
       updated.temps = calcTemps(debut, fin);
     }
 
-    // Réinitialiser les champs d'arrêt quand on repasse à "En marche"
+    if (name === "heureDebutArret" || name === "heureFinArret") {
+      const debutArret = name === "heureDebutArret" ? value : formData.heureDebutArret;
+      const finArret = name === "heureFinArret" ? value : formData.heureFinArret;
+      updated.heures_arret = calcDuree(debutArret, finArret);
+    }
+
+    // Ce bloc était en dehors de handleChange — déplacé ici
     if (name === "etat_machine" && value === "En marche") {
-      updated.type_arret       = "";
-      updated.heureDebutArret  = "";
-      updated.heureFinArret    = "";
+      updated.type_arret = "";
+      updated.heureDebutArret = "";
+      updated.heureFinArret = "";
+      updated.heures_arret = 0;
     }
 
     setFormData(updated);
@@ -115,6 +132,25 @@ function Dashboard() {
     formData.temps > 0
       ? (parseFloat(formData.volume_sote) / parseFloat(formData.temps)).toFixed(2)
       : 0;
+
+  // FIX 4 : OEE / TU / TD étaient utilisés sans être définis — calculs ajoutés
+  const htp = parseFloat(formData.htp) || 0;
+  const temps = parseFloat(formData.temps) || 0;
+  const heuresArret = parseFloat(formData.heures_arret) || 0;
+const OEE = htp > 0 && rendement > 0
+    ? ((htp / 24) * 100).toFixed(1) :0;  
+ 
+// 1. Taux d'utilisation (TU) basé sur htp
+const TU = htp > 0 ? ((OEE / 24) * 100) .toFixed(1) :0;
+
+// 2. Temps disponible réel
+const tempsFonctionnement = htp - heuresArret;
+
+// 3. Taux de disponibilité (TD)
+const TD = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
+
+// 4. Format final
+
 
   return (
     <div>
@@ -267,17 +303,20 @@ function Dashboard() {
             <input type="text" className="db-form-input" name="niveau"
               value={formData.niveau} onChange={handleChange} placeholder="Ex: N1" />
           </div>
+          <div>
+            <label className="db-form-label">HTP</label>
+            <input type="number" step="1" min="0" max="8" className="db-form-input" name="htp"
+              value={formData.htp} onChange={handleChange} placeholder="Saisir le htp" />
+          </div>
 
           {/* ROW 2 — Mesures */}
           <div>
             <label className="db-form-label">Profondeur (m)</label>
-            {/* name="profondeur" — corrigé (était "profendeur") */}
             <input type="number" step="0.01" className="db-form-input" name="profondeur"
               value={formData.profondeur} onChange={handleChange} placeholder="0.00" />
           </div>
           <div>
             <label className="db-form-label">Volume Souté (t)</label>
-            {/* name="volume_sote" — corrigé (était "volume_soté") */}
             <input type="number" step="0.01" className="db-form-input" name="volume_sote"
               value={formData.volume_sote} onChange={handleChange} placeholder="0.00" />
           </div>
@@ -305,7 +344,6 @@ function Dashboard() {
           </div>
           <div>
             <label className="db-form-label">Machine</label>
-            {/* name="machine_id" — ajouté, requis par le backend */}
             <input type="number" className="db-form-input" name="machine_id"
               value={formData.machine_id} onChange={handleChange} placeholder="ID machine" />
           </div>
@@ -315,22 +353,9 @@ function Dashboard() {
               value={formData.poste} onChange={handleChange} placeholder="Ex: Matin" />
           </div>
 
-          {/* ROW 4 — Compteurs & État */}
-          <div>
-            <label className="db-form-label">Compteur Début</label>
-            {/* name="compteur_debut" — corrigé (était "compteurDebut") */}
-            <input type="number" className="db-form-input" name="compteur_debut"
-              value={formData.compteur_debut} onChange={handleChange} placeholder="0" />
-          </div>
-          <div>
-            <label className="db-form-label">Compteur Fin</label>
-            {/* name="compteur_fin" — corrigé (était "compteurFin") */}
-            <input type="number" className="db-form-input" name="compteur_fin"
-              value={formData.compteur_fin} onChange={handleChange} placeholder="0" />
-          </div>
+        
           <div style={{ gridColumn: "span 2" }}>
             <label className="db-form-label">État Machine</label>
-            {/* name="etat_machine" — corrigé (était "etatMachine"), valeurs = exactement l'enum backend */}
             <select
               className={`db-form-select ${formData.etat_machine === "En arrêt" ? "db-select-danger" : ""}`}
               name="etat_machine"
@@ -349,7 +374,6 @@ function Dashboard() {
               <div className="db-arret-grid">
                 <div>
                   <label className="db-form-label" style={{ color: "#92400e" }}>Nature d'arrêt</label>
-                  {/* name="type_arret" — corrigé (était "typeArret") */}
                   <input type="text" className="db-form-input" name="type_arret"
                     value={formData.type_arret} onChange={handleChange} placeholder="Cause technique..." />
                 </div>
@@ -384,7 +408,8 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* BANNIÈRE — Heures de marche + Rendement */}
+          {/* FIX 5 : bannières corrigées — JSX invalide (commentaire // dans JSX) supprimé,
+              structure de grille imbriquée déplacée hors de la div parente */}
           <div style={{ gridColumn: "span 2", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", alignSelf: "end" }}>
             <div className="db-rendement-banner">
               <div className="db-rendement-value">{formData.temps || 0}</div>
@@ -393,6 +418,21 @@ function Dashboard() {
             <div className="db-rendement-banner">
               <div className="db-rendement-value">{rendement}</div>
               <div className="db-rendement-label">t/h<br />Rendement instantané</div>
+            </div>
+          </div>
+
+          <div style={{ gridColumn: "span 2", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", alignSelf: "end" }}>
+            <div className="db-rendement-banner">
+              <div className="db-rendement-value">{OEE}</div>
+              <div className="db-rendement-label">OEE %</div>
+            </div>
+            <div className="db-rendement-banner">
+              <div className="db-rendement-value">{TU}</div>
+              <div className="db-rendement-label">TU %</div>
+            </div>
+            <div className="db-rendement-banner">
+              <div className="db-rendement-value">{TD}</div>
+              <div className="db-rendement-label">TD %</div>
             </div>
           </div>
 

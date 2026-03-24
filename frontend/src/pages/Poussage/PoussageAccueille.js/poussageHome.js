@@ -8,10 +8,10 @@ import "./Home.css";
 export default function PoussageHome() {
   return (
     <div className="home-page">
-      <OperationsSection />
+      
     
       <DefinitionSection />
-      
+      <OperationsSection />
       <CTASection />
       <Footer />
     </div>
