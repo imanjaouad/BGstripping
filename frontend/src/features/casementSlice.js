@@ -1,158 +1,265 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  fetchCasementsAPI,
-  createCasementAPI,
-  updateCasementAPI,
-  deleteCasementAPI,
-} from "../services/api";
+// ═══════════════════════════════════════════════════════════════════════════
+// casementSlice.js  — Version API Laravel
+//
+// Remplace intégralement la version localStorage.
+// Toutes les mutations (add / update / delete) passent par l'API Laravel.
+// La liste locale Redux est synchronisée après chaque réponse serveur.
+// ═══════════════════════════════════════════════════════════════════════════
 
-// ─── Async Thunks ─────────────────────────────────────────────────────────────
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+// ── URL de base ──────────────────────────────────────────────────────────
+const BASE = process.env.REACT_APP_API_URL
+  ? `${process.env.REACT_APP_API_URL}/api`
+  : "http://localhost:8000/api";
+
+const JSON_HEADERS = {
+  "Content-Type": "application/json",
+  Accept: "application/json",
+};
+
+/* ─────────────────────────────────────────────────────────────────────────
+   MAPPING  camelCase (React)  ←→  snake_case (Laravel)
+   Les champs du formulaire React utilisent camelCase ;
+   l'API Laravel attend snake_case.
+───────────────────────────────────────────────────────────────────────── */
+
+/** Formulaire React → corps JSON pour l'API */
+const toApi = (f) => ({
+  date:                  f.date                  ?? null,
+  panneau:               f.panneau               ?? null,
+  tranchee:              f.tranchee              ?? null,
+  niveau:                f.niveau                ?? null,
+  profondeur:            f.profondeur            ?? null,
+  volume_saute:          f.volume_saute !== "" ? Number(f.volume_saute) : null,
+  conducteur:            f.conducteur            ?? null,
+  matricule:             f.matricule             ?? null,
+  poste:                 f.poste                 ?? null,
+  equipements:           Array.isArray(f.equipements) ? f.equipements : [],
+  arrets_equipements:    f.arretsEquipements     ?? null,
+  heure_debut_compteur:  f.heureDebutCompteur    ?? null,
+  heure_fin_compteur:    f.heureFinCompteur      ?? null,
+  temps:                 f.temps  !== "" ? Number(f.temps)  : null,
+  htp:                   f.htp    !== "" ? Number(f.htp)    : null,
+  etat_machine:          f.etatMachine           ?? "marche",
+  type_arret:            f.typeArret             ?? null,
+  heure_debut_arret:     f.heureDebutArret       ?? null,
+  heure_fin_arret:       f.heureFinArret         ?? null,
+  oee:                   f.oee !== "" && f.oee != null ? Number(f.oee) : null,
+  tu:                    f.tu  !== "" && f.tu  != null ? Number(f.tu)  : null,
+  td:                    f.td  !== "" && f.td  != null ? Number(f.td)  : null,
+});
+
+/** Réponse API → objet compatible avec le store Redux / composants React */
+const fromApi = (r) => ({
+  id:                  r.id,
+  date:                r.date,
+  panneau:             r.panneau             ?? "",
+  tranchee:            r.tranchee            ?? "",
+  niveau:              r.niveau              ?? "",
+  profondeur:          r.profondeur          ?? "",
+  volume_saute:        r.volume_saute        ?? 0,
+  conducteur:          r.conducteur          ?? "",
+  matricule:           r.matricule           ?? "",
+  poste:               r.poste              ?? "",
+  equipements:         r.equipements        ?? [],
+  arretsEquipements:   r.arrets_equipements  ?? {},
+  heureDebutCompteur:  r.heure_debut_compteur ?? "",
+  heureFinCompteur:    r.heure_fin_compteur   ?? "",
+  temps:               r.temps               ?? "",
+  htp:                 r.htp                 ?? "",
+  etatMachine:         r.etat_machine        ?? "marche",
+  typeArret:           r.type_arret          ?? "",
+  heureDebutArret:     r.heure_debut_arret   ?? "",
+  heureFinArret:       r.heure_fin_arret     ?? "",
+  oee:                 r.oee                 ?? "",
+  tu:                  r.tu                  ?? "",
+  td:                  r.td                  ?? "",
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THUNKS
+═══════════════════════════════════════════════════════════════════════════ */
+
+// ── Charger toutes les opérations ─────────────────────────────────────────
 export const fetchCasements = createAsyncThunk(
   "casement/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetchCasementsAPI();
-      return res.data;
+      const res  = await fetch(`${BASE}/casements?no_pagination=1`, { headers: JSON_HEADERS });
+      if (!res.ok) throw new Error(`Erreur ${res.status}`);
+      const json = await res.json();
+      const list = Array.isArray(json) ? json : (json.data ?? []);
+      return list.map(fromApi);
     } catch (err) {
       return rejectWithValue(err.message);
     }
   }
 );
 
-export const addCasementAsync = createAsyncThunk(
-  "casement/create",
+// ── Ajouter ───────────────────────────────────────────────────────────────
+export const addCasement = createAsyncThunk(
+  "casement/add",
   async (formData, { rejectWithValue }) => {
     try {
-      const res = await createCasementAPI(formData);
-      return res.data;
+      const res = await fetch(`${BASE}/casements`, {
+        method:  "POST",
+        headers: JSON_HEADERS,
+        body:    JSON.stringify(toApi(formData)),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        return rejectWithValue(err.message ?? "Erreur lors de l'ajout.");
+      }
+      const json = await res.json();
+      return fromApi(json.data);
     } catch (err) {
-      return rejectWithValue(err.data || err.message);
+      return rejectWithValue(err.message);
     }
   }
 );
 
-export const updateCasementAsync = createAsyncThunk(
+// ── Mettre à jour ─────────────────────────────────────────────────────────
+// Signature : { id, data }   (l'index n'est plus nécessaire)
+export const updateCasement = createAsyncThunk(
   "casement/update",
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const res = await updateCasementAPI(id, data);
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err.data || err.message);
-    }
-  }
-);
-
-export const deleteCasementAsync = createAsyncThunk(
-  "casement/delete",
-  async (id, { rejectWithValue }) => {
-    try {
-      await deleteCasementAPI(id);
-      return id;
+      const res = await fetch(`${BASE}/casements/${id}`, {
+        method:  "PUT",
+        headers: JSON_HEADERS,
+        body:    JSON.stringify(toApi(data)),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        return rejectWithValue(err.message ?? "Erreur lors de la mise à jour.");
+      }
+      const json = await res.json();
+      return fromApi(json.data);
     } catch (err) {
       return rejectWithValue(err.message);
     }
   }
 );
 
-// ─── Helper: map backend → frontend field names ───────────────────────────────
+// ── Supprimer ─────────────────────────────────────────────────────────────
+// Accepte directement l'id (number).
+export const deleteCasement = createAsyncThunk(
+  "casement/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${BASE}/casements/${id}`, {
+        method:  "DELETE",
+        headers: JSON_HEADERS,
+      });
+      if (!res.ok) throw new Error(`Erreur ${res.status}`);
+      return id; // retourné au reducer pour filtrer la liste
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
 
-function mapBackendToFrontend(c) {
-  return {
-    id: c.id,
-    date: c.operation_date ? c.operation_date.split("T")[0] : "",
-    panneau: c.panneau || "",
-    tranchee: c.tranchee || "",
-    niveau: c.niveau || "",
-    volume_casse: c.volume_casse || 0,
-    granulometrie: c.granulometrie || "",
-    type_roche: c.type_roche || "",
-    nombreCoups: c.nombre_coups || 0,
-    equipements: c.equipements || [],
-    conducteur: c.conducteur || "",
-    matricule: c.matricule || "",
-    heureDebut: c.heure_debut || "",
-    heureFin: c.heure_fin || "",
-    temps: c.temps || 0,
-    poste: c.poste || "",
-    etatMachine:
-      c.etat_machine === "en_marche"
-        ? "En marche"
-        : c.etat_machine === "en_arret"
-        ? "En arrêt"
-        : c.etat_machine || "En marche",
-    typeArret: c.type_arret || "",
-    heureDebutArret: c.arret_heure_debut || "",
-    heureFinArret: c.arret_heure_fin || "",
-  };
-}
+// ── Vider tout ────────────────────────────────────────────────────────────
+export const clearCasements = createAsyncThunk(
+  "casement/clearAll",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${BASE}/casements`, {
+        method:  "DELETE",
+        headers: { ...JSON_HEADERS, "X-Confirm-Delete": "true" },
+      });
+      if (!res.ok) throw new Error(`Erreur ${res.status}`);
+      return true;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
 
-// ─── Slice ────────────────────────────────────────────────────────────────────
-
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLICE
+═══════════════════════════════════════════════════════════════════════════ */
 const casementSlice = createSlice({
   name: "casement",
   initialState: {
-    list: [],
+    list:    [],
     loading: false,
-    error: null,
+    error:   null,
   },
+
   reducers: {
-    addCasement: (state, action) => {
-      state.list.unshift(action.payload);
-    },
-    updateCasement: (state, action) => {
-      const { index, data } = action.payload;
-      if (state.list[index]) state.list[index] = data;
-    },
-    deleteCasement: (state, action) => {
-      state.list.splice(action.payload, 1);
-    },
+    clearError: (state) => { state.error = null; },
   },
+
   extraReducers: (builder) => {
+
+    // ── fetchCasements ────────────────────────────────────────────────────
     builder
-      // fetchCasements
-      .addCase(fetchCasements.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(fetchCasements.pending,   (s) => { s.loading = true;  s.error = null; })
+      .addCase(fetchCasements.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        s.list    = payload;
       })
-      .addCase(fetchCasements.fulfilled, (state, action) => {
-        state.loading = false;
-        state.list = (action.payload || []).map(mapBackendToFrontend);
-      })
-      .addCase(fetchCasements.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(fetchCasements.rejected,  (s, { payload }) => {
+        s.loading = false;
+        s.error   = payload;
+      });
 
-      // addCasementAsync
-      .addCase(addCasementAsync.pending, (state) => {
-        state.loading = true;
+    // ── addCasement ───────────────────────────────────────────────────────
+    builder
+      .addCase(addCasement.pending,   (s) => { s.loading = true;  s.error = null; })
+      .addCase(addCasement.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        s.list.unshift(payload);   // plus récent en tête, comme avant
       })
-      .addCase(addCasementAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.list.unshift(mapBackendToFrontend(action.payload));
-      })
-      .addCase(addCasementAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(addCasement.rejected,  (s, { payload }) => {
+        s.loading = false;
+        s.error   = payload;
+      });
 
-      // updateCasementAsync
-      .addCase(updateCasementAsync.fulfilled, (state, action) => {
-        const mapped = mapBackendToFrontend(action.payload);
-        const idx = state.list.findIndex((item) => item.id === mapped.id);
-        if (idx !== -1) state.list[idx] = mapped;
+    // ── updateCasement ────────────────────────────────────────────────────
+    builder
+      .addCase(updateCasement.pending,   (s) => { s.loading = true;  s.error = null; })
+      .addCase(updateCasement.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        const idx = s.list.findIndex((c) => c.id === payload.id);
+        if (idx !== -1) s.list[idx] = payload;
       })
+      .addCase(updateCasement.rejected,  (s, { payload }) => {
+        s.loading = false;
+        s.error   = payload;
+      });
 
-      // deleteCasementAsync
-      .addCase(deleteCasementAsync.fulfilled, (state, action) => {
-        const id = action.payload;
-        state.list = state.list.filter((item) => item.id !== id);
+    // ── deleteCasement ────────────────────────────────────────────────────
+    builder
+      .addCase(deleteCasement.pending,   (s) => { s.loading = true;  s.error = null; })
+      .addCase(deleteCasement.fulfilled, (s, { payload: id }) => {
+        s.loading = false;
+        s.list    = s.list.filter((c) => c.id !== id);
+      })
+      .addCase(deleteCasement.rejected,  (s, { payload }) => {
+        s.loading = false;
+        s.error   = payload;
+      });
+
+    // ── clearCasements ────────────────────────────────────────────────────
+    builder
+      .addCase(clearCasements.pending,   (s) => { s.loading = true;  })
+      .addCase(clearCasements.fulfilled, (s) => { s.loading = false; s.list = []; })
+      .addCase(clearCasements.rejected,  (s, { payload }) => {
+        s.loading = false;
+        s.error   = payload;
       });
   },
 });
 
-export const { addCasement, updateCasement, deleteCasement } =
-  casementSlice.actions;
+export const { clearError } = casementSlice.actions;
 export default casementSlice.reducer;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELECTORS
+═══════════════════════════════════════════════════════════════════════════ */
+export const selectCasements       = (s) => s.casement.list;
+export const selectCasementLoading = (s) => s.casement.loading;
+export const selectCasementError   = (s) => s.casement.error;

@@ -82,7 +82,7 @@ const toggleTheme = () => {
   }, []);
 
   return (
-    <section className="definition-section">
+    <section className="definition-section" id="definition">
       <div className="container">
 
         <div className="definition-header" ref={headerRef}>
