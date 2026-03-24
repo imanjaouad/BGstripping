@@ -6,9 +6,7 @@ import Poussage from "./pages/Poussage/poussage";
 import Casement from "./pages/Casement/casement";
 import TransportDashboard from "./pages/Transport/TransportDashboard";
 import TransportStatistiques from "./pages/Transport/TransportStatistiques";
-import PrivateRoute from "./components/PrivateRoute";
 import "./style/PoussageForm.css";
-import UserManagement from "./pages/UsersManagement/UserManagement";
 import "./style/ReportsSection.css";
 
 function App() {
@@ -16,27 +14,19 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-        {/* USER MANAGEMENT */}
-      <Route
-        path="/admin/users"
-        element={
-          <PrivateRoute>
-            <UserManagement />
-          </PrivateRoute>
-        }
-      />
+
       {/* Poussage — wildcard /* required for nested <Routes> in poussage.js */}
-      <Route path="/poussage/*" element={<PrivateRoute><Poussage /></PrivateRoute>} />
-      <Route path="/operations/poussage/*" element={<PrivateRoute><Poussage /></PrivateRoute>} />
+      <Route path="/poussage/*" element={<Poussage />} />
+      <Route path="/operations/poussage/*" element={<Poussage />} />
 
       {/* Casement — wildcard /* required for nested <Routes> in casement.js */}
-      <Route path="/casement/*" element={<PrivateRoute><Casement /></PrivateRoute>} />
-      <Route path="/operations/casement/*" element={<PrivateRoute><Casement /></PrivateRoute>} />
+      <Route path="/casement/*" element={<Casement />} />
+      <Route path="/operations/casement/*" element={<Casement />} />
 
       {/* Transport */}
-      <Route path="/transport" element={<PrivateRoute><TransportDashboard /></PrivateRoute>} />
-      <Route path="/transport/statistiques" element={<PrivateRoute><TransportStatistiques /></PrivateRoute>} />
-      <Route path="/operations/transport" element={<PrivateRoute><TransportDashboard /></PrivateRoute>} />
+      <Route path="/transport" element={<TransportDashboard />} />
+      <Route path="/transport/statistiques" element={<TransportStatistiques />} />
+      <Route path="/operations/transport" element={<TransportDashboard />} />
     </Routes>
   );
 }
