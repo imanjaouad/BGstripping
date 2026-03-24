@@ -20,12 +20,11 @@ class Poussage extends Model
         'machine_id',
         'conducteur',
         'matricule',
-        'compteur_debut',
-        'compteur_fin',
+       
         'heure_debut',
         'heure_fin',
         'temps',
-        'poste',
+       
         'etat_machine',
         'type_arret',
         'arret_heure_debut',

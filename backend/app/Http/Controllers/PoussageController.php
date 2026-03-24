@@ -39,8 +39,7 @@ class PoussageController extends Controller
             'heureDebut' => ['nullable', 'date_format:H:i'],
             'heureFin' => ['nullable', 'date_format:H:i'],
             'temps' => ['nullable', 'numeric', 'min:0'],
-            'compteur_debut' => ['nullable', 'integer', 'min:0'],
-            'compteur_fin' => ['nullable', 'integer', 'min:0'],
+           
             'poste' => ['nullable', 'string', 'max:255'],
             'etat_machine' => ['nullable', 'in:En marche,En arrêt'],
             'type_arret' => ['nullable', 'string', 'max:255'],
@@ -64,8 +63,7 @@ class PoussageController extends Controller
             'machine_id' => $validated['machine_id'] ?? null,
             'conducteur' => $validated['conducteur'] ?? '',
             'matricule' => $validated['matricule'] ?? '',
-            'compteur_debut' => $validated['compteur_debut'] ?? 0,
-            'compteur_fin' => $validated['compteur_fin'] ?? 0,
+           
             'heure_debut' => $validated['heureDebut'] ?? null,
             'heure_fin' => $validated['heureFin'] ?? null,
             'temps' => $validated['temps'] ?? 0,
@@ -99,9 +97,8 @@ class PoussageController extends Controller
             'heureDebut' => ['nullable', 'date_format:H:i'],
             'heureFin' => ['nullable', 'date_format:H:i'],
             'temps' => ['nullable', 'numeric', 'min:0'],
-            'compteur_debut' => ['nullable', 'integer', 'min:0'],
-            'compteur_fin' => ['nullable', 'integer', 'min:0'],
-            'poste' => ['nullable', 'string', 'max:255'],
+           
+            
             'etat_machine' => ['nullable', 'in:En marche,En arrêt'],
             'type_arret' => ['nullable', 'string', 'max:255'],
             'heureDebutArret' => ['nullable', 'date_format:H:i'],
@@ -124,12 +121,11 @@ class PoussageController extends Controller
             'machine_id' => array_key_exists('machine_id', $validated) ? $validated['machine_id'] : $poussage->machine_id,
             'conducteur' => array_key_exists('conducteur', $validated) ? ($validated['conducteur'] ?? '') : $poussage->conducteur,
             'matricule' => array_key_exists('matricule', $validated) ? ($validated['matricule'] ?? '') : $poussage->matricule,
-            'compteur_debut' => array_key_exists('compteur_debut', $validated) ? ($validated['compteur_debut'] ?? 0) : $poussage->compteur_debut,
-            'compteur_fin' => array_key_exists('compteur_fin', $validated) ? ($validated['compteur_fin'] ?? 0) : $poussage->compteur_fin,
+            
             'heure_debut' => array_key_exists('heureDebut', $validated) ? ($validated['heureDebut'] ?? null) : $poussage->heure_debut,
             'heure_fin' => array_key_exists('heureFin', $validated) ? ($validated['heureFin'] ?? null) : $poussage->heure_fin,
             'temps' => array_key_exists('temps', $validated) ? ($validated['temps'] ?? 0) : $poussage->temps,
-            'poste' => array_key_exists('poste', $validated) ? ($validated['poste'] ?? '') : $poussage->poste,
+            
             'etat_machine' => array_key_exists('etat_machine', $validated) ? ($validated['etat_machine'] ?? 'En marche') : $poussage->etat_machine,
             'type_arret' => array_key_exists('type_arret', $validated) ? ($validated['type_arret'] ?? '') : $poussage->type_arret,
             'arret_heure_debut' => array_key_exists('heureDebutArret', $validated) ? ($validated['heureDebutArret'] ?? null) : $poussage->arret_heure_debut,

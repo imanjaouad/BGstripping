@@ -217,7 +217,7 @@ const SIDEBAR_CSS = `
 const BASE = "/poussage";
 
 const NAV_ITEMS = [
-  { to: `${BASE}`,              end: true, icon: <IcoHome/>,    label: "Accueil"         },
+  { to: `${BASE}`,              end: true, icon: <IcoHome/ >,    label: "Accueil"         },
   { to: `${BASE}/DashboardComplet`,  icon: <IcoDash/>,  label: "Tableau de Bord" },
   { to: `${BASE}/Dashboard`,  icon: <IcoEdit/>,label: "Gestion" },
   { to: `${BASE}/Statistique`,  icon: <IcoStats/>,   label: "Statistiques" },
@@ -239,16 +239,16 @@ function SidebarCasement({ isOpen, toggleSidebar }) {
           onClick={toggleSidebar}
           style={{ cursor: "pointer" }}
         >
-          <div className="sb-csm-logo-ring">
+          <div className="sb-csm-logo-ring"style={{margin:"auto" , borderRadius:"100px" , border:" 3px solid black"}} >
             <img src={image} alt="Logo Mine" className="sb-csm-logo-img" />
           </div>
-
+  </div>
           {isOpen && (
-            <div className="sb-csm-brand">
-              <span className="sb-csm-brand-sub">Casement</span>
+            <div className="sb-csm-brand" style={{margin:"auto" }}>
+              <span className="sb-csm-brand-sub" style={{color:"white"}}>Gestion ZD11</span>
             </div>
           )}
-        </div>
+      
         {/* Navigation */}
         <ul className="sb-csm-nav">
           {NAV_ITEMS.map(({ to, end, icon, label, badge }) => (
@@ -258,7 +258,7 @@ function SidebarCasement({ isOpen, toggleSidebar }) {
                 end={end}
                 className={({ isActive }) =>
                   isActive ? "sb-csm-link active" : "sb-csm-link"
-                }
+                } 
               >
                 <span className="sb-csm-nav-icon">{icon}</span>
                 {isOpen && <span className="sb-csm-nav-label">{label}</span>}
