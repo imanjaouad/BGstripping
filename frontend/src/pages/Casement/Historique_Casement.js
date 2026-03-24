@@ -1,8 +1,11 @@
-import React, { useState, useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { deleteCasement, fetchCasements } from "../../features/casementSlice";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 /* ══════════════════════════════════════════════════════════════════════════
    HistoriqueCasement
@@ -183,7 +186,7 @@ opacity:0.6;
 background:#f0fdf4;
 color:#15803d;
 border:1.5px solid #bbf7d0;
-padding:5px 14px;
+padding:5px 12px;
 border-radius:8px;
 font-weight:600;
 font-size:12px;
@@ -191,13 +194,101 @@ cursor:pointer;
 transition:0.2s;
 white-space:nowrap;
 }
-
 .btn-edit:hover{
 background:#dcfce7;
 border-color:#16a34a;
 }
 
-`;
+.btn-del{
+background:#fef2f2;
+color:#dc2626;
+border:1.5px solid #fecaca;
+padding:5px 12px;
+border-radius:8px;
+font-weight:600;
+font-size:12px;
+cursor:pointer;
+transition:0.2s;
+white-space:nowrap;
+}
+.btn-del:hover{
+background:#fee2e2;
+border-color:#ef4444;
+}
+
+.btn-pdf{
+background:#1d4ed8;
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+transition:0.2s;
+display:inline-flex;
+align-items:center;
+gap:6px;
+}
+.btn-pdf:hover{ background:#1e40af; }
+
+.actions-cell{
+display:flex;
+gap:6px;
+align-items:center;
+}
+
+/* Badge état machine */
+.badge-marche{
+display:inline-flex;align-items:center;gap:4px;
+background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;
+padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;
+}
+.badge-arret{
+display:inline-flex;align-items:center;gap:4px;
+background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;
+padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;
+}
+
+/* Modal confirmation suppression */
+.modal-overlay{
+position:fixed;inset:0;z-index:9999;
+background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);
+display:flex;align-items:center;justify-content:center;
+}
+.modal-box{
+background:#fff;border-radius:20px;padding:32px 36px;
+max-width:420px;width:90%;
+box-shadow:0 24px 80px rgba(0,0,0,0.2);
+animation:modalIn .3s cubic-bezier(0.16,1,0.3,1);
+text-align:center;
+}
+@keyframes modalIn{
+  from{opacity:0;transform:scale(0.93) translateY(12px)}
+  to  {opacity:1;transform:scale(1) translateY(0)}
+}
+.modal-icon{
+width:56px;height:56px;border-radius:16px;
+background:#fef2f2;color:#dc2626;
+display:flex;align-items:center;justify-content:center;
+margin:0 auto 16px;
+}
+.modal-title{font-size:17px;font-weight:800;color:#111827;margin-bottom:8px;}
+.modal-msg  {font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:24px;}
+.modal-btns {display:flex;gap:10px;justify-content:center;}
+.modal-cancel{
+padding:10px 24px;border-radius:10px;border:1.5px solid #e5e7eb;
+background:#f9fafb;color:#374151;font-weight:600;font-size:14px;
+cursor:pointer;transition:all .18s;
+}
+.modal-cancel:hover{background:#f3f4f6;}
+.modal-confirm{
+padding:10px 28px;border-radius:10px;border:none;
+background:linear-gradient(135deg,#dc2626,#ef4444);
+color:#fff;font-weight:700;font-size:14px;cursor:pointer;
+transition:all .18s;box-shadow:0 4px 14px rgba(220,38,38,0.3);
+}
+.modal-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(220,38,38,0.4);}
+`
 
 /* ══════════════════════════════════════════════════════════════════════════
    COMPOSANT PRINCIPAL
@@ -205,16 +296,58 @@ border-color:#16a34a;
 
 function HistoriqueCasement() {
 
-  const casements = useSelector((state) => state.casement?.list || []);
-  const navigate  = useNavigate();
+  const casements  = useSelector((state) => state.casement?.list    ?? []);
+  const loading    = useSelector((state) => state.casement?.loading  ?? false);
+  const storeError = useSelector((state) => state.casement?.error    ?? null);
+  const dispatch   = useDispatch();
+  const navigate   = useNavigate();
 
-  const handleEdit = (c, filteredIndex) => {
-    // Retrouver l'index réel dans la liste Redux (pas l'index filtré)
-    const realIndex = casements.indexOf(c);
+  /* ① Charger depuis la BDD au montage — données survivent au refresh */
+  useEffect(() => {
+    dispatch(fetchCasements());
+  }, [dispatch]);
+
+  /* État local */
+  // id = id réel BDD (pas l'index du tableau)
+  const [confirmDlg, setConfirmDlg] = useState({
+    open: false, id: null, label: "", deleting: false,
+  });
+  const [toast, setToast] = useState(null);
+
+  const showToast = useCallback((msg, type = "success") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  }, []);
+
+  /* ② Modifier — transmet editId pour que le formulaire fasse PUT */
+  const handleEdit = useCallback((c) => {
     navigate("/operations/casement/gestion", {
-      state: { editData: c, editIndex: realIndex },
+      state: {
+        editData:  c,
+        editIndex: casements.indexOf(c),
+        editId:    c.id,   // ← sans ça, le formulaire faisait POST au lieu de PUT
+      },
     });
-  };
+  }, [casements, navigate]);
+
+  /* ③ Supprimer — DELETE /api/casements/{id} avec l'id BDD */
+  const askDelete = useCallback((c) => {
+    const label = [c.date, c.panneau, c.tranchee].filter(Boolean).join(" · ");
+    setConfirmDlg({ open: true, id: c.id, label, deleting: false });
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    if (!confirmDlg.id) return;
+    setConfirmDlg(prev => ({ ...prev, deleting: true }));
+    try {
+      await dispatch(deleteCasement(confirmDlg.id)).unwrap();
+      showToast("Opération supprimée de la base de données.");
+    } catch (err) {
+      showToast(err?.message ?? "Erreur lors de la suppression.", "error");
+    } finally {
+      setConfirmDlg({ open: false, id: null, label: "", deleting: false });
+    }
+  }, [confirmDlg.id, dispatch, showToast]);
 
   const [filterPanneau,   setFilterPanneau]   = useState("");
   const [filterTranchee,  setFilterTranchee]  = useState("");
@@ -261,23 +394,38 @@ function HistoriqueCasement() {
   };
 
   const exportExcel = () => {
-
-    const data = filteredCasements.map(c => ({
-
-      Date:               c.date,
-      Panneau:            c.panneau,
-      Tranchee:           c.tranchee,
-      Profondeur:         c.profondeur,                          // ex: Niveau
-      Poste:              c.poste,                               // ex: TypeRoche
-      Equipements:        c.equipements?.join(", "),
-      Conducteur:         c.conducteur,
-      Matricule:          c.matricule,
-      "Volume Saute":     c.volume_saute,                        // ex: volume_casse
-      Heures:             c.temps,
-      Rendement:          c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : 0,
-      "Etat Machine":     c.etatMachine === "arret" ? "En arrêt" : "En marche",
-
-    }));
+    const data = filteredCasements.map(c => {
+      const htp  = parseFloat(c.htp || 0);
+      const oee  = htp > 0 ? ((htp / 24) * 100).toFixed(2) : 0;
+      const tu   = htp > 0 ? (((htp / 24) * 100 / 24) * 100).toFixed(2) : 0;
+      const sommeArrets = Object.values(c.arretsEquipements || {}).reduce((s, a) => {
+        if (!a?.debut || !a?.fin) return s;
+        const [dh, dm] = a.debut.split(":").map(Number);
+        const [fh, fm] = a.fin.split(":").map(Number);
+        const min = fh * 60 + fm - (dh * 60 + dm);
+        return s + (min > 0 ? min / 60 : 0);
+      }, 0);
+      const tuVal = parseFloat(tu);
+      const td = tuVal > 0 ? (Math.max(0, tuVal - sommeArrets) / 24 * 100).toFixed(2) : 0;
+      return {
+        Date:               c.date,
+        Panneau:            c.panneau,
+        Tranchee:           c.tranchee,
+        Profondeur:         c.profondeur,
+        Poste:              c.poste,
+        Equipements:        c.equipements?.join(", "),
+        Conducteur:         c.conducteur,
+        Matricule:          c.matricule,
+        "Volume Saute (m²)": c.volume_saute,
+        "Heures Marche":    c.temps,
+        "Rendement (m²/h)": c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : 0,
+        "HTP (h)":          c.htp || 0,
+        "OEE (%)":          oee,
+        "Tu (%)":           tu,
+        "TD (%)":           td,
+        "Etat Machine":     c.etatMachine === "arret" ? "En arrêt" : "En marche",
+      };
+    });
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -290,7 +438,72 @@ function HistoriqueCasement() {
     });
 
     saveAs(blob, "historique_casement.xlsx");
+  };
 
+  // ── Export PDF ──
+  const exportPDF = () => {
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+
+    // En-tête
+    doc.setFillColor(21, 128, 61);
+    doc.rect(0, 0, 297, 22, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Historique des Opérations — Casement", 14, 14);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Exporté le ${new Date().toLocaleDateString("fr-MA")}  |  ${filteredCasements.length} opération(s)`, 200, 14);
+
+    autoTable(doc, {
+      startY: 28,
+      head: [[
+        "Date", "Panneau", "Tranchée", "Profondeur", "Poste",
+        "Équipements", "Conducteur", "Matricule",
+        "Volume (m²)", "Heures", "Rendement", "HTP", "OEE%", "Tu%", "TD%", "État"
+      ]],
+      body: filteredCasements.map(c => {
+        const htp  = parseFloat(c.htp || 0);
+        const oee  = htp > 0 ? ((htp / 24) * 100).toFixed(1) : "—";
+        const tu   = htp > 0 ? (((htp / 24) * 100 / 24) * 100).toFixed(1) : "—";
+        // Somme arrêts équipements
+        const sommeArrets = Object.values(c.arretsEquipements || {}).reduce((s, a) => {
+          if (!a?.debut || !a?.fin) return s;
+          const [dh, dm] = a.debut.split(":").map(Number);
+          const [fh, fm] = a.fin.split(":").map(Number);
+          const min = fh * 60 + fm - (dh * 60 + dm);
+          return s + (min > 0 ? min / 60 : 0);
+        }, 0);
+        const tuVal = htp > 0 ? (htp / 24) * 100 / 24 * 100 : 0;
+        const td = tuVal > 0 ? (Math.max(0, tuVal - sommeArrets) / 24 * 100).toFixed(1) : "—";
+        const rend = c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : "—";
+        return [
+          c.date || "", c.panneau || "", c.tranchee || "", c.profondeur || "", c.poste || "",
+          c.equipements?.join(", ") || "",
+          c.conducteur || "", c.matricule || "",
+          c.volume_saute || "", c.temps || "", rend,
+          htp || "—", oee, tu, td,
+          c.etatMachine === "arret" ? "En arrêt" : "En marche",
+        ];
+      }),
+      styles:       { fontSize: 8, cellPadding: 3, font: "helvetica" },
+      headStyles:   { fillColor: [21, 128, 61], textColor: 255, fontStyle: "bold", fontSize: 8 },
+      alternateRowStyles: { fillColor: [240, 253, 244] },
+      columnStyles: { 0: { cellWidth: 20 }, 5: { cellWidth: 28 }, 10: { cellWidth: 18 } },
+      margin: { left: 14, right: 14 },
+    });
+
+    // Pied de page
+    const pages = doc.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(156, 163, 175);
+      doc.text(`Page ${i} / ${pages}`, 14, doc.internal.pageSize.height - 8);
+      doc.text("Casement — Rapport Historique", 230, doc.internal.pageSize.height - 8);
+    }
+
+    doc.save("historique_casement.pdf");
   };
 
   /* ────────────────────────────────────────────────────────────────────────
@@ -309,15 +522,96 @@ return (
 <>
 <style>{CSS}</style>
 
+{/* Toast */}
+{toast && (
+  <div style={{
+    position:"fixed", bottom:24, right:24, zIndex:9998,
+    background: toast.type === "error" ? "#b91c1c" : "#14532d",
+    color:"#fff", borderRadius:12, padding:"14px 20px",
+    fontSize:13, fontWeight:600,
+    boxShadow:"0 8px 32px rgba(0,0,0,0.18)",
+    display:"flex", alignItems:"center", gap:8,
+    animation:"modalIn .35s cubic-bezier(0.16,1,0.3,1)",
+  }}>
+    {toast.type === "error" ? "❌" : "✅"} {toast.msg}
+  </div>
+)}
+
+{/* ── MODAL CONFIRMATION SUPPRESSION ── */}
+{confirmDlg.open && (
+  <div className="modal-overlay" onClick={() => !confirmDlg.deleting && setConfirmDlg({ open:false, id:null, label:"", deleting:false })}>
+    <div className="modal-box" onClick={e => e.stopPropagation()}>
+      <div className="modal-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6"/><path d="M14 11v6"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+      </div>
+      <div className="modal-title">Supprimer cette opération ?</div>
+      <div className="modal-msg">
+        <strong>{confirmDlg.label}</strong>
+        <br/>Cette action supprimera définitivement l'enregistrement de la base de données.
+      </div>
+      <div className="modal-btns">
+        <button
+          className="modal-cancel"
+          onClick={() => setConfirmDlg({ open:false, id:null, label:"", deleting:false })}
+          disabled={confirmDlg.deleting}
+        >
+          Annuler
+        </button>
+        <button
+          className="modal-confirm"
+          onClick={confirmDelete}
+          disabled={confirmDlg.deleting}
+        >
+          {confirmDlg.deleting ? "Suppression…" : "Supprimer"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 <div className="casement-root">
 
   {/* ── HEADER ── */}
-
   <div className="casement-header">
     <div>
       <div className="casement-title">Historique Casement</div>
+      <div style={{fontSize:13, color:"#6b7280", marginTop:3}}>
+        {casements.length} opération(s) enregistrée(s) au total
+      </div>
     </div>
+    <button
+      className="btn-excel"
+      onClick={() => dispatch(fetchCasements())}
+      disabled={loading}
+      style={{display:"flex", alignItems:"center", gap:6}}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-5"/>
+      </svg>
+      {loading ? "Chargement…" : "Rafraîchir"}
+    </button>
   </div>
+
+  {/* Erreur API */}
+  {storeError && (
+    <div style={{
+      background:"#fef2f2", border:"1px solid #fecaca", borderRadius:12,
+      padding:"14px 20px", color:"#b91c1c", fontSize:13,
+      display:"flex", alignItems:"center", gap:10, marginBottom:16,
+    }}>
+      ⚠️ Erreur API : <strong>{storeError}</strong>
+      &nbsp;—&nbsp;
+      <span style={{textDecoration:"underline", cursor:"pointer"}} onClick={() => dispatch(fetchCasements())}>
+        Réessayer
+      </span>
+    </div>
+  )}
 
   {/* ── CARTE FILTRES ── */}
 
@@ -420,10 +714,19 @@ return (
 
       <div className="casement-card-title">Liste Historique</div>
 
-      {/* Export Excel — exporte uniquement les lignes filtrées */}
-      <button className="btn-excel" onClick={exportExcel}>
-        Télécharger Excel
-      </button>
+      <div style={{display:"flex", gap:8}}>
+        <button className="btn-pdf" onClick={exportPDF}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Télécharger PDF
+        </button>
+        <button className="btn-excel" onClick={exportExcel}>
+          Télécharger Excel
+        </button>
+      </div>
 
     </div>
 
@@ -433,6 +736,7 @@ return (
 
         <thead>
           <tr>
+            <th>#</th>
             <th>Date</th>
             <th>Panneau</th>
             <th>Tranchée</th>
@@ -441,11 +745,15 @@ return (
             <th>Équipements</th>
             <th>Conducteur</th>
             <th>Matricule</th>
-            <th>Volume Sauté</th>
+            <th>Volume (m²)</th>
             <th>Heures</th>
             <th>Rendement</th>
+            <th>HTP</th>
+            <th>OEE</th>
+            <th>Tu</th>
+            <th>TD</th>
             <th>État Machine</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -453,36 +761,59 @@ return (
 
           {filteredCasements.length > 0 ? (
 
-            filteredCasements.map((c, i) => (
+            filteredCasements.map((c, i) => {
+              const htp     = parseFloat(c.htp || 0);
+              const oee     = c.oee ? `${c.oee}%` : "—";
+              const tu      = c.tu  ? `${c.tu}%`  : "—";
+              const td      = c.td  ? `${c.td}%`  : "—";
+              const rend    = c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : "—";
 
-              <tr key={i}>
-                <td>{c.date}</td>
-                <td>{c.panneau}</td>
-                <td>{c.tranchee}</td>
-                <td>{c.profondeur}</td>
-                <td>{c.poste}</td>
-                <td>{c.equipements?.join(", ")}</td>
-                <td>{c.conducteur}</td>
-                <td>{c.matricule}</td>
-                <td>{c.volume_saute}</td>
-                <td>{c.temps}</td>
-                <td>{c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : 0} t/h</td>
-                <td>{c.etatMachine === "arret" ? "En arrêt" : "En marche"}</td>
+              return (
+              <tr key={c.id ?? i}>
+                <td style={{color:"#9ca3af",fontWeight:700,fontSize:11}}>{i + 1}</td>
+                <td>{c.date || "—"}</td>
+                <td>{c.panneau || "—"}</td>
+                <td>{c.tranchee || "—"}</td>
+                <td>{c.profondeur || "—"}</td>
+                <td>{c.poste || "—"}</td>
+                <td style={{fontSize:11}}>{(c.equipements ?? []).join(", ") || "—"}</td>
+                <td>{c.conducteur || "—"}</td>
+                <td style={{fontSize:11}}>{c.matricule || "—"}</td>
+                <td><strong style={{color:"#14532d"}}>{c.volume_saute || "—"}</strong></td>
+                <td>{c.temps ? `${c.temps} h` : "—"}</td>
+                <td><strong>{rend}</strong>{rend !== "—" ? " m²/h" : ""}</td>
+                <td style={{fontWeight:700,color:"#15803d"}}>{htp > 0 ? `${htp} h` : "—"}</td>
+                <td style={{fontWeight:700,color:"#1d4ed8"}}>{oee}</td>
+                <td style={{fontWeight:700,color:"#b45309"}}>{tu}</td>
+                <td style={{fontWeight:700,color:"#6d28d9"}}>{td}</td>
                 <td>
-                  <button className="btn-edit" onClick={() => handleEdit(c, i)}>
-                    ✏️ Modifier
-                  </button>
+                  <span className={c.etatMachine === "arret" ? "badge-arret" : "badge-marche"}>
+                    {c.etatMachine === "arret" ? "En arrêt" : "En marche"}
+                  </span>
+                </td>
+                <td>
+                  <div className="actions-cell">
+                    <button className="btn-edit" onClick={() => handleEdit(c)}>
+                      ✏️ Modifier
+                    </button>
+                    <button className="btn-del" onClick={() => askDelete(c)}>
+                      🗑️ Supprimer
+                    </button>
+                  </div>
                 </td>
               </tr>
-
-            ))
+              );
+            })
 
           ) : (
 
-            /* Ligne affichée si aucun résultat ne correspond aux filtres */
             <tr>
-              <td colSpan="13" className="empty-row">
-                Aucun résultat trouvé
+              <td colSpan="18" className="empty-row">
+                {loading
+                  ? "⏳ Chargement depuis la base de données…"
+                  : hasActiveFilters
+                    ? "Aucun résultat pour ces filtres."
+                    : "Aucune opération enregistrée. Ajoutez une opération depuis la page Gestion."}
               </td>
             </tr>
 

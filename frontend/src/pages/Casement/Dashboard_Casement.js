@@ -1,369 +1,415 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { fetchCasements, addCasementAsync, updateCasementAsync } from "../../features/casementSlice";
+import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import image from "../../images/image3.webp";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CASEMENT  — DASHBOARD FORM (Light Mode Premium)
-   FIXES v2:
-   ✅ Removed erroneous <StatistiqueCasement/> import + render inside this page
-   ✅ Cleaned up unused imports
-   ✅ emptyForm factored out to avoid duplication
-   ✅ reset() also clears editIndex
+   ACCUEIL CASEMENT  — Page d'accueil du module
+   Style identique au reste du module (Plus Jakarta Sans, palette verte)
 ═══════════════════════════════════════════════════════════════════════════ */
 
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Epilogue:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
 
-  .lcsm-root {
-    --ivory: #fafaf7; --ivory-warm: #f5f4ef; --ivory-deep: #ede9df; --paper: #ffffff;
-    --ink: #111827; --ink-soft: #4b5563; --ink-faint: #9ca3af;
-    --forest: #14532d; --forest-mid: #15803d; --forest-hi: #16a34a; --emerald: #10b981;
-    --mist: #dcfce7; --fog: #f0fdf4; --border-g: #bbf7d0;
-    --copper: #92400e; --copper-hi: #b45309; --blush: #fef3c7;
-    --shadow-xs: 0 1px 3px rgba(20,83,45,0.06), 0 1px 2px rgba(20,83,45,0.04);
-    --shadow-sm: 0 4px 16px rgba(20,83,45,0.08), 0 2px 6px rgba(20,83,45,0.05);
-    --shadow-md: 0 8px 32px rgba(20,83,45,0.10), 0 3px 10px rgba(20,83,45,0.06);
-    --shadow-xl: 0 32px 80px rgba(20,83,45,0.14), 0 12px 30px rgba(20,83,45,0.08);
-    font-family: 'Epilogue', sans-serif; color: var(--ink); position: relative;
+  @keyframes acc-fadeUp    { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes acc-shimmer   { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+  @keyframes acc-float     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes acc-pulse     { 0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} 50%{box-shadow:0 0 0 12px rgba(22,163,74,0)} }
+  @keyframes acc-stripe    { from{background-position:0%} to{background-position:200%} }
+  @keyframes acc-countUp   { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+  @keyframes acc-rowIn     { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+
+  .acc-root {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    background: #f0fdf4;
+    padding: 32px 28px 60px;
+    color: #14532d;
+    position: relative;
+    overflow-x: hidden;
   }
-  .lcsm-bg {
+
+  /* Decorative background */
+  .acc-bg {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background: radial-gradient(ellipse 70% 50% at 100% 0%, rgba(220,252,231,0.5) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 0% 100%, rgba(187,247,208,0.3) 0%, transparent 55%);
+    background:
+      radial-gradient(ellipse 60% 50% at 100% 0%,  rgba(220,252,231,0.6) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 0% 100%, rgba(187,247,208,0.35) 0%, transparent 55%);
   }
-  .lcsm-dots {
+  .acc-dots {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image: radial-gradient(circle, rgba(20,83,45,0.06) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(20,83,45,0.05) 1px, transparent 1px);
     background-size: 28px 28px;
     mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 80%);
   }
-  .lcsm-leaf { position: fixed; z-index: 0; pointer-events: none; opacity: 0.05; }
-  .lcsm-leaf-1 { top: -60px; right: 60px; width: 280px; height: 280px; background: radial-gradient(ellipse 40% 80% at 50% 50%, #14532d, transparent); border-radius: 0 80% 0 80%; animation: lcsm-leafSway 12s ease-in-out infinite; }
-  .lcsm-leaf-2 { bottom: 40px; left: -60px; width: 240px; height: 240px; background: radial-gradient(ellipse 40% 80% at 50% 50%, #15803d, transparent); border-radius: 80% 0 80% 0; animation: lcsm-leafSway 16s ease-in-out infinite reverse; }
-  @keyframes lcsm-leafSway { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
-  .lcsm-page { position: relative; z-index: 1; }
-  .lcsm-header {
-    display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 20px;
-    padding-bottom: 24px; margin-bottom: 32px; border-bottom: 1.5px solid var(--border-g);
-    position: relative; opacity: 0; animation: lcsm-riseIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.05s forwards;
+  .acc-content { position: relative; z-index: 1; }
+
+  /* ── Hero ── */
+  .acc-hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 24px;
+    background: #fff;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0; animation: acc-fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.05s forwards;
   }
-  .lcsm-header::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 80px; height: 3px; background: linear-gradient(90deg, var(--forest), var(--forest-hi), transparent); border-radius: 2px; }
-  .lcsm-vol-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--forest-hi); display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .lcsm-vol-label::before { content: ''; width: 28px; height: 1.5px; background: linear-gradient(90deg, var(--forest-hi), transparent); }
-  .lcsm-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 400; color: var(--forest); margin: 0; line-height: 1.05; }
-  .lcsm-title em { font-style: italic; color: var(--forest-hi); position: relative; }
-  .lcsm-title em::after { content: ''; position: absolute; bottom: 2px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--emerald), var(--forest-hi), transparent); border-radius: 1px; }
-  .lcsm-header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-  .lcsm-logo { height: 80px; border-radius: 12px; border: 1.5px solid var(--border-g); box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s; }
-  .lcsm-logo:hover { transform: translateY(-2px) scale(1.02); box-shadow: var(--shadow-md); }
-  .lcsm-pill { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 999px; background: var(--fog); border: 1.5px solid var(--border-g); font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--forest-hi); }
-  .lcsm-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--emerald); animation: lcsm-pulse 2.5s ease infinite; }
-  @keyframes lcsm-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
-  .lcsm-card { background: var(--paper); border: 1.5px solid rgba(187,247,208,0.6); border-radius: 20px; padding: 40px 44px; box-shadow: var(--shadow-xl); position: relative; overflow: hidden; opacity: 0; animation: lcsm-riseIn 0.75s cubic-bezier(0.16,1,0.3,1) 0.18s forwards; }
-  .lcsm-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--forest) 0%, var(--forest-hi) 25%, var(--emerald) 50%, var(--forest-hi) 75%, var(--forest) 100%); background-size: 200% 100%; animation: lcsm-stripe 4s linear infinite; }
-  @keyframes lcsm-stripe { from { background-position: 0%; } to { background-position: 200%; } }
-  .lcsm-card-wm { position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; border-radius: 50%; border: 40px solid rgba(220,252,231,0.2); pointer-events: none; }
-  .lcsm-card-wm::before { content: ''; position: absolute; inset: 28px; border-radius: 50%; border: 18px solid rgba(187,247,208,0.15); }
-  .lcsm-section { display: flex; align-items: center; gap: 12px; grid-column: 1 / -1; margin: 28px 0 2px; padding-bottom: 10px; border-bottom: 1px solid rgba(187,247,208,0.6); opacity: 0; animation: lcsm-riseIn 0.45s ease forwards; }
-  .lcsm-section:first-of-type { margin-top: 0; }
-  .lcsm-section-num { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: var(--paper); background: var(--forest-hi); width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(22,163,74,0.3); }
-  .lcsm-section-title { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--forest-hi); }
-  .lcsm-section-line { flex: 1; height: 1px; background: rgba(187,247,208,0.5); }
-  .lcsm-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
-  .lcsm-full { grid-column: 1 / -1; }
-  @media (max-width: 900px) { .lcsm-grid { grid-template-columns: repeat(2,1fr); } }
-  @media (max-width: 520px) { .lcsm-grid { grid-template-columns: 1fr; } .lcsm-card { padding: 24px 20px; } }
-  .lcsm-field { display: flex; flex-direction: column; gap: 6px; opacity: 0; animation: lcsm-riseIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
-  .lcsm-field:nth-child(1)  { animation-delay:0.28s } .lcsm-field:nth-child(2)  { animation-delay:0.33s }
-  .lcsm-field:nth-child(3)  { animation-delay:0.38s } .lcsm-field:nth-child(4)  { animation-delay:0.43s }
-  .lcsm-field:nth-child(5)  { animation-delay:0.48s } .lcsm-field:nth-child(6)  { animation-delay:0.53s }
-  .lcsm-field:nth-child(7)  { animation-delay:0.58s } .lcsm-field:nth-child(8)  { animation-delay:0.63s }
-  .lcsm-field:nth-child(9)  { animation-delay:0.68s } .lcsm-field:nth-child(10) { animation-delay:0.73s }
-  .lcsm-field:nth-child(11) { animation-delay:0.78s } .lcsm-field:nth-child(12) { animation-delay:0.83s }
-  .lcsm-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); display: flex; align-items: center; gap: 7px; }
-  .lcsm-auto-badge { font-size: 8px; font-weight: 500; color: var(--forest-hi); background: var(--fog); border: 1px solid var(--border-g); padding: 1px 7px; border-radius: 20px; }
-  .lcsm-input, .lcsm-select { width: 100%; box-sizing: border-box; padding: 11px 14px; background: var(--ivory); border: 1.5px solid rgba(187,247,208,0.8); border-radius: 10px; color: var(--ink); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; transition: all 0.22s cubic-bezier(0.16,1,0.3,1); box-shadow: var(--shadow-xs), inset 0 1px 0 rgba(255,255,255,0.8); -webkit-appearance: none; appearance: none; }
-  .lcsm-input::placeholder { color: var(--ink-faint); font-size: 12px; }
-  .lcsm-input:hover:not(:focus), .lcsm-select:hover:not(:focus) { border-color: rgba(22,163,74,0.4); background: var(--fog); }
-  .lcsm-input:focus, .lcsm-select:focus { border-color: var(--forest-hi); background: var(--paper); box-shadow: 0 0 0 3px rgba(22,163,74,0.10), var(--shadow-sm); transform: translateY(-1px); color: var(--forest); }
-  .lcsm-input[readonly] { background: var(--fog); border-color: var(--border-g); color: var(--forest-hi); font-weight: 600; cursor: default; }
-  .lcsm-select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 15px; padding-right: 38px; }
-  .lcsm-select-danger { border-color: rgba(217,119,6,0.4) !important; background-color: var(--blush) !important; color: var(--copper) !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b45309' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important; }
-  .lcsm-select-danger:focus { box-shadow: 0 0 0 3px rgba(217,119,6,0.12), var(--shadow-sm) !important; border-color: var(--copper-hi) !important; }
-  .lcsm-equip-area { grid-column: 1 / -1; }
-  .lcsm-chips-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .lcsm-chip { padding: 8px 18px; border: 1.5px solid rgba(187,247,208,0.9); border-radius: 999px; background: var(--ivory); color: var(--ink-soft); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); user-select: none; box-shadow: var(--shadow-xs); }
-  .lcsm-chip:hover { border-color: var(--forest-hi); color: var(--forest); background: var(--fog); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-  .lcsm-chip.active { background: linear-gradient(135deg, var(--forest), var(--forest-hi)); border-color: var(--forest); color: #fff; font-weight: 500; box-shadow: 0 4px 14px rgba(21,128,61,0.3); }
-  .lcsm-chip.active::before { content: '✓ '; font-size: 10px; }
-  .lcsm-chip-add { padding: 8px 18px; border: 1.5px dashed rgba(22,163,74,0.4); border-radius: 999px; background: transparent; color: var(--forest-hi); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s ease; }
-  .lcsm-chip-add:hover { background: var(--fog); border-color: var(--forest-hi); transform: translateY(-2px); }
-  .lcsm-arret-zone { grid-column: 1 / -1; background: linear-gradient(135deg, var(--blush), #fff9ec); border: 1.5px solid rgba(217,119,6,0.25); border-radius: 16px; padding: 22px 26px; position: relative; animation: lcsm-arretReveal 0.4s cubic-bezier(0.16,1,0.3,1) forwards; box-shadow: 0 4px 20px rgba(146,64,14,0.06); }
-  .lcsm-arret-zone::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--copper-hi), var(--copper)); border-radius: 16px 0 0 16px; }
-  @keyframes lcsm-arretReveal { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-  .lcsm-arret-head { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--copper-hi); }
-  .lcsm-arret-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--copper-hi); box-shadow: 0 0 0 3px rgba(180,83,9,0.15); animation: lcsm-pulse 1.4s ease infinite; }
-  .lcsm-arret-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-  .lcsm-arret-zone .lcsm-input { background: #fff; border-color: rgba(217,119,6,0.2); }
-  .lcsm-arret-zone .lcsm-input:focus { border-color: var(--copper-hi); box-shadow: 0 0 0 3px rgba(217,119,6,0.08); color: var(--copper); }
-  .lcsm-rendement { grid-column: 1 / -1; display: flex; align-items: stretch; background: linear-gradient(135deg, var(--forest) 0%, var(--forest-hi) 60%, var(--emerald) 100%); border-radius: 18px; overflow: hidden; box-shadow: 0 12px 40px rgba(21,128,61,0.3), 0 4px 12px rgba(21,128,61,0.2); position: relative; opacity: 0; animation: lcsm-riseIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.9s forwards; }
-  .lcsm-rendement::after { content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); animation: lcsm-sweep 4s ease-in-out 1.5s infinite; }
-  @keyframes lcsm-sweep { 0% { left: -100%; } 50% { left: 150%; } 100% { left: 150%; } }
-  .lcsm-rendement-left { flex: 1; padding: 26px 32px; position: relative; z-index: 1; }
-  .lcsm-rendement-eyebrow { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
-  .lcsm-rendement-value { font-family: 'DM Serif Display', serif; font-size: 3.8rem; font-weight: 400; line-height: 1; color: #fff; letter-spacing: -0.02em; transition: all 0.5s cubic-bezier(0.16,1,0.3,1); }
-  .lcsm-rendement-value.zero { color: rgba(255,255,255,0.3); }
-  .lcsm-rendement-unit { font-family: 'DM Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 6px; }
-  .lcsm-rendement-right { width: 160px; flex-shrink: 0; background: rgba(0,0,0,0.12); border-left: 1px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px; position: relative; z-index: 1; }
-  .lcsm-ring-wrap { position: relative; width: 84px; height: 84px; }
-  .lcsm-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .lcsm-ring-track { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 5; }
-  .lcsm-ring-progress { fill: none; stroke: rgba(255,255,255,0.9); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 245; stroke-dashoffset: 245; transition: stroke-dashoffset 1s cubic-bezier(0.16,1,0.3,1); filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
-  .lcsm-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.9); }
-  .lcsm-ring-pct { font-size: 13px; font-weight: 500; line-height: 1; }
-  .lcsm-ring-sub { font-size: 9px; opacity: 0.55; }
-  .lcsm-rendement-rlabel { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
-  .lcsm-action-row { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; padding-top: 8px; opacity: 0; animation: lcsm-riseIn 0.5s ease 1.1s forwards; }
-  .lcsm-btn-submit { position: relative; overflow: hidden; padding: 13px 40px; background: linear-gradient(135deg, var(--forest) 0%, var(--forest-hi) 100%); border: none; border-radius: 12px; color: #fff; font-family: 'Epilogue', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 4px 20px rgba(21,128,61,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
-  .lcsm-btn-submit::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); transform: skewX(-20deg); transition: left 0.5s ease; }
-  .lcsm-btn-submit:hover::before { left: 160%; }
-  .lcsm-btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(21,128,61,0.45); background: linear-gradient(135deg, var(--forest-hi) 0%, var(--emerald) 100%); }
-  .lcsm-btn-submit:active { transform: translateY(0); }
-  .lcsm-btn-cancel { padding: 13px 24px; background: var(--ivory-warm); border: 1.5px solid var(--ivory-deep); border-radius: 12px; color: var(--ink-soft); font-family: 'Epilogue', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.22s ease; }
-  .lcsm-btn-cancel:hover { background: var(--ivory-deep); color: var(--ink); transform: translateY(-1px); }
-  @keyframes lcsm-riseIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .acc-hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg,#14532d,#16a34a,#10b981,#16a34a,#14532d);
+    background-size: 200% 100%; animation: acc-stripe 4s linear infinite;
+  }
+  .acc-hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.22em;
+    text-transform: uppercase; color: #16a34a;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .acc-hero-eyebrow::before {
+    content: ''; width: 28px; height: 1.5px;
+    background: linear-gradient(90deg,#16a34a,transparent);
+  }
+  .acc-hero-title {
+    font-size: clamp(2rem,4vw,3rem); font-weight: 800;
+    color: #14532d; line-height: 1.05; margin: 0 0 6px;
+  }
+  .acc-hero-title span {
+    background: linear-gradient(135deg,#16a34a,#10b981);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .acc-hero-sub {
+    font-size: 14px; color: #6b7280; margin: 0 0 24px; line-height: 1.6;
+  }
+  .acc-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .acc-hero-img {
+    width: 120px; height: 120px; border-radius: 20px;
+    border: 2px solid #bbf7d0; box-shadow: 0 8px 32px rgba(22,163,74,0.15);
+    object-fit: cover; animation: acc-float 6s ease-in-out infinite;
+  }
+
+  /* ── Buttons ── */
+  .acc-btn-primary {
+    background: linear-gradient(135deg,#15803d,#16a34a);
+    color: #fff; border: none; border-radius: 12px;
+    padding: 12px 24px; font-size: 14px; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s; box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .acc-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(22,163,74,0.35); }
+  .acc-btn-secondary {
+    background: #fff; color: #15803d;
+    border: 1.5px solid #bbf7d0; border-radius: 12px;
+    padding: 11px 22px; font-size: 14px; font-weight: 600;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .acc-btn-secondary:hover { background: #f0fdf4; border-color: #16a34a; transform: translateY(-1px); }
+
+  /* ── KPI cards ── */
+  .acc-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 16px; margin-bottom: 28px; }
+  .acc-kpi {
+    background: #fff; border: 1.5px solid #bbf7d0; border-radius: 16px;
+    padding: 20px 20px; position: relative; overflow: hidden;
+    opacity: 0; animation: acc-fadeUp 0.5s ease forwards;
+    transition: transform 0.2s, box-shadow 0.2s; cursor: default;
+  }
+  .acc-kpi:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(22,163,74,0.12); }
+  .acc-kpi::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
+    background-size: 200%; animation: acc-shimmer 2.4s linear infinite;
+  }
+  .acc-kpi-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px; flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(22,163,74,0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+    border: 1.5px solid rgba(134,239,172,0.6);
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
+    position: relative;
+  }
+  .acc-kpi-icon::after {
+    content: '';
+    position: absolute; inset: -4px;
+    border-radius: 18px;
+    border: 1.5px solid rgba(22,163,74,0);
+    transition: border-color 0.3s ease;
+    pointer-events: none;
+  }
+  .acc-kpi:hover .acc-kpi-icon { transform: scale(1.1) rotate(-4deg); box-shadow: 0 8px 24px rgba(22,163,74,0.28); }
+  .acc-kpi:hover .acc-kpi-icon::after { border-color: rgba(22,163,74,0.25); }
+  .acc-kpi-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: #9ca3af; margin-bottom: 4px;
+  }
+  .acc-kpi-value { font-size: 28px; font-weight: 800; color: #15803d; line-height: 1; }
+  .acc-kpi-unit  { font-size: 12px; font-weight: 500; color: #9ca3af; margin-left: 3px; }
+
+  /* ── Nav cards ── */
+  .acc-nav-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 18px; margin-bottom: 28px; }
+  .acc-nav-card {
+    background: #fff; border: 1.5px solid #bbf7d0; border-radius: 16px;
+    padding: 22px 22px; cursor: pointer;
+    opacity: 0; animation: acc-fadeUp 0.55s ease forwards;
+    transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; color: inherit;
+  }
+  .acc-nav-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(22,163,74,0.14); border-color: #16a34a; }
+  .acc-nav-card-icon {
+    width: 50px; height: 50px; border-radius: 14px;
+    background: linear-gradient(145deg,#f0fdf4,#dcfce7,#bbf7d0);
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid rgba(134,239,172,0.7);
+    box-shadow: 0 0 0 5px rgba(220,252,231,0.4), 0 4px 14px rgba(22,163,74,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease, background 0.3s ease;
+  }
+  .acc-nav-card:hover .acc-nav-card-icon {
+    transform: scale(1.1) rotate(-4deg);
+    background: linear-gradient(145deg,#dcfce7,#bbf7d0,#86efac);
+    box-shadow: 0 0 0 7px rgba(187,247,208,0.45), 0 8px 24px rgba(22,163,74,0.25);
+  }
+  .acc-nav-card-title { font-size: 15px; font-weight: 700; color: #14532d; }
+  .acc-nav-card-desc  { font-size: 12px; color: #9ca3af; line-height: 1.5; }
+  .acc-nav-card-arrow {
+    margin-top: auto; font-size: 11px; font-weight: 600;
+    color: #16a34a; display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ── Section title ── */
+  .acc-section {
+    font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: #16a34a; margin: 0 0 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .acc-section::after { content:''; flex:1; height:1px; background:#bbf7d0; }
+
+  /* ── Recent table ── */
+  .acc-table-wrap { overflow-x:auto; border-radius:12px; border:1.5px solid #bbf7d0; }
+  .acc-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .acc-table thead tr { background:#15803d; }
+  .acc-table th { padding:11px 13px; text-align:left; font-size:10px; font-weight:700;
+    letter-spacing:.07em; text-transform:uppercase; color:#fff; white-space:nowrap; }
+  .acc-table tbody tr { border-bottom:1px solid #f0fdf4; animation:acc-rowIn .4s ease both; transition:background .15s; }
+  .acc-table tbody tr:hover { background:#f0fdf4; }
+  .acc-table tbody tr:last-child { border-bottom:none; }
+  .acc-table td { padding:10px 13px; color:#374151; vertical-align:middle; white-space:nowrap; }
+  .acc-table td:first-child { font-weight:600; color:#14532d; }
+  .acc-badge-marche { background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+  .acc-badge-arret  { background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+
+  /* ── Info card ── */
+  .acc-info-card {
+    background: #fff; border: 1.5px solid #bbf7d0; border-radius: 16px;
+    padding: 24px 22px; margin-bottom: 28px;
+    opacity:0; animation: acc-fadeUp 0.55s ease 0.5s forwards;
+  }
+
+  /* ── Empty ── */
+  .acc-empty { text-align:center; padding:40px 0; color:#9ca3af; font-size:13px; }
 `;
 
-function SectionLabel({ num, title }) {
-  return (
-    <div className="lcsm-section lcsm-full">
-      <div className="lcsm-section-num">{num}</div>
-      <span className="lcsm-section-title">{title}</span>
-      <div className="lcsm-section-line" />
-    </div>
-  );
-}
-function Field({ label, children, auto = false }) {
-  return (
-    <div className="lcsm-field">
-      <label className="lcsm-label">
-        {label}{auto && <span className="lcsm-auto-badge">AUTO</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-function RendementRing({ value, max = 200 }) {
-  const C = 245;
-  const pct = Math.min(Math.max(value, 0) / max, 1);
-  return (
-    <div className="lcsm-ring-wrap">
-      <svg viewBox="0 0 90 90">
-        <circle className="lcsm-ring-track" cx="45" cy="45" r="39" />
-        <circle className="lcsm-ring-progress" cx="45" cy="45" r="39"
-          style={{ strokeDashoffset: C * (1 - pct) }} />
-      </svg>
-      <div className="lcsm-ring-center">
-        <span className="lcsm-ring-pct">{value > 0 ? `${Math.round(pct * 100)}%` : "—"}</span>
-        <span className="lcsm-ring-sub">perf.</span>
-      </div>
-    </div>
-  );
-}
-
 function DashboardCasement() {
-  const dispatch = useDispatch();
-  const [editIndex, setEditIndex] = useState(null);
-  const [editId, setEditId] = useState(null);
-  const [equipOpts, setEquipOpts] = useState(["7500M1", "7500M2", "P&H1", "P&H2", "200B1"]);
+  const navigate = useNavigate();
+  const casements = useSelector((s) => s.casement?.list || []);
 
-  // ── Role check ──────────────────────────────────────────────
-  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const currentUser = userStr ? JSON.parse(userStr) : null;
-  const isLimited = currentUser?.role === "limited";
+  const totalVolume = casements.reduce(
+    (a, c) => a + Number(c.volume_saute || 0),
+    0,
+  );
+  const totalCoups = casements.reduce(
+    (a, c) => a + Number(c.nombreCoups || 0),
+    0,
+  );
+  const totalTemps = casements.reduce((a, c) => a + Number(c.temps || 0), 0);
+  const totalOps = casements.length;
+  const rendMoyen =
+    totalOps > 0
+      ? (
+          casements.reduce((a, c) => {
+            const v = Number(c.volume_saute || 0),
+              t = Number(c.temps || 0);
+            return a + (t > 0 ? v / t : 0);
+          }, 0) / totalOps
+        ).toFixed(1)
+      : 0;
+  const enMarcheCnt = casements.filter(
+    (c) => c.etatMachine === "marche",
+  ).length;
 
-  // Load data from API on mount
-  useEffect(() => {
-    dispatch(fetchCasements());
-  }, [dispatch]);
+  const recentCasements = [...casements].slice(-6).reverse();
 
-  const emptyForm = {
-    date: "", panneau: "", tranchee: "", niveau: "",
-    volume_casse: "", granulometrie: "", type_roche: "",
-    equipements: [], conducteur: "", matricule: "",
-    heureDebut: "", heureFin: "", temps: "", nombreCoups: "",
-    poste: "", etatMachine: "En marche",
-    typeArret: "", heureDebutArret: "", heureFinArret: "",
-  };
-  const [form, setForm] = useState(emptyForm);
+  const BASE = "/operations/casement";
+  const navCards = [
+    {
+      icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>),
+      title: "Tableau de Bord",
+      path: `${BASE}`,
+      desc: "Saisie des opérations de cassage. Formulaire complet avec calcul automatique du rendement.",
+    },
+    {
+      icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>),
+      title: "Statistiques",
+      path: `${BASE}/statistique`,
+      desc: "Graphes de volume par engin et par tranchée. Analyse complète des performances.",
+    },
+    {
+      icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>),
+      title: "Historique",
+      path: `${BASE}/historique`,
+      desc: "Tableau filtrable de toutes les opérations enregistrées. Export Excel disponible.",
+    },
+    {
+      icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>),
+      title: "Rapport",
+      path: `${BASE}/statistique`,
+      desc: "Synthèse mensuelle et annuelle. Génération automatique des rapports PDF/Excel.",
+    },
+    {
+      icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>),
+      title: "Coûts",
+      path: `${BASE}/couts`,
+      desc: "Suivi budgétaire par coup. Calcul du coût mensuel et de la répartition annuelle.",
+    },
+  ];
 
-  const calcTemps = (d, f) => {
-    if (!d || !f) return "";
-    const [dh, dm] = d.split(":").map(Number);
-    const [fh, fm] = f.split(":").map(Number);
-    const min = fh * 60 + fm - (dh * 60 + dm);
-    return min > 0 ? (min / 60).toFixed(2) : "";
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const u = { ...form, [name]: value };
-    if (name === "heureDebut" || name === "heureFin")
-      u.temps = calcTemps(name === "heureDebut" ? value : form.heureDebut, name === "heureFin" ? value : form.heureFin);
-    setForm(u);
-  };
-
-  const toggleEquip = (eq) => setForm({ ...form, equipements: form.equipements.includes(eq) ? form.equipements.filter(e => e !== eq) : [...form.equipements, eq] });
-  const addEquip = () => { const n = prompt("Nom du nouvel équipement"); if (n && !equipOpts.includes(n)) setEquipOpts([...equipOpts, n]); };
-  const reset = () => { setForm(emptyForm); setEditIndex(null); };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editIndex !== null && editId) {
-      dispatch(updateCasementAsync({ id: editId, data: form }));
-      setEditIndex(null);
-      setEditId(null);
-    } else {
-      dispatch(addCasementAsync(form));
-    }
-    reset();
-  };
-
-  const rendement = form.temps > 0 ? parseFloat((form.volume_casse / form.temps).toFixed(2)) : 0;
-  const isArret = form.etatMachine === "En arrêt";
-
-  // ── If limited user, show read-only message ──────────────────────────────
-  if (isLimited) {
-    return (
-      <div className="lcsm-root">
-        <style>{CSS}</style>
-        <div className="lcsm-bg" /><div className="lcsm-dots" />
-        <div className="lcsm-page">
-          <header className="lcsm-header">
+  return (
+    <>
+      <style>{CSS}</style>
+      <div className="acc-root">
+        <div className="acc-bg" />
+        <div className="acc-dots" />
+        <div className="acc-content">
+          {/* ── HERO ─────────────────────────────────────────────────────── */}
+          <div className="acc-hero">
             <div>
-              <div className="lcsm-vol-label">Opérations Minières · </div>
-              <h1 className="lcsm-title">Décapage par <em>Casement</em></h1>
+              <h1 className="acc-hero-title">
+                Gestion du <span>Casement</span>
+              </h1>
+              <p className="acc-hero-sub">
+                Suivi des opérations de cassage par — volumes, équipements,
+                rendements, coûts et rapports en temps réel.
+              </p>
+              {/* ── Definition de casement ──────────────────────────────────────────────────────── */}
+              <div></div>
+              <div className="acc-hero-actions">
+                <button className="acc-btn-primary" onClick={() => navigate(`${BASE}/gestion`)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Nouvelle saisie
+                </button>
+                <button className="acc-btn-secondary" onClick={() => navigate(`${BASE}/statistique`)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                  Voir les statistiques
+                </button>
+              </div>
             </div>
-            <div className="lcsm-header-right">
-              <div className="lcsm-pill"><div className="lcsm-pill-dot" />Système actif</div>
-              <img src={image} alt="logo" className="lcsm-logo" />
+            <img src={image} alt="Logo Mine" className="acc-hero-img" />
+          </div>
+
+          {/* ── KPI ──────────────────────────────────────────────────────── */}
+          <div className="acc-kpi-grid">
+            {[
+              {
+                icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>),
+                bg: "linear-gradient(145deg,#f0fdf4,#dcfce7)", color: "#15803d",
+                label: "Volume Sauté", value: totalVolume.toLocaleString(), unit: "t", delay: "0.10s",
+              },
+              {
+                icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>),
+                bg: "linear-gradient(145deg,#f0fdf4,#dcfce7)", color: "#16a34a",
+                label: "Coups ", value: totalCoups.toLocaleString(), unit: "", delay: "0.18s",
+              },
+              {
+                icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>),
+                bg: "linear-gradient(145deg,#f0fdf4,#dcfce7)", color: "#15803d",
+                label: "Heurs de marche", value: totalTemps.toLocaleString(), unit: "h", delay: "0.26s",
+              },
+              {
+                icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>),
+                bg: "linear-gradient(145deg,#f0fdf4,#dcfce7)", color: "#16a34a",
+                label: "Rendement Moy.", value: rendMoyen, unit: "t/h", delay: "0.34s",
+              },
+              {
+                icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>),
+                bg: "linear-gradient(145deg,#f0fdf4,#dcfce7)", color: "#15803d",
+                label: "En Marche", value: enMarcheCnt.toLocaleString(), unit: "", delay: "0.50s",
+              },
+            ].map(({ icon, bg, color, label, value, unit, delay }) => (
+              <div key={label} className="acc-kpi" style={{ animationDelay: delay }}>
+                <div className="acc-kpi-icon" style={{ background: bg, color }}>{icon}</div>
+                <div className="acc-kpi-label">{label}</div>
+                <div className="acc-kpi-value">{value}<span className="acc-kpi-unit">{unit}</span></div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Navigation cards ─────────────────────────────────────────── */}
+          <div className="acc-section">Navigation rapide</div>
+          <div className="acc-nav-grid">
+            {navCards.map(({ icon, title, path, desc }, i) => (
+              <div
+                key={title}
+                className="acc-nav-card"
+                style={{ animationDelay: `${0.12 + i * 0.08}s` }}
+                onClick={() => navigate(path)}
+              >
+                <div className="acc-nav-card-icon">{icon}</div>
+                <div className="acc-nav-card-title">{title}</div>
+                <div className="acc-nav-card-desc">{desc}</div>
+                <div className="acc-nav-card-arrow">Accéder →</div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Dernières opérations ─────────────────────────────────────── */}
+
+          {/* ── Info équipements ─────────────────────────────────────────── */}
+          <div className="acc-section">Équipements disponibles</div>
+          <div
+            style={{
+              background: "#fff",
+              border: "1.5px solid #bbf7d0",
+              borderRadius: 16,
+              padding: "20px 22px",
+              opacity: 0,
+              animation: "acc-fadeUp 0.55s ease 0.6s forwards",
+            }}
+          >
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              {["7500M1", "7500M2", "P&H1", "P&H2", "200B1"].map((eq) => (
+                <div
+                  key={eq}
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: 20,
+                    background: "linear-gradient(135deg,#dcfce7,#bbf7d0)",
+                    border: "1.5px solid #86efac",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    color: "#14532d",
+                    fontFamily: "'DM Mono',monospace",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {eq}
+                </div>
+              ))}
             </div>
-          </header>
-          <div style={{
-            background: "#fff", border: "1.5px solid #bbf7d0", borderRadius: 20,
-            padding: "40px 32px", textAlign: "center",
-            boxShadow: "0 4px 20px rgba(22,163,74,0.06)"
-          }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
-            <h3 style={{ color: "#14532d", fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
-              Accès en lecture seule
-            </h3>
-            <p style={{ color: "#6b7280", fontSize: 14 }}>
-              Vous avez un accès limité. Les formulaires de saisie ne sont pas disponibles.<br/>
-              Consultez les statistiques et l'historique via le menu latéral.
+            <p style={{ marginTop: 12, fontSize: 12, color: "#9ca3af" }}>
+              Ces équipements sont sélectionnables lors de la saisie. D'autres
+              peuvent être ajoutés dynamiquement.
             </p>
           </div>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="lcsm-root">
-      <style>{CSS}</style>
-      <div className="lcsm-bg" /><div className="lcsm-dots" />
-      <div className="lcsm-leaf lcsm-leaf-1" /><div className="lcsm-leaf lcsm-leaf-2" />
-
-      <div className="lcsm-page">
-        <header className="lcsm-header">
-          <div>
-            <div className="lcsm-vol-label">Opérations Minières · </div>
-            <h1 className="lcsm-title">Décapage par <em>Casement</em></h1>
-          </div>
-          <div className="lcsm-header-right">
-            <div className="lcsm-pill"><div className="lcsm-pill-dot" />Système actif</div>
-            <img src={image} alt="logo" className="lcsm-logo" />
-          </div>
-        </header>
-
-        <div className="lcsm-card">
-          <div className="lcsm-card-wm" />
-          <form onSubmit={handleSubmit}>
-            <div className="lcsm-grid">
-
-              <SectionLabel num="01" title="Localisation & Identification" />
-              <Field label="Date"><input type="date" className="lcsm-input" name="date" value={form.date} onChange={handleChange} required /></Field>
-              <Field label="Panneau"><input type="text" className="lcsm-input" name="panneau" placeholder="ex : P-12" value={form.panneau} onChange={handleChange} /></Field>
-              <Field label="Tranchée"><input type="text" className="lcsm-input" name="tranchee" placeholder="ex : T-03" value={form.tranchee} onChange={handleChange} /></Field>
-              <Field label="Niveau"><input type="text" className="lcsm-input" name="niveau" placeholder="ex : −45 m" value={form.niveau} onChange={handleChange} /></Field>
-              <SectionLabel num="02" title="Données de Production" />
-              <Field label="Volume Cassé"><input type="number" className="lcsm-input" name="volume_casse" placeholder="tonnes" value={form.volume_casse} onChange={handleChange} /></Field>
-              <SectionLabel num="03" title="Temps & Planification" />
-              <Field label="Heure de Début"><input type="time" className="lcsm-input" name="heureDebut" value={form.heureDebut} onChange={handleChange} /></Field>
-              <Field label="Heure de Fin"><input type="time" className="lcsm-input" name="heureFin" value={form.heureFin} onChange={handleChange} /></Field>
-              <Field label="Heures de Marche" auto><input type="number" className="lcsm-input" name="temps" value={form.temps} onChange={handleChange} placeholder="calculé auto" readOnly={!!(form.heureDebut && form.heureFin)} /></Field>
-              <Field label="Poste"><input type="text" className="lcsm-input" name="poste" placeholder="Matin / Après-midi / Nuit" value={form.poste} onChange={handleChange} /></Field>
-
-              <SectionLabel num="04" title="Personnel & Équipements" />
-              <Field label="Conducteur"><input type="text" className="lcsm-input" name="conducteur" placeholder="Nom complet" value={form.conducteur} onChange={handleChange} /></Field>
-              <Field label="Matricule"><input type="text" className="lcsm-input" name="matricule" placeholder="MAT-XXXX" value={form.matricule} onChange={handleChange} /></Field>
-
-              <div className="lcsm-equip-area lcsm-full">
-                <label className="lcsm-label" style={{ marginBottom: 10, display: "block" }}>Équipements Utilisés</label>
-                <div className="lcsm-chips-wrap">
-                  {equipOpts.map(eq => (
-                    <div key={eq} className={`lcsm-chip${form.equipements.includes(eq) ? " active" : ""}`} onClick={() => toggleEquip(eq)}>{eq}</div>
-                  ))}
-                  <button type="button" className="lcsm-chip-add" onClick={addEquip}>+ Ajouter</button>
-                </div>
-              </div>
-
-              <SectionLabel num="05" title="État Machine & Arrêts" />
-              <Field label="État Machine">
-                <select className={`lcsm-select${isArret ? " lcsm-select-danger" : ""}`} name="etatMachine" value={form.etatMachine} onChange={handleChange}>
-                  <option>En marche</option>
-                  <option>En arrêt</option>
-                </select>
-              </Field>
-
-              {isArret && (
-                <div className="lcsm-arret-zone lcsm-full">
-                  <div className="lcsm-arret-head"><div className="lcsm-arret-dot" />Détails de l'arrêt</div>
-                  <div className="lcsm-arret-grid">
-                    <Field label="Nature d'arrêt"><input type="text" className="lcsm-input" name="typeArret" placeholder="Panne / Maintenance…" value={form.typeArret} onChange={handleChange} /></Field>
-                    <Field label="Heure Début Arrêt"><input type="time" className="lcsm-input" name="heureDebutArret" value={form.heureDebutArret} onChange={handleChange} /></Field>
-                    <Field label="Heure Fin Arrêt"><input type="time" className="lcsm-input" name="heureFinArret" value={form.heureFinArret} onChange={handleChange} /></Field>
-                  </div>
-                </div>
-              )}
-
-              <div className="lcsm-rendement lcsm-full">
-                <div className="lcsm-rendement-left">
-                  <div className="lcsm-rendement-eyebrow">Rendement Instantané · Casement</div>
-                  <div className={`lcsm-rendement-value${rendement === 0 ? " zero" : ""}`}>{rendement > 0 ? rendement : "—"}</div>
-                  <div className="lcsm-rendement-unit">tonnes / heure</div>
-                </div>
-                <div className="lcsm-rendement-right">
-                  <RendementRing value={rendement} max={200} />
-                  <div className="lcsm-rendement-rlabel">performance</div>
-                </div>
-              </div>
-
-              <div className="lcsm-action-row">
-                <button type="submit" className="lcsm-btn-submit">
-                  {editIndex !== null ? "↑ Mettre à jour" : "+ Enregistrer l'opération"}
-                </button>
-                {editIndex !== null && (
-                  <button type="button" className="lcsm-btn-cancel" onClick={reset}>Annuler</button>
-                )}
-              </div>
-
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
 
