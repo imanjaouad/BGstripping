@@ -1,56 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../style/Securite.css";
 
 /**
  * Page de Sécurité — Permet le suivi de la sécurité et le téléchargement de documents.
- * Fidèle à l'interface demandée par l'utilisateur.
+ * Fidèle à l'interface demandée par l'utilisateur avec tableau de lecture.
  */
 const Securite = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [importedFiles, setImportedFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Gérer la sélection de fichier pour le document
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      console.log("Fichier sélectionné :", e.target.files[0].name);
+  // Charger la liste des fichiers au montage du composant
+  useEffect(() => {
+    fetchFiles();
+  }, []);
+
+  const fetchFiles = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/securite');
+      if (response.ok) {
+        const data = await response.json();
+        setImportedFiles(data);
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des fichiers:", error);
     }
   };
 
-  // Fonction pour l'envoi effectif du fichier (Appel API)
+  // Gérer la sélection de fichier (Déclenché par le bouton BLEU "Ajouter fichier")
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+      alert("Fichier sélectionné : " + e.target.files[0].name + ". Cliquez sur 'Parcourir...' pour l'envoyer.");
+    }
+  };
+
+  // Envoyer le fichier au serveur (Déclenché par le bouton VERT "Parcourir...")
   const handleUploadFile = async () => {
     if (!selectedFile) {
-      alert("Veuillez d'abord sélectionner un fichier avec le bouton 'Parcourir...'");
+      alert("Veuillez d'abord sélectionner un fichier avec le bouton bleu 'Ajouter fichier'");
       return;
     }
 
+    setLoading(true);
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('type', 'document');
 
     try {
-      // Remplacez l'URL par celle de votre API Laravel
       const response = await fetch('http://localhost:8000/api/securite', {
         method: 'POST',
         body: formData,
       });
 
       if (response.ok) {
-        alert("Fichier '" + selectedFile.name + "' ajouté avec succès !");
+        alert("Fichier '" + selectedFile.name + "' importé avec succès !");
         setSelectedFile(null);
+        fetchFiles(); // Rafraîchir la liste
       } else {
         const err = await response.json();
-        alert("Erreur lors de l'ajout : " + (err.message || "Erreur serveur"));
+        alert("Erreur lors de l'importation : " + (err.message || "Erreur serveur"));
       }
     } catch (error) {
-      console.error("Erreur API:", error);
       alert("Erreur de connexion au serveur.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Gérer l'ajout d'une image
+  // Gérer l'aperçu d'image
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
@@ -81,17 +102,20 @@ const Securite = () => {
       <div className="upload-section">
         <p className="upload-label">Télécharger un document</p>
         <div className="upload-buttons">
-          <label className="btn-browse">
-            Parcourir...
+          {/* Bouton VERT : Rôle d'envoi (Parcourir) */}
+          <button className="btn-browse" onClick={handleUploadFile} disabled={loading}>
+            {loading ? "Envoi..." : "Parcourir..."}
+          </button>
+          
+          {/* Bouton BLEU : Rôle de sélection (Ajouter fichier) */}
+          <label className="btn-add-file">
+            Ajouter fichier
             <input type="file" onChange={handleFileChange} hidden />
           </label>
-          <button className="btn-add-file" onClick={handleUploadFile}>
-            Ajouter fichier
-          </button>
         </div>
         {selectedFile && (
-          <p style={{ fontSize: '12px', color: '#14532d', marginTop: '8px' }}>
-            Fichier prêt : <strong>{selectedFile.name}</strong>
+          <p className="file-ready-text">
+            Fichier prêt à être envoyé : <strong>{selectedFile.name}</strong>
           </p>
         )}
       </div>
@@ -118,6 +142,42 @@ const Securite = () => {
           Ajouter une image
           <input type="file" accept="image/*" onChange={handleImageChange} hidden />
         </label>
+      </div>
+
+      {/* ── TABLEAU DES FICHIERS IMPORTÉS ── */}
+      <div className="files-table-container">
+        <h2 className="table-title">Documents Importés</h2>
+        {importedFiles.length === 0 ? (
+          <p className="no-files-msg">Aucun document importé pour le moment.</p>
+        ) : (
+          <table className="securite-table">
+            <thead>
+              <tr>
+                <th>Nom du fichier</th>
+                <th>Date d'importation</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {importedFiles.map((file) => (
+                <tr key={file.id}>
+                  <td>{file.filename}</td>
+                  <td>{new Date(file.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <a 
+                      href={file.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="btn-read-file"
+                    >
+                      Lire le fichier
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
