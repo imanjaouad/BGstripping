@@ -14,6 +14,8 @@ export default function Login() {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(""); // ✅ error state
 
   const [formData, setFormData] = useState({
     username: "",
@@ -23,6 +25,8 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setErrorMsg(""); // ✅ reset error
 
     try {
       const res = await axios.post("http://127.0.0.1:8000/api/login", {
@@ -32,6 +36,7 @@ export default function Login() {
 
       const user = res.data.user;
 
+      // ✅ stockage
       sessionStorage.setItem("token", res.data.token);
       sessionStorage.setItem("user", JSON.stringify(user));
 
@@ -39,27 +44,31 @@ export default function Login() {
         localStorage.setItem("token", res.data.token);
       }
 
-      if (user.role === "admin") {
-        navigate("/admin/users");
-      } else {
-        switch (user.mode_operation) {
-          case "poussage":
-            navigate("/operations/poussage/dashboard");
-            break;
-          case "casement":
-            navigate("/operations/casement/dashboard");
-            break;
-          case "transport":
-            navigate("/operations/transport/dashboard");
-            break;
-          default:
-            navigate("/");
+      // ✅ redirection
+      setTimeout(() => {
+        if (user.role === "admin") {
+          navigate("/admin/users");
+        } else {
+          switch (user.mode_operation) {
+            case "poussage":
+              navigate("/operations/poussage/dashboard");
+              break;
+            case "casement":
+              navigate("/operations/casement/dashboard");
+              break;
+            case "transport":
+              navigate("/operations/transport/dashboard");
+              break;
+            default:
+              navigate("/");
+          }
         }
-      }
+      }, 300);
 
     } catch (error) {
-      console.log(error.response?.data);
-      alert("Login incorrect");
+      // ✅ message UX propre
+      setErrorMsg("Nom d'utilisateur ou mot de passe incorrect");
+      setLoading(false);
     }
   };
 
@@ -69,7 +78,6 @@ export default function Login() {
       <Header />
 
       <main className="login-container">
-
         <div className="login-card">
 
           {/* LOGO */}
@@ -78,62 +86,83 @@ export default function Login() {
           </div>
 
           <h2>Se Connecter</h2>
-          <p className="subtitle">Accédez à votre espace BG Stripping</p>
+
+         
 
           <form onSubmit={handleLogin}>
 
-            <div className="input-box">
-              <FaUser className="icon" />
-              <input
-                type="text"
-                placeholder="Nom d'utilisateur"
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-                required
-              />
+            {/* USERNAME */}
+            <div className="form-group">
+              <label htmlFor="username">Nom d'utilisateur:</label>
+              <div className="input-box">
+                <FaUser className="icon" />
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="Nom d'utilisateur"
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                  required
+                  disabled={loading}
+                />
+              </div>
             </div>
 
-            <div className="input-box">
-              <FaLock className="icon" />
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Mot de passe"
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                required
-              />
-              <span
-                className="toggle-pass"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </span>
+            {/* PASSWORD */}
+            <div className="form-group">
+              <label htmlFor="password">Mot de passe:</label>
+              <div className="input-box">
+                <FaLock className="icon" />
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mot de passe"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  required
+                  disabled={loading}
+                />
+                <span
+                  className="toggle-pass"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
             </div>
 
+            {/* OPTIONS */}
             <div className="options">
               <label>
                 <input
                   type="checkbox"
+                  checked={formData.remember}
                   onChange={(e) =>
                     setFormData({ ...formData, remember: e.target.checked })
                   }
+                  disabled={loading}
                 />
                 Se souvenir de moi
               </label>
             </div>
 
-            <button type="submit" className="login-btn">Se Connecter</button>
+            {/* BUTTON */}
+            <button
+              type="submit"
+              className={`login-btn ${loading ? "loading" : ""}`}
+              disabled={loading}
+            >
+              {loading ? <span className="spinner"></span> : "Se Connecter"}
+            </button>
+            {/* ✅ ERROR تحت */}
+{errorMsg && <div className="error-msg">{errorMsg}</div>}
 
           </form>
-
-          <div className="footer-text">
-            OCP Group | BGstripping Service
-          </div>
-
         </div>
-
       </main>
 
       <Footer />
