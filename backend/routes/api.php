@@ -6,16 +6,16 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\CasementController;
 use App\Http\Controllers\PoussageController;
 use App\Http\Controllers\TransportJournalierController;
+use Illuminate\Http\Request;
 
 // ─── Routes publiques ─────────────────────────────
 Route::post('/login', [AuthController::class , 'login']);
-
-
+//Ça renvoie l’utilisateur connecté
+Route::middleware(['auth:sanctum'])->get('/me', function (Request $request) {
+    return response()->json($request->user());
+});
 // ─── Routes protégées (Sanctum) ───────────────────
-Route::middleware('auth:sanctum')->group(function () {
-
-    Route::post('/logout', [AuthController::class , 'logout']);
-    Route::get('/me', [AuthController::class , 'me']);
+Route::middleware(['auth:sanctum','role:admin,superadmin'])->group(function () {
 
     Route::get('/users',[UserController::class,'index']);
     Route::post('/users',[UserController::class,'store']);
