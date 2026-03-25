@@ -94,7 +94,7 @@ const Header = ({ children }) => {
       <div className={`navbar-collapse ${isOpen ? "show" : ""}`}>
 
         {/*
-          Injection des liens de navigation fournis par le parent.
+          Injection des liens de navigation fournis par le parent (ex: <Navbar />).
           On clone l'élément pour lui passer la fonction closeMenu,
           permettant de fermer le menu au clic sur un lien (UX mobile).
         */}

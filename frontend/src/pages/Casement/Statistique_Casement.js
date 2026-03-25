@@ -379,7 +379,6 @@ const EMPTY_FORM = {
   htp:"",
   etatMachine:"marche", typeArret:"",
   heureDebutArret:"", heureFinArret:"",
-  arretsEquipements:{},
 };
 
 function calcTemps(debut,fin) {
@@ -522,50 +521,47 @@ function StatistiqueCasement() {
     if(n && !equipOpts.includes(n)) setEquipOpts([...equipOpts,n]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Calculer TB, TA, HTP, OEE, TU, TD avant dispatch (comme FormulaireCasement)
-    const TB = Math.min(parseFloat(formData.temps || 0), 24);
-    const TA_MACHINE = parseFloat(
-      calcTemps(formData.heureDebutArret, formData.heureFinArret) || 0
+    const TR = 24;
+    const TB = Math.min(parseFloat(formData.temps || 0), TR);
+    // TA = arrêt machine uniquement (arrêts par équipement supprimés)
+    const TA = Math.min(
+      parseFloat(calcTemps(formData.heureDebutArret, formData.heureFinArret) || 0),
+      TB
     );
-    const TA_GLOBAL = (formData.equipements || []).reduce((total, eq) => {
-      const a = formData.arretsEquipements?.[eq];
-      if (!a?.debut || !a?.fin) return total;
-      const d = parseFloat(calcTemps(a.debut, a.fin) || 0);
-      return total + (d > 0 ? d : 0);
-    }, 0);
-    const TA = Math.min(Math.max(TA_GLOBAL, TA_MACHINE), TB);
+    const HM  = Math.max(0, TB - TA);
     const HTP = Math.min(
-      formData.htp !== ""
-        ? Math.max(0, parseFloat(formData.htp || 0))
-        : Math.max(0, TB - TA),
-      TB, 24
+      formData.htp !== "" ? Math.max(0, parseFloat(formData.htp || 0)) : HM,
+      HM, TR
     );
-    const OEE = HTP > 0 ? parseFloat(Math.min((HTP / 24) * 100, 100).toFixed(2)) : 0;
-    const TU  = TB  > 0 ? parseFloat(Math.min((HTP / TB)  * 100, 100).toFixed(2)) : 0;
-    const TD  = HTP > 0 ? parseFloat(Math.min((HTP / 24) * 100, OEE, 100).toFixed(2)) : 0;
+    // Formules corrigées
+    const OEE = HTP > 0 ? parseFloat(Math.min((HTP / TR) * 100, 100).toFixed(2)) : 0;
+    const TU  = TB  > 0 ? parseFloat(Math.min((HM  / TB) * 100, 100).toFixed(2)) : 0;
+    const TD  = TB  > 0 ? parseFloat(Math.min(((TB - TA) / TB) * 100, 100).toFixed(2)) : 0;
 
     const payload = {
       ...formData,
-      htp: HTP,
-      oee: OEE,
-      tu:  TU,
-      td:  TD,
-      temps: TB, // ✅ TB conservé dans temps (Heures de Marche brutes)
+      htp: HTP, oee: OEE, tu: TU, td: TD,
+      temps: TB,
     };
 
-    if(editIndex!==null) {
-      const recordId = casements[editIndex]?.id ?? null;
-      dispatch(updateCasement({id: recordId, index:editIndex, data:payload})); // ✅ id + index
-      setEditIndex(null);
-      showToast("warning","Opération modifiée","Les données du casement ont été mises à jour avec succès.");
-    } else {
-      dispatch(addCasement(payload));
-      showToast("success","Opération ajoutée","Le nouveau casement a été enregistré avec succès.");
+    try {
+      if (editIndex !== null) {
+        const recordId = casements[editIndex]?.id ?? null;
+        if (!recordId) throw new Error("ID manquant pour la mise à jour.");
+        await dispatch(updateCasement({ id: recordId, data: payload })).unwrap();
+        setEditIndex(null);
+        showToast("warning", "Opération modifiée", "Les données ont été mises à jour dans la base de données.");
+      } else {
+        await dispatch(addCasement(payload)).unwrap();
+        showToast("success", "Opération ajoutée", "Le nouveau casement a été enregistré avec succès.");
+      }
+      resetForm(); setShowForm(false);
+    } catch (err) {
+      showToast("danger", "Erreur API", err?.message ?? "Erreur de connexion au serveur.");
     }
-    resetForm(); setShowForm(false);
   };
 
   const handleEdit = (c, i) => {
@@ -578,15 +574,26 @@ function StatistiqueCasement() {
 
   const handleDelete = (i) => {
     const c = casements[i];
-    const label = c ? `${c.date || ""} · ${c.panneau || ""} · ${c.tranchee || ""}`.trim().replace(/^·|·$/g,"").trim() : `#${i+1}`;
-    setConfirmDlg({open:true, index:i, id: c?.id ?? null, label}); // ✅ stocker l'id Laravel
+    const label = c
+      ? `${c.date || ""} · ${c.panneau || ""} · ${c.tranchee || ""}`.trim().replace(/^·|·$/g, "").trim()
+      : `#${i + 1}`;
+    setConfirmDlg({ open: true, index: i, id: c?.id ?? null, label });
   };
-  const confirmDelete = () => {
-    // ✅ Utiliser l'id Laravel en priorité (requis par le slice API)
-    const target = confirmDlg.id ?? confirmDlg.index;
-    dispatch(deleteCasement(target));
-    showToast("danger","Opération supprimée",`L'enregistrement "${confirmDlg.label}" a été supprimé définitivement.`);
-    setConfirmDlg({open:false, index:null, id:null, label:""});
+
+  const confirmDelete = async () => {
+    if (!confirmDlg.id) {
+      showToast("danger", "Erreur", "Identifiant manquant — impossible de supprimer.");
+      setConfirmDlg({ open: false, index: null, id: null, label: "" });
+      return;
+    }
+    try {
+      await dispatch(deleteCasement(confirmDlg.id)).unwrap();
+      showToast("danger", "Opération supprimée", `L'enregistrement "${confirmDlg.label}" a été supprimé de la base de données.`);
+    } catch (err) {
+      showToast("danger", "Erreur suppression", err?.message ?? "Erreur de connexion au serveur.");
+    } finally {
+      setConfirmDlg({ open: false, index: null, id: null, label: "" });
+    }
   };
 
   // Rendement instantané basé sur volume_saute

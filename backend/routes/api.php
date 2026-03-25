@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\SecuriteController;
 use App\Http\Controllers\CasementController;
 use App\Http\Controllers\PoussageController;
 use App\Http\Controllers\TransportJournalierController;
@@ -22,6 +23,13 @@ Route::middleware(['auth:sanctum','role:admin,superadmin'])->group(function () {
     Route::put('/users/{id}',[UserController::class,'update']);
     Route::delete('/users/{id}',[UserController::class,'destroy']);
 
+});
+
+// Routes pour la gestion de la sécurité (documents et images)
+Route::prefix('securite')->group(function () {
+    Route::get('/', [SecuriteController::class, 'index']);      // Lister les fichiers
+    Route::post('/', [SecuriteController::class, 'store']);     // Ajouter un fichier
+    Route::delete('/{id}', [SecuriteController::class, 'destroy']); // Supprimer un fichier
 });
 
 // ─── Poussages ────────────────────────────────────

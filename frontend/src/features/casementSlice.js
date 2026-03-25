@@ -25,30 +25,42 @@ const JSON_HEADERS = {
 ───────────────────────────────────────────────────────────────────────── */
 
 /** Formulaire React → corps JSON pour l'API */
-const toApi = (f) => ({
-  date:                  f.date                  ?? null,
-  panneau:               f.panneau               ?? null,
-  tranchee:              f.tranchee              ?? null,
-  niveau:                f.niveau                ?? null,
-  profondeur:            f.profondeur            ?? null,
-  volume_saute:          f.volume_saute !== "" ? Number(f.volume_saute) : null,
-  conducteur:            f.conducteur            ?? null,
-  matricule:             f.matricule             ?? null,
-  poste:                 f.poste                 ?? null,
-  equipements:           Array.isArray(f.equipements) ? f.equipements : [],
-  arrets_equipements:    f.arretsEquipements     ?? null,
-  heure_debut_compteur:  f.heureDebutCompteur    ?? null,
-  heure_fin_compteur:    f.heureFinCompteur      ?? null,
-  temps:                 f.temps  !== "" ? Number(f.temps)  : null,
-  htp:                   f.htp    !== "" ? Number(f.htp)    : null,
-  etat_machine:          f.etatMachine           ?? "marche",
-  type_arret:            f.typeArret             ?? null,
-  heure_debut_arret:     f.heureDebutArret       ?? null,
-  heure_fin_arret:       f.heureFinArret         ?? null,
-  oee:                   f.oee !== "" && f.oee != null ? Number(f.oee) : null,
-  tu:                    f.tu  !== "" && f.tu  != null ? Number(f.tu)  : null,
-  td:                    f.td  !== "" && f.td  != null ? Number(f.td)  : null,
-});
+const toApi = (f) => {
+  // Fonction utilitaire pour s'assurer que l'heure est au format HH:mm (H:i en Laravel)
+  const formatTime = (t) => {
+    if (!t || t.trim() === "") return null;
+    // Si le format est déjà HH:mm (5 caractères), on le garde tel quel
+    if (t.length === 5) return t;
+    // Si le format est HH:mm:ss (8 caractères), on ne garde que les 5 premiers
+    if (t.length === 8) return t.substring(0, 5);
+    return t;
+  };
+
+  return {
+    date:                  f.date                  ?? null,
+    panneau:               f.panneau               ?? null,
+    tranchee:              f.tranchee              ?? null,
+    niveau:                f.niveau                ?? null,
+    profondeur:            f.profondeur            ?? null,
+    volume_saute:          f.volume_saute !== "" ? Number(f.volume_saute) : null,
+    conducteur:            f.conducteur            ?? null,
+    matricule:             f.matricule             ?? null,
+    poste:                 f.poste                 ?? null,
+    equipements:           Array.isArray(f.equipements) ? f.equipements : [],
+    arrets_equipements:    f.arretsEquipements     ?? null,
+    heure_debut_compteur:  formatTime(f.heureDebutCompteur),
+    heure_fin_compteur:    formatTime(f.heureFinCompteur),
+    temps:                 f.temps  !== "" ? Number(f.temps)  : null,
+    htp:                   f.htp    !== "" ? Number(f.htp)    : null,
+    etat_machine:          f.etatMachine           ?? "marche",
+    type_arret:            f.typeArret             ?? null,
+    heure_debut_arret:     formatTime(f.heureDebutArret),
+    heure_fin_arret:       formatTime(f.heureFinArret),
+    oee:                   f.oee !== "" && f.oee != null ? Number(f.oee) : null,
+    tu:                    f.tu  !== "" && f.tu  != null ? Number(f.tu)  : null,
+    td:                    f.td  !== "" && f.td  != null ? Number(f.td)  : null,
+  };
+};
 
 /** Réponse API → objet compatible avec le store Redux / composants React */
 const fromApi = (r) => ({
@@ -131,8 +143,14 @@ export const updateCasement = createAsyncThunk(
         body:    JSON.stringify(toApi(data)),
       });
       if (!res.ok) {
-        const err = await res.json();
-        return rejectWithValue(err.message ?? "Erreur lors de la mise à jour.");
+        let errMsg = `Erreur ${res.status}`;
+        try {
+          const err = await res.json();
+          errMsg = err.message || err.error || errMsg;
+        } catch (e) {
+          // Si le corps de la réponse n'est pas du JSON
+        }
+        return rejectWithValue(errMsg);
       }
       const json = await res.json();
       return fromApi(json.data);

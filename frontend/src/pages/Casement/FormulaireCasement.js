@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { addCasement, updateCasement, deleteCasement } from "../../features/casementSlice";
+import { addCasement, updateCasement, deleteCasement, fetchCasements } from "../../features/casementSlice";
 import image from "../../images/image3.webp";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -696,14 +696,12 @@ const EMPTY_FORM = {
   equipements:          [],
   heureDebutCompteur: "",
   heureFinCompteur:   "",
-  temps:                "",   // TB = heureFin - heureDebut (calculé auto)
-  htp:                  "",   // HTP = TB - TA  (calculé auto, surchargeable manuellement)
+  temps:                "",
+  htp:                  "",
   etatMachine:          "marche",
   typeArret:            "",
   heureDebutArret:      "",
   heureFinArret:        "",
-  // Arrêts par équipement : { "7500M1": { debut:"", fin:"", nature:"" }, ... }
-  arretsEquipements:    {},
 };
 /**
  * INITIAL_EQUIP — Liste de base des équipements disponibles.
@@ -921,6 +919,10 @@ function Gestion() {
   const [toasts,     setToasts]     = useState([]);
   const [search,     setSearch]     = useState("");
   const [confirmDlg, setConfirmDlg] = useState({ open: false, id: null, index: null, label: "" });
+  const [submitting, setSubmitting] = useState(false);
+
+  // Charger les données depuis la BDD au montage
+  useEffect(() => { dispatch(fetchCasements()); }, [dispatch]);
 
   const showToast = (type, title, msg, duration=4000) => {
     const id = Date.now() + Math.random();
@@ -952,19 +954,6 @@ function Gestion() {
       u.temps = calcTemps(debut, fin); // TB stocké dans `temps`
     }
     setForm(u);
-  };
-
-  // Mise à jour arrêt d'un équipement spécifique
-  const handleArretEquip = (eq, field, value) => {
-    setForm(prev => {
-      const arrets = { ...(prev.arretsEquipements || {}) };
-      arrets[eq] = { ...(arrets[eq] || { debut: "", fin: "", nature: "" }), [field]: value };
-      // Recalculer durée auto
-      const d = field === "debut" ? value : (arrets[eq].debut || "");
-      const f = field === "fin"   ? value : (arrets[eq].fin   || "");
-      arrets[eq].duree = calcTemps(d, f) || "0";
-      return { ...prev, arretsEquipements: arrets };
-    });
   };
 
   /**
@@ -1022,115 +1011,59 @@ function Gestion() {
     navigate(location.pathname, { replace: true, state: {} });
   };
 
-  /**
-   * handleSubmit — Soumission du formulaire.
-   * - Mode création  (editIndex === null) : dispatche addCasement
-   * - Mode édition   (editIndex ≥ 0)     : dispatche updateCasement avec id Laravel
-   * Dans les deux cas, réinitialise le formulaire après dispatch.
-   */
-  const handleSubmit = (e) => {
+  // handleSubmit — async, attend la réponse API avant de reset
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Enrichir le form avec les KPI calculés avant dispatch
+    if (submitting) return;
     const payload = {
       ...form,
-      htp:  HTP,
-      oee:  OEE,
-      tu:   TU,
-      td:   TD,
-      temps: parseFloat(form.temps || 0), // ✅ TB brut conservé dans temps
+      htp:   HTP,
+      oee:   OEE,
+      tu:    TU,
+      td:    TD,
+      temps: parseFloat(form.temps || 0),
     };
-    if (editIndex !== null) {
-      // ✅ Passer id ET index pour que le slice retrouve l'enregistrement Laravel
-      dispatch(updateCasement({ id: editId, index: editIndex, data: payload }));
-      showToast("warning", "Opération modifiée", "Les données du casement ont été mises à jour avec succès.");
-    } else {
-      dispatch(addCasement(payload));
-      showToast("success", "Opération enregistrée", "Le nouveau casement a bien été ajouté à l'historique.");
+    setSubmitting(true);
+    try {
+      if (editIndex !== null && editId !== null) {
+        console.log("Modification de l'ID :", editId, "avec les données :", payload);
+        await dispatch(updateCasement({ id: editId, data: payload })).unwrap();
+        showToast("warning", "Opération modifiée", "Les données ont été mises à jour dans la base de données.");
+      } else {
+        await dispatch(addCasement(payload)).unwrap();
+        showToast("success", "Opération enregistrée", "Le casement a bien été ajouté à l'historique.");
+      }
+      reset();
+    } catch (err) {
+      // Si err est une chaîne de caractères (payload rejeté par createAsyncThunk)
+      const message = typeof err === 'string' ? err : (err?.message || "Erreur de connexion au serveur.");
+      showToast("danger", "Erreur API", message);
+    } finally {
+      setSubmitting(false);
     }
-    reset();
   };
 
-  /* ────────────────────────────────────────────────────────────────────────
-     VALEURS CALCULÉES — Indicateurs industriels
-     ┌─────────────────────────────────────────────────────────────────┐
-     │  TB  = Temps Brut       = heureFin - heureDebut (compteur)     │
-     │  TA  = Temps Arrêt      = max(TA_machine, somme arrêts équip.) │
-     │  HM  = Heures de Marche = TB - TA                              │
-     │  HTP = Heures Trav. Pur = HM (ou saisi manuellement)           │
-     │  TR  = Temps Requis     = 24 h (atelier continu)               │
-     │                                                                 │
-     │  OEE = (HTP / TR) × 100        formule demandée               │
-     │  TU  = (HM  / TB) × 100        formule demandée               │
-     │  TD  = ((TB - TA) / TB) × 100  formule demandée               │
-     └─────────────────────────────────────────────────────────────────┘
-  ──────────────────────────────────────────────────────────────────────── */
-
-  // TR — Temps Requis (référence atelier continu 24h/24)
+  /* ── KPI ──────────────────────────────────────────────────────────────── */
   const TR = 24;
-
-  // TB — Temps Brut : durée totale Compteur (heureFin - heureDebut), plafonné à 24h
   const TB = Math.min(parseFloat(form.temps || 0), TR);
-
-  // TA_GLOBAL — Somme des arrêts détaillés par équipement (section 06)
-  const TA_GLOBAL = form.equipements.reduce((total, eq) => {
-    const a = form.arretsEquipements?.[eq];
-    if (!a?.debut || !a?.fin) return total;
-    const d = parseFloat(calcTemps(a.debut, a.fin) || 0);
-    return total + (d > 0 ? d : 0);
-  }, 0);
-
-  // TA_MACHINE — Arrêt machine global (section 05 "État Machine")
-  const TA_MACHINE = parseFloat(
-    calcTemps(form.heureDebutArret, form.heureFinArret) || 0
+  // TA = arrêt machine global uniquement (section 05)
+  const TA = Math.min(
+    parseFloat(calcTemps(form.heureDebutArret, form.heureFinArret) || 0),
+    TB
   );
-
-  // TA — Temps Arrêt total
-  // On prend le MAX des deux sources (même réalité, niveaux de détail différents)
-  // Plafonné à TB pour garantir HM ≥ 0
-  const TA = Math.min(Math.max(TA_GLOBAL, TA_MACHINE), TB);
-
-  // HM — Heures de Marche = TB - TA
-  const HM = Math.max(0, TB - TA);
-
-  // HTP — Heures de Travail Pur
-  // Si saisi manuellement → valeur utilisateur (clampée entre 0 et HM)
-  // Sinon → égal à HM (calculé automatiquement)
+  const HM  = Math.max(0, TB - TA);
   const HTP = Math.min(
-    form.htp !== ""
-      ? Math.max(0, parseFloat(form.htp || 0))
-      : HM,
-    HM,  // HTP ne peut jamais dépasser HM
-    TR   // et ne peut pas dépasser 24h
+    form.htp !== "" ? Math.max(0, parseFloat(form.htp || 0)) : HM,
+    HM, TR
   );
-
-  // nbEquip — nombre d'équipements sélectionnés (min 1)
-  const nbEquip = form.equipements.length || 1;
-
-  // HTP_GLOBAL — HTP total sur l'ensemble des équipements
+  const nbEquip    = form.equipements.length || 1;
   const HTP_GLOBAL = HTP * nbEquip;
-
-  // ── FORMULES CORRIGÉES ────────────────────────────────────────────────
-
-  // OEE (%) = (HTP / TR) × 100
-  // Efficience globale équipement — rapporte le travail pur au temps total requis (24h)
-  const OEE = HTP > 0
-    ? parseFloat(Math.min((HTP / 24) * 100, 100).toFixed(2))
-    : 0;
-
-  // TU (%) = (HM / TB) × 100
-  // Taux d'Utilisation — part du temps brut effectivement en marche
-  const TU = TB > 0
-    ? parseFloat(Math.min((OEE / 24) * 100, 100).toFixed(2))
-    : 0;
-
-  // TD (%) = ((TB - TA) / TB) × 100  =  (HM / TB) × 100
-  // Taux de Disponibilité — fraction du temps brut sans arrêt
-  // Note : TD = TU par définition (HM = TB - TA), conservé séparé pour affichage distinct
-  const TD = TB > 0
-    ? parseFloat(Math.min(((TU - TA) / 24) * 100, 100).toFixed(2))
-    : 0;
-
-  // Rendement — basé sur HTP (temps réellement productif)
+  // OEE = (HTP / TR) × 100
+  const OEE = HTP > 0 ? parseFloat(Math.min((HTP / TR) * 100, 100).toFixed(2)) : 0;
+  // TU  = (HM  / TB) × 100
+  const TU  = TB  > 0 ? parseFloat(Math.min((HM  / TB) * 100, 100).toFixed(2)) : 0;
+  // TD  = ((TB - TA) / TB) × 100
+  const TD  = TB  > 0 ? parseFloat(Math.min(((TB - TA) / TB) * 100, 100).toFixed(2)) : 0;
   const rendement = HTP > 0
     ? parseFloat((parseFloat(form.volume_saute || 0) / HTP).toFixed(2))
     : 0;
@@ -1139,24 +1072,38 @@ function Gestion() {
 
   /* ── Handlers tableau ──────────────────────────────────────────────── */
   const handleEditRow = (c, i) => {
-    setForm({ ...EMPTY_FORM, ...c, equipements: c.equipements || [] });
+    // Charger les données dans le formulaire — sans arretsEquipements
+    const { arretsEquipements, ...rest } = c;
+    setForm({ ...EMPTY_FORM, ...rest, equipements: c.equipements ?? [] });
     setEditIndex(i);
-    setEditId(c?.id ?? null);
+    setEditId(c.id ?? null); // id BDD → handleSubmit fera PUT /api/casements/{id}
     window.scrollTo({ top: 0, behavior: "smooth" });
     showToast("warning", "Mode édition activé", `Opération du ${c.date || "—"} chargée dans le formulaire.`);
   };
 
   const handleDeleteRow = (i) => {
     const c = casements[i];
-    const label = c ? `${c.date || ""} · ${c.panneau || ""} · ${c.tranchee || ""}`.replace(/^·\s*|·\s*$/g,"").trim() : `#${i+1}`;
+    const label = c
+      ? `${c.date || ""} · ${c.panneau || ""} · ${c.tranchee || ""}`.replace(/^·\s*|·\s*$/g, "").trim()
+      : `#${i + 1}`;
     setConfirmDlg({ open: true, id: c?.id ?? null, index: i, label });
   };
 
-  const confirmDelete = () => {
-    const target = confirmDlg.id ?? confirmDlg.index;
-    dispatch(deleteCasement(target));
-    showToast("danger", "Opération supprimée", `L'enregistrement « ${confirmDlg.label} » a été supprimé.`);
-    setConfirmDlg({ open: false, id: null, index: null, label: "" });
+  // confirmDelete — supprime dans la BDD via DELETE /api/casements/{id}
+  const confirmDelete = async () => {
+    if (!confirmDlg.id) {
+      showToast("danger", "Erreur", "Identifiant manquant — impossible de supprimer.");
+      setConfirmDlg({ open: false, id: null, index: null, label: "" });
+      return;
+    }
+    try {
+      await dispatch(deleteCasement(confirmDlg.id)).unwrap();
+      showToast("danger", "Opération supprimée", `L'enregistrement « ${confirmDlg.label} » a été supprimé de la base de données.`);
+    } catch (err) {
+      showToast("danger", "Erreur suppression", err?.message ?? "Erreur de connexion au serveur.");
+    } finally {
+      setConfirmDlg({ open: false, id: null, index: null, label: "" });
+    }
   };
 
   /* ── Filtrage tableau ──────────────────────────────────────────────── */
@@ -1280,7 +1227,7 @@ function Gestion() {
                   value={form.heureFinCompteur} onChange={handleChange} />
               </Field>
 
-              <Field label="Heur de marche" auto>
+              <Field label="hHeur de marche" auto>
                 <input type="number" className="lcsm-input" name="temps"
                   value={form.temps} readOnly placeholder="calculé auto" />
               </Field>
@@ -1355,63 +1302,8 @@ function Gestion() {
                 </div>
               )}
 
-              {/* ── 06 · ARRÊTS PAR ÉQUIPEMENT ── */}
-              {/* Affiché uniquement si la machine est en arrêt ET qu'au moins un équipement est sélectionné */}
-              {isArret && form.equipements.length > 0 && (
-                <>
-                  <SectionLabel num="06" title="Arrêts par Équipement" />
-                  <div className="lcsm-arret-equip lcsm-full">
-                    <div className="lcsm-arret-equip-head">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                      </svg>
-                      Renseigner les arrêts par machine pour calculer TA, HTP, OEE, TU, TD
-                    </div>
-                    <div className="lcsm-arret-equip-rows">
-                      {form.equipements.map(eq => {
-                        const a = form.arretsEquipements?.[eq] || { debut: "", fin: "", nature: "", duree: "" };
-                        return (
-                          <div key={eq} className="lcsm-arret-equip-row">
-                            <div className="lcsm-equip-badge">{eq}</div>
-                            <Field label="Nature arrêt">
-                              <input type="text" className="lcsm-input"
-                                placeholder="Panne, maintenance…"
-                                value={a.nature || ""}
-                                onChange={e => handleArretEquip(eq, "nature", e.target.value)} />
-                            </Field>
-                            <Field label="Début arrêt">
-                              <input type="time" className="lcsm-input"
-                                value={a.debut || ""}
-                                onChange={e => handleArretEquip(eq, "debut", e.target.value)} />
-                            </Field>
-                            <Field label="Fin arrêt">
-                              <input type="time" className="lcsm-input"
-                                value={a.fin || ""}
-                                onChange={e => handleArretEquip(eq, "fin", e.target.value)} />
-                            </Field>
-                            <div>
-                              <div className="lcsm-label" style={{marginBottom:6}}>TA (h)</div>
-                              <div className="lcsm-arret-duree-badge">
-                                {parseFloat(a.duree || 0) > 0
-                                  ? `${parseFloat(a.duree).toFixed(2)} h`
-                                  : "—"}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div className="lcsm-arret-total">
-                      <span>TA total : <strong>{TA.toFixed(2)} h</strong></span>
-                      <span>TB : <strong>{TB.toFixed(2)} h</strong></span>
-                      <span>HTP calculé : <strong>{Math.max(0, TB - TA).toFixed(2)} h</strong></span>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* ── 07 · INDICATEURS KPI ── */}
-              <SectionLabel num="07" title="Indicateurs de Performance (OEE · TU · TD)" />
+              {/* ── 06 · INDICATEURS KPI ── */}
+              <SectionLabel num="06" title="Indicateurs de Performance (OEE · TU · TD)" />
 
               <div className="lcsm-kpi-banner">
 
@@ -1539,15 +1431,17 @@ function Gestion() {
 
               {/* ── ACTIONS ── */}
               <div className="lcsm-action-row">
-                <button type="submit" className="lcsm-btn-submit">
+                <button type="submit" className="lcsm-btn-submit" disabled={submitting}>
                   {editIndex !== null ? (
-                    <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg> Mettre à jour</>
+                    <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg>
+                    {submitting ? "Mise à jour…" : "Mettre à jour"}</>
                   ) : (
-                    <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Enregistrer l'opération</>
+                    <><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    {submitting ? "Enregistrement…" : "Enregistrer l'opération"}</>
                   )}
                 </button>
                 {editIndex !== null && (
-                  <button type="button" className="lcsm-btn-cancel" onClick={reset}>
+                  <button type="button" className="lcsm-btn-cancel" onClick={reset} disabled={submitting}>
                     Annuler
                   </button>
                 )}

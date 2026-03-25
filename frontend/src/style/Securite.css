@@ -1,0 +1,132 @@
+.securite-container {
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1a4d2e; /* Vert foncé typique OCP */
+}
+
+.securite-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.upload-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.upload-label {
+  font-size: 16px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.upload-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-browse, .btn-add-file, .btn-add-image {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.btn-browse {
+  background-color: #1a4d2e; /* Vert foncé */
+  color: white;
+}
+
+.btn-add-file {
+  background-color: #2563eb; /* Bleu */
+  color: white;
+}
+
+.banner-red {
+  background-color: #dc2626; /* Rouge vif */
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.warning-icon {
+  font-size: 24px;
+}
+
+.image-display-area {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.no-image-text {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+.preview-img {
+  max-width: 1000px;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.add-image-footer {
+  text-align: center;
+}
+
+.btn-add-image {
+  background-color: #1a4d2e; /* Vert foncé */
+  color: white;
+  display: inline-block;
+}
+
+.btn-browse:hover, .btn-add-file:hover, .btn-add-image:hover {
+  opacity: 0.9;
+}
+
+/* ── Bouton Retour ── */
+.back-btn-container {
+  margin-bottom: 20px;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1.5px solid #1a4d2e;
+  color: #1a4d2e;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background-color: #1a4d2e;
+  color: white;
+  transform: translateX(-4px);
+}
