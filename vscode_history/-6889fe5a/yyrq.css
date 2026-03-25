@@ -1,0 +1,437 @@
+/* ========================================
+   ETUDIA - DESIGN "CAHIER D'ÉCOLE" INNOVANT
+   Motivant, chaleureux, créatif
+   ======================================== */
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* =========================================
+   1. RESET & GLOBAL
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #2c3e50;
+  line-height: 1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  
+  /* FOND PAPIER DE CAHIER */
+  background-color: #faf8f3; /* Couleur papier vieilli */
+  background-image: 
+    /* Marge rouge à gauche */
+    linear-gradient(90deg, transparent 80px, #ff6b6b 80px, #ff6b6b 82px, transparent 82px),
+    /* Lignes horizontales bleues */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 31px,
+      #b8d4e3 31px,
+      #b8d4e3 32px
+    ),
+    /* Trous de classeur */
+    radial-gradient(circle at 40px 50px, #e0e0e0 8px, transparent 8px),
+    radial-gradient(circle at 40px 120px, #e0e0e0 8px, transparent 8px),
+    radial-gradient(circle at 40px 190px, #e0e0e0 8px, transparent 8px);
+  background-size: 100% 100%, 100% 32px, 100% 250px, 100% 250px, 100% 250px;
+  background-position: 0 0, 0 10px, 0 0, 0 70px, 0 140px;
+}
+
+/* Petits gribouillis motivants */
+body::before {
+  content: '★ ✓ ♥ ☺ ✎';
+  position: fixed;
+  top: 20px;
+  left: 90px;
+  font-size: 20px;
+  color: rgba(255, 107, 107, 0.2);
+  font-family: 'Kalam', cursive;
+  animation: float 10s infinite ease-in-out;
+  z-index: 0;
+}
+
+body::after {
+  content: 'Tu peux le faire!';
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  font-size: 16px;
+  color: rgba(255, 159, 67, 0.3);
+  font-family: 'Kalam', cursive;
+  transform: rotate(-5deg);
+  z-index: 0;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* =========================================
+   2. HEADER STYLE POST-IT
+   ========================================= */
+.header {
+  position: relative;
+  height: 120px;
+  background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%);
+  margin: 20px 20px 30px 100px;
+  border-radius: 0 0 3px 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  transform: rotate(-1deg);
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 40px;
+  width: 80px;
+  height: 30px;
+  background: rgba(255,255,255,0.4);
+  transform: rotate(-45deg);
+  border: 2px solid rgba(0,0,0,0.05);
+}
+
+.diagonal {
+  display: none;
+}
+
+/* Logo comme un sticker */
+.logo-container {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: white;
+  padding: 15px 25px;
+  border-radius: 50%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  z-index: 10;
+  transform: rotate(5deg);
+  transition: transform 0.3s;
+  border: 3px solid #ff6b6b;
+}
+
+.logo-container:hover {
+  transform: rotate(0deg) scale(1.1);
+}
+
+.logo-container img {
+  height: 70px;
+  object-fit: contain;
+}
+
+/* =========================================
+   3. STRUCTURE & TITRES
+   ========================================= */
+.main-content {
+  flex: 1;
+  padding: 20px 20px 20px 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.section {
+  margin-bottom: 50px;
+  animation: fadeIn 0.6s ease-out;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border: 2px dashed #ff9a9e;
+  position: relative;
+}
+
+/* Titre souligné avec surligneur */
+.section-title {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  position: relative;
+  display: inline-block;
+  font-family: 'Kalam', cursive;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -5px;
+  right: -5px;
+  height: 12px;
+  background: rgba(255, 235, 59, 0.4);
+  transform: skewY(-2deg);
+  z-index: -1;
+}
+
+/* --- BOUTON RETOUR (Style gomme) --- */
+.back-button {
+  background: #ff6b9d;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 12px 25px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+  font-family: 'Kalam', cursive;
+}
+
+.back-button:hover {
+  transform: translateX(-5px) rotate(-2deg);
+  box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
+}
+
+/* =========================================
+   4. PAGE D'ACCUEIL (Style créatif)
+   ========================================= */
+.text-section {
+  text-align: center;
+  margin-top: 20px;
+  background: white;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  border: 3px solid #ffd93d;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Coins de page pliés */
+.text-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-style: solid;
+  border-width: 0 50px 50px 0;
+  border-color: transparent #ffd93d transparent transparent;
+}
+
+.title {
+  font-size: 2.8rem;
+  color: #ff6b6b;
+  font-family: 'Kalam', cursive;
+  margin: 10px 0 30px 0;
+  font-weight: 700;
+  text-shadow: 2px 2px 0px rgba(255, 217, 61, 0.3);
+}
+
+/* Bouton COMMENCER style crayon */
+.start-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 20px 60px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.start-button::before {
+  content: '✏️';
+  position: absolute;
+  left: 20px;
+  font-size: 1.5rem;
+  animation: write 2s infinite;
+}
+
+@keyframes write {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(5px) rotate(10deg); }
+}
+
+.start-button:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+}
+
+/* =========================================
+   5. CARTES MODULES (Style fiches)
+   ========================================= */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  padding-bottom: 50px;
+}
+
+.module-card {
+  background: linear-gradient(135deg, #fff 0%, #fffbf0 100%);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+  cursor: pointer;
+  border: 2px solid transparent;
+  position: relative;
+  transform: rotate(-1deg);
+}
+
+.module-card:nth-child(even) {
+  transform: rotate(1deg);
+}
+
+.module-card:hover {
+  transform: rotate(0deg) translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  border-color: #667eea;
+}
+
+/* Épingle sur la carte */
+.module-card::before {
+  content: '📌';
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  font-size: 30px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.module-header h3 {
+  font-family: 'Kalam', cursive;
+  font-size: 1.3rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.module-code {
+  background: #ffe0b2;
+  color: #e65100;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.select-module-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s;
+  font-size: 1rem;
+}
+
+.module-card:hover .select-module-btn {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+}
+
+/* =========================================
+   6. BOUTON CONTINUER (Style validation)
+   ========================================= */
+.continue-button {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  border: none;
+  padding: 18px 50px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 30px;
+  width: 100%;
+  transition: all 0.3s;
+  box-shadow: 0 10px 25px rgba(56, 239, 125, 0.3);
+  position: relative;
+}
+
+.continue-button::after {
+  content: '→';
+  position: absolute;
+  right: 30px;
+  font-size: 1.5rem;
+  animation: moveRight 1s infinite;
+}
+
+@keyframes moveRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+}
+
+.continue-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 15px 35px rgba(56, 239, 125, 0.4);
+}
+
+/* =========================================
+   7. ÉTATS VIDES (Encourageants)
+   ========================================= */
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  background: white;
+  border-radius: 20px;
+  border: 3px dashed #ffd93d;
+  margin: 20px auto;
+  max-width: 600px;
+  position: relative;
+}
+
+.empty-state::before {
+  content: '💡 Astuce: ';
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  color: #ff9a9e;
+  font-weight: bold;
+  font-family: 'Kalam', cursive;
+}
+
+/* =========================================
+   8. ANIMATIONS
+   ========================================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(5deg); }
+  50% { transform: translateY(0) rotate(-5deg); }
+  75% { transform: translateY(-5px) rotate(3deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   9. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  body { 
+    background-size: 100% 100%, 100% 32px;
+    padding-left: 0;
+  }
+  .main-content { padding-left: 20px; }
+  .header { margin-left: 20px; }
+  .modules-grid { grid-template-columns: 1fr; }
+}

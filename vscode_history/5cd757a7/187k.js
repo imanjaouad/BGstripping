@@ -1,0 +1,11 @@
+const express = require('express')
+const data = require('./simple')
+const app = express()
+
+// middlware : 
+
+app.use(express.json());
+
+// Route :
+
+app.get('/stagiaires')

@@ -1,0 +1,47 @@
+import { Link } from "react-router-dom";
+import "../../style/Footer.css";
+
+export default function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container">
+        <div className="footer-grid">
+
+          <div>
+            <h5>Phosphate Management</h5>
+            <p>
+              Plateforme de gestion intégrée pour les opérations
+              de décapage de phosphate.
+            </p>
+          </div>
+
+          <div>
+            <h5>Navigation</h5>
+            <ul>
+              <li><Link to="/">Accueil</Link></li>
+              <li><a href="#definition">Définition</a></li>
+              <li><a href="#operations">Opérations</a></li>
+              <li><Link to="/securite">Sécurité</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h5>Opérations</h5>
+            <ul>
+              <li><Link to="/poussage">Poussage</Link></li>
+              <li><Link to="/operations/casement">Casement</Link></li>
+              <li><Link to="/operations/transport">Transport</Link></li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div className="footer-divider"></div>
+
+        <p className="footer-copy">
+          ©  {new Date().getFullYear()} Phosphate Management System. Tous droits réservés.
+        </p>
+      </div>
+    </footer>
+  );
+}
