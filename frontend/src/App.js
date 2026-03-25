@@ -27,7 +27,7 @@ function App() {
       {/* PUBLIC */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-    
+
 
       {/* ADMIN */}
       <Route

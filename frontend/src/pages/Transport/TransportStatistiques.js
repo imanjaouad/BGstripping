@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTransportJournaliers } from "../../features/transportSlice";
+import { fetchTransportJournaliers, deleteTransportJournalier, updateTransportJournalier } from "../../features/transportSlice";
 import { fetchPoussages } from "../../features/poussageSlice";
-import { FaBolt, FaHardHat, FaTruck, FaTruckLoading, FaChartBar, FaFileExcel, FaInbox, FaSpinner } from "react-icons/fa";
+import { FaBolt, FaHardHat, FaTruck, FaTruckLoading, FaChartBar, FaFileExcel, FaFilePdf, FaInbox, FaSpinner, FaEdit, FaTrashAlt, FaTimes, FaSave } from "react-icons/fa";
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend, Filler, ArcElement,
@@ -10,6 +10,8 @@ import {
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import image from "../../images/ocpLogo.png";
 import TransportSidebar from "./TransportSidebar";
 
@@ -29,13 +31,15 @@ const CSS = `
   .ts-kpi {
     background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
     padding:20px 22px; position:relative; overflow:hidden;
-    opacity:0; animation:ts-fadeUp .5s ease forwards;
+    opacity:1; animation:ts-fadeUp .5s ease both;
     transition:transform .2s,box-shadow .2s; cursor:default;
   }
-  .ts-kpi:hover { transform:translateY(-5px); animation:ts-pulse 2s ease infinite !important; }
+  .ts-kpi:hover { transform:translateY(-5px); }
   .ts-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
     background:linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
     background-size:200%; animation:ts-shimmer 2.4s linear infinite; }
+  .ts-kpi::after { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:0; }
+  .ts-kpi:hover::after { opacity:1; animation:ts-pulse 2s ease infinite; }
   .ts-kpi-shimmer { position:absolute;inset:0;
     background:linear-gradient(100deg,transparent 25%,rgba(255,255,255,.6) 50%,transparent 75%);
     background-size:600px 100%;animation:ts-shimmer 2.8s linear infinite;pointer-events:none; }
@@ -68,14 +72,14 @@ const CSS = `
   .ts-grid4 { display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px; }
 
   .ts-table-wrap { overflow-x:auto; border-radius:12px; border:1.5px solid #bbf7d0; }
-  .ts-table { width:100%;border-collapse:collapse;font-size:12.5px; }
+  .ts-table { width:100%;border-collapse:collapse;font-size:11.5px; }
   .ts-table thead tr { background:#15803d; }
-  .ts-table th { padding:11px 13px;text-align:left;font-size:10px;font-weight:700;
-    letter-spacing:.07em;text-transform:uppercase;color:#fff;white-space:nowrap; }
+  .ts-table th { padding:10px 8px;text-align:left;font-size:9.5px;font-weight:700;
+    letter-spacing:.05em;text-transform:uppercase;color:#fff;white-space:nowrap; }
   .ts-table tbody tr { border-bottom:1px solid #f0fdf4; animation:ts-rowIn .4s ease both; transition:background .15s; }
   .ts-table tbody tr:hover { background:#f0fdf4; }
   .ts-table tbody tr:last-child { border-bottom:none; }
-  .ts-table td { padding:10px 13px;color:#374151;vertical-align:middle;white-space:nowrap; }
+  .ts-table td { padding:8px 8px;color:#374151;vertical-align:middle;white-space:nowrap; }
   .ts-table td:first-child { font-weight:600;color:#14532d; }
 
   .ts-btn-excel { background:#166534;color:#fff;border:none;border-radius:10px;
@@ -98,6 +102,72 @@ const CSS = `
   .ts-progress-bar  { height:100%; border-radius:20px;
     background:linear-gradient(90deg,#16a34a,#4ade80);
     transition:width .8s cubic-bezier(.4,0,.2,1); }
+
+  /* ── CRUD Buttons ── */
+  .ts-btn-edit {
+    background:#eff6ff; color:#2563eb; border:1.5px solid #bfdbfe;
+    border-radius:8px; padding:5px 11px; font-size:12px; font-weight:600;
+    cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+    transition:all .18s; font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .ts-btn-edit:hover { background:#dbeafe; border-color:#2563eb; transform:translateY(-1px); }
+
+  .ts-btn-del {
+    background:#fff5f5; color:#dc2626; border:1.5px solid #fecaca;
+    border-radius:8px; padding:5px 11px; font-size:12px; font-weight:600;
+    cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+    transition:all .18s; font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .ts-btn-del:hover { background:#fee2e2; border-color:#dc2626; transform:translateY(-1px); }
+
+  /* ── Modal ── */
+  .ts-modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.45);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999; animation:ts-fadeUp .2s ease;
+    backdrop-filter:blur(3px);
+  }
+  .ts-modal {
+    background:#fff; border-radius:20px; padding:32px;
+    width:100%; max-width:560px; box-shadow:0 24px 80px rgba(22,163,74,0.18);
+    border:1.5px solid #bbf7d0; position:relative;
+    animation:ts-fadeUp .25s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .ts-modal-title { font-size:18px; font-weight:800; color:#14532d; margin:0 0 4px; }
+  .ts-modal-sub   { font-size:12px; color:#9ca3af; margin:0 0 24px; }
+  .ts-modal-grid  { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px; }
+  .ts-modal-label { font-size:10px; font-weight:700; color:#4b5563; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:5px; }
+  .ts-modal-input {
+    width:100%; border:1.5px solid #d1fae5; border-radius:8px;
+    padding:9px 12px; font-size:13px; color:#1f2937;
+    background:#f8fafc; outline:none; transition:all .2s;
+    box-sizing:border-box; font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .ts-modal-input:focus { border-color:#16a34a; background:#fff; box-shadow:0 0 0 3px rgba(22,163,74,0.1); }
+  .ts-modal-input[readonly] { background:#f0fdf4; color:#15803d; font-weight:600; }
+  .ts-modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+  .ts-modal-close {
+    position:absolute; top:16px; right:16px;
+    background:#f3f4f6; border:none; border-radius:50%;
+    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:#6b7280; font-size:14px; transition:all .18s;
+  }
+  .ts-modal-close:hover { background:#e5e7eb; color:#111; }
+  .ts-btn-save {
+    background:#16a34a; color:#fff; border:none; border-radius:10px;
+    padding:10px 22px; font-size:13px; font-weight:700; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px; transition:all .18s;
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .ts-btn-save:hover { background:#15803d; transform:translateY(-1px); }
+  .ts-btn-save:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+  .ts-btn-cancel2 {
+    background:#f3f4f6; color:#4b5563; border:none; border-radius:10px;
+    padding:10px 22px; font-size:13px; font-weight:700; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px; transition:all .18s;
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .ts-btn-cancel2:hover { background:#e5e7eb; }
 `;
 
 const COLOR_PALETTE = [
@@ -135,10 +205,40 @@ export default function TransportStatistiques() {
   const transportData = useSelector((s) => s.transport?.list || []);
   const poussages = useSelector((s) => s.poussage?.list || []);
   const loading = useSelector((s) => s.transport?.loading);
+  const saving = useSelector((s) => s.transport?.saving);
 
   const [period, setPeriod] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+
+  // ── Edit modal state ──
+  const [editRecord, setEditRecord] = useState(null);
+  const [editForm, setEditForm] = useState({});
+
+  const openEdit = (r) => {
+    setEditRecord(r);
+    setEditForm({
+      nombre_voyages: r.nombre_voyages,
+      capacite_camion: r.capacite_camion,
+      panneau: r.panneau || "",
+      tranchee: r.tranchee || "",
+      niveau: r.niveau || "",
+    });
+  };
+  const closeEdit = () => { setEditRecord(null); setEditForm({}); };
+
+  const handleEditChange = (field, val) => setEditForm((f) => ({ ...f, [field]: val }));
+
+  const handleSaveEdit = async () => {
+    if (!editRecord) return;
+    await dispatch(updateTransportJournalier({ id: editRecord.id, data: editForm }));
+    closeEdit();
+  };
+
+  const handleDelete = async (r) => {
+    if (!window.confirm(`Supprimer l'enregistrement du ${r.date} (${r.entreprise} — ${r.type_moyen}) ?`)) return;
+    dispatch(deleteTransportJournalier(r.id));
+  };
 
   useEffect(() => {
     dispatch(fetchTransportJournaliers());
@@ -169,10 +269,10 @@ export default function TransportStatistiques() {
   });
 
   // ─── KPIs ──────────────────────────────────────────────────────────────────
-  const totalVoyages      = filtered.reduce((s, r) => s + r.nombre_voyages, 0);
+  const totalVoyages = filtered.reduce((s, r) => s + r.nombre_voyages, 0);
   const totalVolumeDecape = filtered.reduce((s, r) => s + r.volume_decape, 0);
-  const totalOps          = filtered.length;
-  const avgCapacite       = totalOps > 0 ? (filtered.reduce((s, r) => s + r.capacite_camion, 0) / totalOps).toFixed(1) : 0;
+  const totalOps = filtered.length;
+  const avgCapacite = totalOps > 0 ? (filtered.reduce((s, r) => s + r.capacite_camion, 0) / totalOps).toFixed(1) : 0;
 
   // Volume sauté depuis Sautage (Poussage), filtré par la même période
   const filteredPoussages = poussages.filter((p) => {
@@ -199,13 +299,13 @@ export default function TransportStatistiques() {
   const totalVolumeSaute = filteredPoussages.reduce((s, p) => s + Number(p.volume_soté || 0), 0);
 
   // ─── Volume décapé par entreprise ─────────────────────────────────────────
-  const procaneqData  = filtered.filter((r) => r.entreprise === "procaneq");
+  const procaneqData = filtered.filter((r) => r.entreprise === "procaneq");
   const transwineData = filtered.filter((r) => r.entreprise === "transwine");
 
-  const volProcaneq  = procaneqData.reduce((s, r) => s + r.volume_decape, 0);
+  const volProcaneq = procaneqData.reduce((s, r) => s + r.volume_decape, 0);
   const volTranswine = transwineData.reduce((s, r) => s + r.volume_decape, 0);
 
-  const voyProcaneq  = procaneqData.reduce((s, r) => s + r.nombre_voyages, 0);
+  const voyProcaneq = procaneqData.reduce((s, r) => s + r.nombre_voyages, 0);
   const voyTranswine = transwineData.reduce((s, r) => s + r.nombre_voyages, 0);
 
   // ─── Volume décapé par jour (last 30 days) ────────────────────────────────
@@ -235,7 +335,7 @@ export default function TransportStatistiques() {
     responsive: true, maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
-      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` } },
+      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} m³` } },
     },
     scales: {
       x: { grid: { display: false }, ticks: baseTick },
@@ -249,7 +349,7 @@ export default function TransportStatistiques() {
     interaction: { mode: "index", intersect: false },
     plugins: {
       legend: { display: false },
-      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` } },
+      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} m³` } },
     },
     scales: {
       x: { grid: { display: false }, ticks: { ...baseTick, maxTicksLimit: 10 } },
@@ -263,24 +363,110 @@ export default function TransportStatistiques() {
     animation: { duration: 1200, easing: "easeOutBack" },
     plugins: {
       legend: { position: "bottom", labels: { color: "#6b7280", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 }, padding: 14, usePointStyle: true } },
-      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.label}: ${c.parsed.toLocaleString()} t` } },
+      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.label}: ${c.parsed.toLocaleString()} m³` } },
     },
   };
 
   // ─── Excel export ─────────────────────────────────────────────────────────
   const exportExcel = () => {
+    if (filtered.length === 0) {
+      alert("Il n'y a aucune donnée à exporter pour la période sélectionnée.");
+      return;
+    }
     const rows = filtered.map((r) => ({
       Date: r.date,
       Entreprise: r.entreprise,
       "Type Moyen": r.type_moyen,
       "Nombre Voyages": r.nombre_voyages,
-      "Capacité Camion (t)": r.capacite_camion,
-      "Volume Décapé (t)": r.volume_decape,
+      "Capacité Camion (m³)": r.capacite_camion,
+      "Volume Décapé (m³)": r.volume_decape,
+      Panneau: r.panneau || "—",
+      Tranchée: r.tranchee || "—",
+      Niveau: r.niveau || "—",
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Transport_Stats");
     saveAs(new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })]), "statistiques_transport.xlsx");
+  };
+
+  // ─── PDF export ───────────────────────────────────────────────────────────
+  const exportPDF = () => {
+    if (filtered.length === 0) {
+      alert("Il n'y a aucune donnée à exporter pour la période sélectionnée.");
+      return;
+    }
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+
+    // Header bar
+    doc.setFillColor(21, 128, 61);
+    doc.rect(0, 0, pageW, 22, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Rapport Transport \u2014 OCP", 14, 14);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`G\u00e9n\u00e9r\u00e9 le ${new Date().toLocaleDateString("fr-FR")} \u00e0 ${new Date().toLocaleTimeString("fr-FR")}`, pageW - 14, 14, { align: "right" });
+
+    // KPIs row
+    let y = 30;
+    doc.setTextColor(20, 83, 45);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    const kpis = [
+      `Volume Saut\u00e9: ${Math.round(totalVolumeSaute).toLocaleString()} m\u00b3`,
+      `Volume D\u00e9cap\u00e9: ${Math.round(totalVolumeDecape).toLocaleString()} m\u00b3`,
+      `Voyages: ${totalVoyages}`,
+      `Capacit\u00e9 Moy.: ${avgCapacite} m\u00b3`,
+    ];
+    doc.text(kpis.join("   |   "), 14, y);
+    y += 4;
+
+    // Separator
+    doc.setDrawColor(187, 247, 208);
+    doc.setLineWidth(0.5);
+    doc.line(14, y, pageW - 14, y);
+    y += 4;
+
+    // Table
+    const head = [["Date", "Entreprise", "Type Moyen", "Voyages", "Capacit\u00e9 (m\u00b3)", "Volume D\u00e9cap\u00e9 (m\u00b3)", "Panneau", "Tranch\u00e9e", "Niveau"]];
+    const body = filtered.map((r) => [
+      r.date,
+      r.entreprise,
+      r.type_moyen,
+      String(r.nombre_voyages),
+      String(r.capacite_camion),
+      r.volume_decape.toLocaleString(),
+      r.panneau || "\u2014",
+      r.tranchee || "\u2014",
+      r.niveau || "\u2014",
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      head,
+      body,
+      theme: "grid",
+      headStyles: { fillColor: [22, 163, 74], textColor: 255, fontSize: 8, fontStyle: "bold", halign: "center" },
+      bodyStyles: { fontSize: 8, textColor: [55, 65, 81], halign: "center" },
+      alternateRowStyles: { fillColor: [240, 253, 244] },
+      margin: { left: 14, right: 14 },
+      styles: { cellPadding: 3, lineColor: [187, 247, 208], lineWidth: 0.3 },
+    });
+
+    // Footer
+    const pages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(156, 163, 175);
+      doc.text(`Page ${i} / ${pages}`, pageW - 14, doc.internal.pageSize.getHeight() - 8, { align: "right" });
+      doc.text("OCP \u2014 Syst\u00e8me de Gestion Transport", 14, doc.internal.pageSize.getHeight() - 8);
+    }
+
+    doc.save(`rapport_transport_${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   const anim = (d) => ({ style: { animationDelay: d } });
@@ -326,18 +512,18 @@ export default function TransportStatistiques() {
 
           {/* Loading */}
           {loading && (
-            <div style={{ textAlign: "center", padding: 40, color: "#16a34a", fontWeight: 700, display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
-              <FaSpinner style={{animation:"spin 1s linear infinite"}}/> Chargement des données transport...
+            <div style={{ textAlign: "center", padding: 40, color: "#16a34a", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+              <FaSpinner style={{ animation: "spin 1s linear infinite" }} /> Chargement des données transport...
             </div>
           )}
 
           {/* KPIs */}
           <div className="ts-grid4" style={{ marginBottom: 24 }}>
             {[
-              { icon: <FaBolt/>,        label: "Volume Sauté",        value: Math.round(totalVolumeSaute),    unit: "t",       color: "#16a34a", delay: "0.05s" },
-              { icon: <FaHardHat/>,      label: "Volume Décapé Total",  value: Math.round(totalVolumeDecape),   unit: "t",       color: "#2563eb", delay: "0.10s" },
-              { icon: <FaTruck/>,        label: "Nombre de Voyages",    value: totalVoyages,                    unit: "voyages", color: "#15803d", delay: "0.15s" },
-              { icon: <FaTruckLoading/>, label: "Capacité Moy. Camion", value: parseFloat(avgCapacite),         unit: "t",       color: "#f59e0b", delay: "0.20s" },
+              { icon: <FaBolt />, label: "Volume Sauté", value: Math.round(totalVolumeSaute), unit: "m³", color: "#16a34a", delay: "0.05s" },
+              { icon: <FaHardHat />, label: "Volume Décapé Total", value: Math.round(totalVolumeDecape), unit: "m³", color: "#2563eb", delay: "0.10s" },
+              { icon: <FaTruck />, label: "Nombre de Voyages", value: totalVoyages, unit: "voyages", color: "#15803d", delay: "0.15s" },
+              { icon: <FaTruckLoading />, label: "Capacité Moy. Camion", value: parseFloat(avgCapacite), unit: "m³", color: "#f59e0b", delay: "0.20s" },
             ].map(({ icon, label, value, unit, color, delay }) => (
               <div key={label} className="ts-kpi" style={{ animationDelay: delay, borderColor: color, borderTopWidth: 3 }}>
                 <div className="ts-kpi-shimmer" />
@@ -358,14 +544,14 @@ export default function TransportStatistiques() {
                 <p className="ts-card-title">Volume Décapé par Jour</p>
                 <p className="ts-card-sub">Évolution sur les 30 derniers jours (toutes entreprises)</p>
               </div>
-              <span className="ts-pill" style={{display:"flex",alignItems:"center",gap:5}}><FaChartBar size={10}/> Tendance</span>
+              <span className="ts-pill" style={{ display: "flex", alignItems: "center", gap: 5 }}><FaChartBar size={10} /> Tendance</span>
             </div>
             <div style={{ height: 280 }}>
               <Line
                 data={{
                   labels: dayLabels,
                   datasets: [{
-                    label: "Volume Décapé (t)", data: volParJour,
+                    label: "Volume Décapé (m³)", data: volParJour,
                     borderColor: "#16a34a", backgroundColor: "rgba(22,163,74,0.08)",
                     fill: true, tension: 0.35, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2,
                   }],
@@ -391,7 +577,7 @@ export default function TransportStatistiques() {
                   data={{
                     labels: ["Procaneq", "Transwine"],
                     datasets: [{
-                      label: "Volume Décapé (t)",
+                      label: "Volume Décapé (m³)",
                       data: [volProcaneq, volTranswine],
                       backgroundColor: ["#f59e0b", "#3b82f6"],
                       borderRadius: { topLeft: 8, topRight: 8 }, barPercentage: 0.5,
@@ -488,9 +674,14 @@ export default function TransportStatistiques() {
               <p className="ts-card-title" style={{ margin: 0 }}>
                 {filtered.length} enregistrement(s)
               </p>
-            <button className="ts-btn-excel" onClick={exportExcel} style={{display:"flex",alignItems:"center",gap:7}}>
-              <FaFileExcel/> Exporter Excel
-            </button>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button className="ts-btn-excel" onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  <FaFileExcel /> Exporter Excel
+                </button>
+                <button className="ts-btn-excel" onClick={exportPDF} style={{ display: "flex", alignItems: "center", gap: 7, background: "#dc2626" }}>
+                  <FaFilePdf /> Exporter PDF
+                </button>
+              </div>
             </div>
             {filtered.length > 0 ? (
               <div className="ts-table-wrap">
@@ -501,8 +692,12 @@ export default function TransportStatistiques() {
                       <th>Entreprise</th>
                       <th>Type Moyen</th>
                       <th>Voyages</th>
-                      <th>Capacité (t)</th>
-                      <th>Volume Décapé (t)</th>
+                      <th>Capacité (m³)</th>
+                      <th>Volume Décapé (m³)</th>
+                      <th>Panneau</th>
+                      <th>Tranchée</th>
+                      <th>Niveau</th>
+                      <th style={{ textAlign: "center" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -520,16 +715,29 @@ export default function TransportStatistiques() {
                         </td>
                         <td style={{ textTransform: "capitalize" }}>{r.type_moyen}</td>
                         <td style={{ fontWeight: 700 }}>{r.nombre_voyages}</td>
-                        <td>{r.capacite_camion} t</td>
-                        <td style={{ color: "#16a34a", fontWeight: 700 }}>{r.volume_decape.toLocaleString()} t</td>
+                        <td>{r.capacite_camion} m³</td>
+                        <td style={{ color: "#16a34a", fontWeight: 700 }}>{r.volume_decape.toLocaleString()} m³</td>
+                        <td style={{ color: "#15803d", fontWeight: 600 }}>{r.panneau || "—"}</td>
+                        <td style={{ color: "#2563eb", fontWeight: 600 }}>{r.tranchee || "—"}</td>
+                        <td style={{ color: "#d97706", fontWeight: 600 }}>{r.niveau || "—"}</td>
+                        <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                          <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                            <button className="ts-btn-edit" onClick={() => openEdit(r)}>
+                              <FaEdit size={14} />
+                            </button>
+                            <button className="ts-btn-del" onClick={() => handleDelete(r)}>
+                              <FaTrashAlt size={14} />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <div className="ts-empty" style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
-                <FaInbox size={38} style={{color:"#d1fae5"}}/>
+              <div className="ts-empty" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                <FaInbox size={38} style={{ color: "#d1fae5" }} />
                 Aucune donnée transport pour la période sélectionnée
               </div>
             )}
@@ -537,6 +745,82 @@ export default function TransportStatistiques() {
 
         </div>
       </div>
+
+      {/* ── Edit Modal ────────────────────────────────────────────────────────── */}
+      {editRecord && (
+        <div className="ts-modal-overlay" onClick={(e) => e.target === e.currentTarget && closeEdit()}>
+          <div className="ts-modal">
+            <button className="ts-modal-close" onClick={closeEdit}><FaTimes /></button>
+            <p className="ts-modal-title"> Modifier l’enregistrement</p>
+            <p className="ts-modal-sub">
+              {editRecord.date} — {editRecord.entreprise} — {editRecord.type_moyen}
+            </p>
+
+            <div className="ts-modal-grid">
+              <div>
+                <label className="ts-modal-label">Nombre de Voyages</label>
+                <input
+                  className="ts-modal-input" type="number" min="0"
+                  value={editForm.nombre_voyages}
+                  onChange={(e) => handleEditChange("nombre_voyages", Number(e.target.value))}
+                />
+              </div>
+              <div>
+                <label className="ts-modal-label">Capacité Camion (m³)</label>
+                <input
+                  className="ts-modal-input" type="number" min="0" step="0.1"
+                  value={editForm.capacite_camion}
+                  onChange={(e) => handleEditChange("capacite_camion", Number(e.target.value))}
+                />
+              </div>
+              <div>
+                <label className="ts-modal-label">Volume Décapé (calculé)</label>
+                <input
+                  className="ts-modal-input" readOnly
+                  value={`${(editForm.nombre_voyages * editForm.capacite_camion).toLocaleString()} m³`}
+                />
+              </div>
+              <div>
+                <label className="ts-modal-label">Panneau</label>
+                <input
+                  className="ts-modal-input" type="text"
+                  placeholder="Ex: P1"
+                  value={editForm.panneau}
+                  onChange={(e) => handleEditChange("panneau", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="ts-modal-label">Tranchée</label>
+                <input
+                  className="ts-modal-input" type="text"
+                  placeholder="Ex: T2"
+                  value={editForm.tranchee}
+                  onChange={(e) => handleEditChange("tranchee", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="ts-modal-label">Niveau</label>
+                <input
+                  className="ts-modal-input" type="text"
+                  placeholder="Ex: N3"
+                  value={editForm.niveau}
+                  onChange={(e) => handleEditChange("niveau", e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="ts-modal-actions">
+              <button className="ts-btn-cancel2" onClick={closeEdit}>
+                <FaTimes size={11} /> Annuler
+              </button>
+              <button className="ts-btn-save" onClick={handleSaveEdit} disabled={saving}>
+                {saving ? <FaSpinner style={{ animation: "ts-spin 1s linear infinite" }} /> : <FaSave size={11} />}
+                {saving ? "Enregistrement..." : "Sauvegarder"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
