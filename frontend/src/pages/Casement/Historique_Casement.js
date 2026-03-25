@@ -417,6 +417,7 @@ function HistoriqueCasement() {
         Conducteur:         c.conducteur,
         Matricule:          c.matricule,
         "Volume Saute (m²)": c.volume_saute,
+        "Volume Decape (m²)": c.volume_decaper || 0,
         "Heures Marche":    c.temps,
         "Rendement (m²/h)": c.temps > 0 ? (c.volume_saute / c.temps).toFixed(2) : 0,
         "HTP (h)":          c.htp || 0,
@@ -745,7 +746,8 @@ return (
             <th>Équipements</th>
             <th>Conducteur</th>
             <th>Matricule</th>
-            <th>Volume (m²)</th>
+            <th>Vol. Sauté (m²)</th>
+            <th>Vol. Décapé (m²)</th>
             <th>Heures</th>
             <th>Rendement</th>
             <th>HTP</th>
@@ -780,6 +782,7 @@ return (
                 <td>{c.conducteur || "—"}</td>
                 <td style={{fontSize:11}}>{c.matricule || "—"}</td>
                 <td><strong style={{color:"#14532d"}}>{c.volume_saute || "—"}</strong></td>
+                <td><strong style={{color:"#0891b2"}}>{c.volume_decaper ? Number(c.volume_decaper).toLocaleString() : "—"}</strong></td>
                 <td>{c.temps ? `${c.temps} h` : "—"}</td>
                 <td><strong>{rend}</strong>{rend !== "—" ? " m²/h" : ""}</td>
                 <td style={{fontWeight:700,color:"#15803d"}}>{htp > 0 ? `${htp} h` : "—"}</td>
@@ -808,7 +811,7 @@ return (
           ) : (
 
             <tr>
-              <td colSpan="18" className="empty-row">
+              <td colSpan="19" className="empty-row">
                 {loading
                   ? "⏳ Chargement depuis la base de données…"
                   : hasActiveFilters

@@ -1280,7 +1280,7 @@ function Gestion() {
                   value={form.heureFinCompteur} onChange={handleChange} />
               </Field>
 
-              <Field label="TB — Temps Brut" auto>
+              <Field label="Heur de marche" auto>
                 <input type="number" className="lcsm-input" name="temps"
                   value={form.temps} readOnly placeholder="calculé auto" />
               </Field>

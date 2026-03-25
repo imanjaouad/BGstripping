@@ -18,7 +18,7 @@ use Illuminate\Database\Seeder;
 class CasementSeeder extends Seeder
 {
     private array $equipements    = ['7500M1', '7500M2', 'P&H1', 'P&H2', '200B1'];
-    private array $postes         = ['Matin', 'Après-midi', 'Nuit'];
+    private array $postes         = ['1er', '2ème', '3ème'];
     private array $panneaux       = ['P01', 'P02', 'P03', 'P04', 'P05', 'P06'];
     private array $conducteurs    = ['Ahmed Benali', 'Mohamed Tahir', 'Karim Ouali', 'Yassine Krim', 'Said Meziane'];
     private array $typesArret     = ['Panne mécanique', 'Maintenance préventive', 'Arrêt électrique', 'Attente engin', 'Météo'];
