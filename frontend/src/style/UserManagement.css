@@ -1,17 +1,166 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
+/* SEARCH */
+.search-box {
+  position: relative;
+}
+
+.search-box input {
+  padding-left: 40px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+/* PASSWORD */
+.password-box {
+  position: relative;
+}
+
+.password-box input {
+  padding-right: 40px;
+}
+
+.password-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* LAYOUT */
+.dashboard-layout {
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(160deg, #15830D 0%, #16A34A 50%,#18bd54 100%);
+  color: white;
+  padding: 20px;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  transition: 0.3s;
+}
+
+.sidebar:hover {
+  box-shadow: 5px 0 20px rgba(0,0,0,0.2);
+}
+
+/* LOGO */
+.logo-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo-section img {
+  width: 80px;
+  background: white;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.logo-section h3 {
+  margin-top: 8px;
+}
+
+/* MENU */
+.menu {
+  margin-top: 30px;
+}
+
+.menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: none;
+  background: transparent;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.menu button:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateX(6px);
+}
+
+.menu button.active {
+  background: white;
+  color: #1b5e20;
+  font-weight: bold;
+}
+
+/* LOGOUT */
+.logout {
+  margin-top: auto;
+  background: #dc2626;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+/* MAIN */
+.main-content {
+  margin-left: 270px;
+  padding: 20px;
+  width: 100%;
+  position: relative;
+}
+
+/* BADGE */
+.welcome-badge {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: #2e7d32;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+/* USERS CONTAINER */
 .users-container {
   min-height: 100vh;
   background: #f4fdf6;
-  padding: 30px;
-  font-family: Arial, sans-serif;
+  padding: 20px;
 }
 
+/* TITLE */
 .users-container h2 {
   text-align: center;
   color: #1b5e20;
   margin-bottom: 20px;
 }
 
+/* FILTERS */
 .users-filters {
   display: flex;
   gap: 10px;
@@ -26,6 +175,7 @@
   border-radius: 6px;
 }
 
+/* FORM */
 .users-form {
   background: white;
   padding: 15px;
@@ -41,7 +191,7 @@
 .users-form select {
   padding: 8px;
   border-radius: 6px;
-  border: 1px solid #c8e6c9;
+  border: 1px solid #ddd;
 }
 
 .users-form button {
@@ -51,12 +201,14 @@
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 .users-form button:hover {
   background: #1b5e20;
 }
 
+/* TABLE */
 .users-table {
   width: 100%;
   border-collapse: collapse;
@@ -76,13 +228,13 @@
   border-bottom: 1px solid #eee;
 }
 
+/* BUTTONS */
 .btn-edit {
-  background: #ddd201;
-  color: rgb(255, 255, 255);
+  background: orange;
+  color: white;
   border: none;
-  padding: 5px 8px;
+  padding: 5px 10px;
   border-radius: 5px;
-  margin-right: 5px;
   cursor: pointer;
 }
 
@@ -90,8 +242,73 @@
   background: #c62828;
   color: white;
   border: none;
-  padding: 5px 8px;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
+}
 
+/* SEARCH */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box input {
+  padding-left: 35px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: #888;
+}
+
+/* PASSWORD */
+.password-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-box input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.password-icon {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: #555;
+}
+
+/* ALERT */
+.custom-alert {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  animation: fadeIn 0.4s ease;
+}
+
+.custom-alert.success {
+  background-color: #e6f9ec;
+  color: #1b5e20;
+}
+
+.custom-alert.error {
+  background-color: #fdecea;
+  color: #c62828;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
