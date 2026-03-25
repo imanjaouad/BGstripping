@@ -1,28 +1,26 @@
+import React from "react";
 import { Navigate } from "react-router-dom";
 
-/**
- * PrivateRoute — protège les routes qui nécessitent une authentification.
- * Si aucun token n'est présent, redirige vers /login.
- * Si adminOnly est true, vérifie aussi que le rôle est 'admin'.
- */
-export default function PrivateRoute({ children, adminOnly = false }) {
-  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+const PrivateRoute = ({ children, allowedMode }) => {
+  const user = JSON.parse(sessionStorage.getItem("user"));
 
-  if (!token || !userStr) {
+  if (!user) {
+    // pas connecté → redirect login
     return <Navigate to="/login" replace />;
   }
 
-  if (adminOnly) {
-    try {
-      const user = JSON.parse(userStr);
-      if (user.role !== "admin") {
-        return <Navigate to="/" replace />;
-      }
-    } catch {
-      return <Navigate to="/login" replace />;
-    }
+  // admin peut accéder partout
+  if (user.role === "admin") {
+    return children;
+  }
+
+  // utilisateur normal : vérifie le mode
+  if (allowedMode && user.mode_operation !== allowedMode) {
+    alert("❌ Vous n'avez pas le droit d'accéder à cette page !");
+    return <Navigate to="/" replace />;
   }
 
   return children;
-}
+};
+
+export default PrivateRoute;
