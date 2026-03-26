@@ -167,26 +167,7 @@ const Header = ({ children }) => {
             Affiche un avatar SVG générique et le nom de l'utilisateur.
             L'attribut title permet de voir le nom complet en survol.
           */}
-          {user && (
-            <div className="user-info" title={user.name}>
-              <div className="user-avatar">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-              </div>
-              <span className="user-name">{user.name}</span>
-            </div>
-          )}
+         
 
           {/*
             ── Bouton "Déconnexion" ──
