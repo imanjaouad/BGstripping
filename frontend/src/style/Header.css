@@ -298,10 +298,6 @@
     margin-bottom: 2rem;
     text-align: center;
   }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-
   .nav-link {
     font-size: 1.1rem; /* Texte plus gros sur mobile */
   }
@@ -329,9 +325,6 @@
   .logo-text {
     font-size: 1.1rem;
   }
-=======
->>>>>>> clean-IMANE
-
   .nav-link {
     font-size: 1.1rem; /* Texte plus gros sur mobile */
   }
@@ -379,8 +372,5 @@
   color:white;
   transform:translateY(-2px);
   box-shadow:0 4px 8px var(--shadow-color);
-<<<<<<< HEAD
-=======
->>>>>>> main
->>>>>>> clean-IMANE
+
 }

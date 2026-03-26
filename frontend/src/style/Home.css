@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 
-=======
->>>>>>> main
->>>>>>> clean-IMANE
 /* ============================================
 - HOME PAGE STYLES 
    ============================================ */
@@ -90,14 +84,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-section {
   min-height: 600px;
+  height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+  background-size: cover;        /* ← ajouter */
+  background-position: center;   /* ← ajouter */
+  background-repeat: no-repeat;  /* ← ajouter */
 }
 
 .hero-image {
@@ -118,8 +113,6 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 2;
-=======
->>>>>>> clean-IMANE
   /* L'image est passée via style={{ backgroundImage }} dans Hero.js */
   background-size: cover;
   background-position: center center;
@@ -138,10 +131,6 @@ h1, h2, h3, h4, h5, h6 {
     rgba(10, 40, 20, 0.4) 100%
   );
   z-index: 1;
-<<<<<<< HEAD
-=======
->>>>>>> main
->>>>>>> clean-IMANE
 }
 
 .hero-content {
@@ -727,15 +716,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ---------- Image Area ---------- */
 .ops-card-img-wrap {
   position: relative;
-<<<<<<< HEAD
   height: 290px;
-=======
-<<<<<<< HEAD
-  height: 220px;
-=======
-  height: 290px;
->>>>>>> main
->>>>>>> clean-IMANE
   overflow: hidden;
 }
 
@@ -744,15 +725,8 @@ h1, h2, h3, h4, h5, h6 {
   inset: 0;
   width: 100%;
   height: 100%;
-<<<<<<< HEAD
-  object-fit: contain;
-=======
-<<<<<<< HEAD
   object-fit: cover;
-=======
   object-fit: contain;
->>>>>>> main
->>>>>>> clean-IMANE
   opacity: 0;
   transform: scale(1);
   transition: opacity 0.5s ease, transform 0.6s ease;

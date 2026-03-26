@@ -82,15 +82,8 @@ const toggleTheme = () => {
   }, []);
 
   return (
-<<<<<<< HEAD
     <section className="definition-section" id="definition">
-=======
-<<<<<<< HEAD
-    <section className="definition-section">
-=======
-    <section className="definition-section" id="definition">
->>>>>>> main
->>>>>>> clean-IMANE
+
       <div className="container">
 
         <div className="definition-header" ref={headerRef}>
