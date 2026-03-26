@@ -48,6 +48,9 @@ class TransportJournalierController extends Controller
                 'nombre_voyages'  => $voyages,
                 'capacite_camion' => $capacite,
                 'volume_decape'   => $voyages * $capacite,
+                'panneau'         => $request->panneau ?? null,
+                'tranchee'        => $request->tranchee ?? null,
+                'niveau'          => $request->niveau ?? null,
             ]
         );
 
@@ -59,7 +62,7 @@ class TransportJournalierController extends Controller
      */
     public function update(Request $request, TransportJournalier $transportJournalier)
     {
-        $data = $request->only(['nombre_voyages', 'capacite_camion']);
+        $data = $request->only(['nombre_voyages', 'capacite_camion', 'panneau', 'tranchee', 'niveau']);
 
         $voyages  = (int)   ($data['nombre_voyages']  ?? $transportJournalier->nombre_voyages);
         $capacite = (float) ($data['capacite_camion'] ?? $transportJournalier->capacite_camion);
@@ -68,6 +71,9 @@ class TransportJournalierController extends Controller
             'nombre_voyages'  => $voyages,
             'capacite_camion' => $capacite,
             'volume_decape'   => $voyages * $capacite,
+            'panneau'         => $data['panneau']  ?? $transportJournalier->panneau,
+            'tranchee'        => $data['tranchee'] ?? $transportJournalier->tranchee,
+            'niveau'          => $data['niveau']   ?? $transportJournalier->niveau,
         ]);
 
         return response()->json($transportJournalier);

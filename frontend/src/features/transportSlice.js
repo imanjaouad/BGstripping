@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchTransportJournaliersAPI,
   createTransportJournalierAPI,
+  updateTransportJournalierAPI,
+  deleteTransportJournalierAPI,
 } from "../services/api";
 
 // ─── Fonction utilitaire ───────────────────────────────────────────────────────
@@ -20,6 +22,9 @@ function mapRecord(r) {
     nombre_voyages: Number(r.nombre_voyages) || 0,
     capacite_camion: Number(r.capacite_camion) || 0,
     volume_decape: Number(r.volume_decape) || 0,
+    panneau: r.panneau || "",
+    tranchee: r.tranchee || "",
+    niveau: r.niveau || "",
   };
 }
 
@@ -53,6 +58,33 @@ export const saveTransportJournalier = createAsyncThunk(
       // Si on passe payload?.date, ça vaut undefined → le filtre backend plante
       const dateParam = payload?.operation_date || null;
       await dispatch(fetchTransportJournaliers(dateParam));
+      return res;
+    } catch (err) {
+      return rejectWithValue(err.data || err.message);
+    }
+  }
+);
+
+/** Supprime un enregistrement transport par son ID */
+export const deleteTransportJournalier = createAsyncThunk(
+  "transport/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      await deleteTransportJournalierAPI(id);
+      return id;
+    } catch (err) {
+      return rejectWithValue(err.data || err.message);
+    }
+  }
+);
+
+/** Met à jour un enregistrement transport */
+export const updateTransportJournalier = createAsyncThunk(
+  "transport/update",
+  async ({ id, data }, { rejectWithValue, dispatch }) => {
+    try {
+      const res = await updateTransportJournalierAPI(id, data);
+      await dispatch(fetchTransportJournaliers());
       return res;
     } catch (err) {
       return rejectWithValue(err.data || err.message);
@@ -102,6 +134,23 @@ const transportSlice = createSlice({
         state.saving = false;
       })
       .addCase(saveTransportJournalier.rejected, (state, action) => {
+        state.saving = false;
+        state.error = action.payload;
+      })
+
+      // ── Delete ──────────────────────────────────────────────────────────────
+      .addCase(deleteTransportJournalier.fulfilled, (state, action) => {
+        state.list = state.list.filter((r) => r.id !== action.payload);
+      })
+
+      // ── Update ──────────────────────────────────────────────────────────────
+      .addCase(updateTransportJournalier.fulfilled, (state) => {
+        state.saving = false;
+      })
+      .addCase(updateTransportJournalier.pending, (state) => {
+        state.saving = true;
+      })
+      .addCase(updateTransportJournalier.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload;
       });
