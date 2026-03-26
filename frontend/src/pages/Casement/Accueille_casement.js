@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import imagePh from "../../images/p&h.jpg";
+import imagePh from "../../images/ph.jpg";
 import image700 from "../../images/700.jpg";
 import image7001 from "../../images/7001.jpeg";
 import image200 from "../../images/image.png";
@@ -10,7 +10,6 @@ import image200 from "../../images/image.png";
 
 /* ══════════════════════════════════════════════════════════════════════════
    AccueilleCasement — Page d'accueil du module Casement
-   AMÉLIORATIONS : Section INFO entièrement redessinée
 ══════════════════════════════════════════════════════════════════════════ */
 
 const EQUIPEMENTS = [
@@ -548,10 +547,6 @@ function Carousel({ images, label }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   SOUS-COMPOSANT — Carrousel
-══════════════════════════════════════════════════════════════════════════ */
-
-/* ══════════════════════════════════════════════════════════════════════════
    COMPOSANT PRINCIPAL
 ══════════════════════════════════════════════════════════════════════════ */
 
@@ -577,7 +572,7 @@ function AccueilCasement() {
       {/* ════════ SECTION 1 — HERO ════════ */}
       <section className="acc-csm-hero">
         <img
-          src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1400&q=80"
+          src={image700}
           alt="Opérations Casement"
           className="acc-csm-hero-img"
         />

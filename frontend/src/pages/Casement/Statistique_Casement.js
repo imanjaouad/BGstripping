@@ -5,6 +5,7 @@ import {
   addCasement,
   deleteCasement,
   updateCasement,
+  fetchCasements, // ✅ Charger les données depuis Laravel
 } from "../../features/casementSlice";
 import {
   Chart as ChartJS,
@@ -233,6 +234,81 @@ const CSS = `
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .db-btn-del:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+/* ── Panneaux volume restant ── */
+@keyframes csm-sweep { 0%{left:-100%} 50%{left:150%} 100%{left:150%} }
+.csm-panneaux-section { margin-bottom: 20px; }
+.csm-panneaux-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
+}
+.csm-panneau-card {
+  background: #fff; border: 1.5px solid #bbf7d0; border-radius: 16px;
+  padding: 16px 18px; position: relative; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(22,163,74,0.07);
+  transition: transform .2s, box-shadow .2s;
+}
+.csm-panneau-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(22,163,74,0.13); }
+.csm-panneau-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 16px 16px 0 0;
+}
+.csm-panneau-card.en_cours::before  { background: linear-gradient(90deg,#16a34a,#4ade80); }
+.csm-panneau-card.completé::before  { background: linear-gradient(90deg,#2563eb,#60a5fa); }
+.csm-panneau-card.suspendu::before  { background: linear-gradient(90deg,#f59e0b,#fcd34d); }
+.csm-panneau-top {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;
+}
+.csm-panneau-name { font-weight: 800; font-size: 15px; color: #14532d; }
+.csm-panneau-tranchee { font-family: 'DM Mono', monospace; font-size: 10px; color: #9ca3af; margin-top: 2px; }
+.csm-panneau-badge {
+  padding: 3px 10px; border-radius: 999px; font-size: 9px; font-weight: 700;
+  font-family: 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase;
+}
+.csm-panneau-badge.en_cours { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.csm-panneau-badge.completé { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.csm-panneau-badge.suspendu { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.csm-panneau-bar-bg {
+  height: 8px; background: #f3f4f6; border-radius: 999px; overflow: hidden; margin: 10px 0 8px;
+}
+.csm-panneau-bar-fill {
+  height: 100%; border-radius: 999px;
+  transition: width 1s cubic-bezier(0.16,1,0.3,1);
+  position: relative; overflow: hidden;
+}
+.csm-panneau-bar-fill::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);
+  animation: csm-sweep 2.5s ease-in-out infinite;
+}
+.csm-panneau-volumes {
+  display: flex; justify-content: space-between;
+  font-family: 'DM Mono', monospace; font-size: 10px; color: #9ca3af;
+}
+.csm-panneau-pct { font-weight: 800; font-size: 11px; color: #15803d; }
+
+/* ── OEE/TU/TD gauge rings ── */
+.csm-gauge-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px;
+}
+@media(max-width:700px){ .csm-gauge-grid { grid-template-columns: 1fr; } }
+.csm-gauge-card {
+  background: #fff; border: 1.5px solid #e5e7eb; border-radius: 16px;
+  padding: 20px 16px; text-align: center; position: relative; overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  transition: transform .2s, box-shadow .2s;
+}
+.csm-gauge-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.09); }
+.csm-gauge-stripe { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.csm-gauge-ring-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 12px; }
+.csm-gauge-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.csm-gauge-track    { fill: none; stroke: #f3f4f6; stroke-width: 7; }
+.csm-gauge-fill     { fill: none; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 283; transition: stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1); filter: drop-shadow(0 0 4px currentColor); }
+.csm-gauge-center   { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.csm-gauge-val      { font-size: 18px; font-weight: 800; line-height: 1; font-family: 'Plus Jakarta Sans',sans-serif; }
+.csm-gauge-unit     { font-size: 10px; opacity: .55; font-family: 'DM Mono',monospace; }
+.csm-gauge-name     { font-family: 'DM Mono',monospace; font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #9ca3af; margin-bottom: 4px; }
+.csm-gauge-sub      { font-family: 'DM Mono',monospace; font-size: 10px; color: #9ca3af; margin-top: 6px; }
+.csm-gauge-bar-bg   { height: 5px; background: #f3f4f6; border-radius: 999px; overflow: hidden; margin-top: 10px; }
+.csm-gauge-bar-fill { height: 100%; border-radius: 999px; transition: width .8s cubic-bezier(0.16,1,0.3,1); }
 `;
 
 // ─── Chart helpers (identiques Poussage) ─────────────────────────────────────
@@ -296,10 +372,11 @@ function AnimCount({ target, duration=1100 }) {
 
 // ─── State initial casement ───────────────────────────────────────────────────
 const EMPTY_FORM = {
-  date:"", panneau:"", tranchee:"", niveau:"",
-  volume_saute:"", granulometrie:"", type_roche:"", nombreCoups:"",
+  date:"", panneau:"", tranchee:"", niveau:"", profondeur:"",
+  volume_saute:"",
   equipements:[], conducteur:"", matricule:"",
-  heureDebut:"", heureFin:"", temps:"", poste:"",
+  heureDebutCompteur:"", heureFinCompteur:"", temps:"", poste:"",
+  htp:"",
   etatMachine:"marche", typeArret:"",
   heureDebutArret:"", heureFinArret:"",
 };
@@ -385,10 +462,8 @@ function StatistiqueCasement() {
   const location  = useLocation();
   const navigate  = useNavigate();
 
-  // Navigation identique à DashboardComplet Poussage
-  const activeTab = location.pathname.endsWith("historique") ? "historique"
-    : location.pathname.endsWith("couts")      ? "couts"
-    : "overview";
+  // Navigation — saisie et historique gérés sur d'autres pages
+  const activeTab = location.pathname.endsWith("couts") ? "couts" : "overview";
 
   const [showForm,  setShowForm]  = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -401,7 +476,12 @@ function StatistiqueCasement() {
 
   // ── Toast & Confirm ───────────────────────────────────────────────────────
   const [toasts,    setToasts]    = useState([]);
-  const [confirmDlg, setConfirmDlg] = useState({open:false, index:null, label:""});
+  const [confirmDlg, setConfirmDlg] = useState({open:false, index:null, id:null, label:""}); // ✅ id ajouté
+
+  // ✅ Charger les données depuis Laravel au montage du composant
+  useEffect(() => {
+    dispatch(fetchCasements());
+  }, [dispatch]);
 
   const showToast = (type, title, msg, duration=4000) => {
     const id = Date.now() + Math.random();
@@ -421,9 +501,9 @@ function StatistiqueCasement() {
   const handleChange = (e) => {
     const {name,value} = e.target;
     const updated = {...formData,[name]:value};
-    if(name==="heureDebut"||name==="heureFin") {
-      const debut = name==="heureDebut"?value:formData.heureDebut;
-      const fin   = name==="heureFin"  ?value:formData.heureFin;
+    if(name==="heureDebutCompteur"||name==="heureFinCompteur") {
+      const debut = name==="heureDebutCompteur"?value:formData.heureDebutCompteur;
+      const fin   = name==="heureFinCompteur"  ?value:formData.heureFinCompteur;
       updated.temps = calcTemps(debut,fin);
     }
     setFormData(updated);
@@ -441,22 +521,52 @@ function StatistiqueCasement() {
     if(n && !equipOpts.includes(n)) setEquipOpts([...equipOpts,n]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if(editIndex!==null) {
-      dispatch(updateCasement({index:editIndex,data:formData}));
-      setEditIndex(null);
-      showToast("warning","Opération modifiée","Les données du casement ont été mises à jour avec succès.");
-    } else {
-      dispatch(addCasement(formData));
-      showToast("success","Opération ajoutée","Le nouveau casement a été enregistré avec succès.");
+
+    const TR = 24;
+    const TB = Math.min(parseFloat(formData.temps || 0), TR);
+    // TA = arrêt machine uniquement (arrêts par équipement supprimés)
+    const TA = Math.min(
+      parseFloat(calcTemps(formData.heureDebutArret, formData.heureFinArret) || 0),
+      TB
+    );
+    const HM  = Math.max(0, TB - TA);
+    const HTP = Math.min(
+      formData.htp !== "" ? Math.max(0, parseFloat(formData.htp || 0)) : HM,
+      HM, TR
+    );
+    // Formules corrigées
+    const OEE = HTP > 0 ? parseFloat(Math.min((HTP / TR) * 100, 100).toFixed(2)) : 0;
+    const TU  = TB  > 0 ? parseFloat(Math.min((HM  / TB) * 100, 100).toFixed(2)) : 0;
+    const TD  = TB  > 0 ? parseFloat(Math.min(((TB - TA) / TB) * 100, 100).toFixed(2)) : 0;
+
+    const payload = {
+      ...formData,
+      htp: HTP, oee: OEE, tu: TU, td: TD,
+      temps: TB,
+    };
+
+    try {
+      if (editIndex !== null) {
+        const recordId = casements[editIndex]?.id ?? null;
+        if (!recordId) throw new Error("ID manquant pour la mise à jour.");
+        await dispatch(updateCasement({ id: recordId, data: payload })).unwrap();
+        setEditIndex(null);
+        showToast("warning", "Opération modifiée", "Les données ont été mises à jour dans la base de données.");
+      } else {
+        await dispatch(addCasement(payload)).unwrap();
+        showToast("success", "Opération ajoutée", "Le nouveau casement a été enregistré avec succès.");
+      }
+      resetForm(); setShowForm(false);
+    } catch (err) {
+      showToast("danger", "Erreur API", err?.message ?? "Erreur de connexion au serveur.");
     }
-    resetForm(); setShowForm(false);
   };
 
   const handleEdit = (c, i) => {
     navigate("/operations/casement/gestion", {
-      state: { editData: c, editIndex: i },
+      state: { editData: c, editIndex: i, editId: c?.id }, // ✅ Passer l'ID Laravel
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
     showToast("warning","Mode édition activé","Formulaire pré-rempli avec les données de l'opération.");
@@ -464,30 +574,113 @@ function StatistiqueCasement() {
 
   const handleDelete = (i) => {
     const c = casements[i];
-    const label = c ? `${c.date || ""} · ${c.panneau || ""} · ${c.tranchee || ""}`.trim().replace(/^·|·$/g,"").trim() : `#${i+1}`;
-    setConfirmDlg({open:true, index:i, label});
+    const label = c
+      ? `${c.date || ""} · ${c.panneau || ""} · ${c.tranchee || ""}`.trim().replace(/^·|·$/g, "").trim()
+      : `#${i + 1}`;
+    setConfirmDlg({ open: true, index: i, id: c?.id ?? null, label });
   };
-  const confirmDelete = () => {
-    dispatch(deleteCasement(confirmDlg.index));
-    showToast("danger","Opération supprimée",`L'enregistrement "${confirmDlg.label}" a été supprimé définitivement.`);
-    setConfirmDlg({open:false, index:null, label:""});
+
+  const confirmDelete = async () => {
+    if (!confirmDlg.id) {
+      showToast("danger", "Erreur", "Identifiant manquant — impossible de supprimer.");
+      setConfirmDlg({ open: false, index: null, id: null, label: "" });
+      return;
+    }
+    try {
+      await dispatch(deleteCasement(confirmDlg.id)).unwrap();
+      showToast("danger", "Opération supprimée", `L'enregistrement "${confirmDlg.label}" a été supprimé de la base de données.`);
+    } catch (err) {
+      showToast("danger", "Erreur suppression", err?.message ?? "Erreur de connexion au serveur.");
+    } finally {
+      setConfirmDlg({ open: false, index: null, id: null, label: "" });
+    }
   };
 
   // Rendement instantané basé sur volume_saute
-  const rendement = formData.temps>0 ? (formData.volume_saute/formData.temps).toFixed(2) : 0;
+  const rendement = Number(formData.temps)>0 ? (Number(formData.volume_saute)/Number(formData.temps)).toFixed(2) : 0;
 
   // ── Statistiques ─────────────────────────────────────────────────────────
   const totalVolume = casements.reduce((a,c)=>a+Number(c.volume_saute||0),0);
-  const totalTemps  = casements.reduce((a,c)=>a+Number(c.temps||0),0);
+  const totalTemps  = casements.reduce((a,c)=>a+Number(c.temps||0),0); // TB (Heures de Marche)
   const totalCoups  = casements.reduce((a,c)=>a+Number(c.nombreCoups||0),0);
   const totalOps    = casements.length;
   const rendMoyen   = totalOps>0
     ? (casements.reduce((a,c)=>{
-        const v=Number(c.volume_saute||0),t=Number(c.temps||0);
+        const v=Number(c.volume_saute||0);
+        const t=Number(c.htp||0)||Number(c.temps||0); // ✅ HTP en priorité, TB en fallback
         return a+(t>0?v/t:0);
       },0)/totalOps).toFixed(2)
     : 0;
   const enMarcheCnt = casements.filter(c=>c.etatMachine==="marche").length;
+  const enArretCnt  = casements.filter(c=>c.etatMachine==="arret").length;
+
+  // ── KPI OEE / TU / TD / HTP (moyennes sur les enregistrements valides) ──
+  const totalHTP   = casements.reduce((a,c)=>a+Number(c.htp||0),0);
+  const opsAvecHTP = casements.filter(c=>Number(c.htp||0)>0).length;
+  const moyOEE = opsAvecHTP>0
+    ? (casements.reduce((a,c)=>a+Number(c.oee||0),0)/opsAvecHTP).toFixed(1) : 0;
+  const moyTU  = opsAvecHTP>0
+    ? (casements.reduce((a,c)=>a+Number(c.tu||0),0)/opsAvecHTP).toFixed(1) : 0;
+  const moyTD  = opsAvecHTP>0
+    ? (casements.reduce((a,c)=>a+Number(c.td||0),0)/opsAvecHTP).toFixed(1) : 0;
+
+  // ── Nature d'arrêt la plus fréquente ──────────────────────────────────
+  const arretNatures = {};
+  casements.forEach(c=>{
+    if(c.etatMachine==="arret"&&c.typeArret){
+      arretNatures[c.typeArret]=(arretNatures[c.typeArret]||0)+1;
+    }
+  });
+  const topArret = Object.entries(arretNatures).sort((a,b)=>b[1]-a[1])[0];
+
+  // ── Évolution mensuelle HTP / OEE ────────────────────────────────────
+  const htpMonthMap = {};
+  casements.forEach(c=>{
+    const m = c.date?c.date.slice(0,7):"N/A";
+    if(!htpMonthMap[m]) htpMonthMap[m]={htp:0,tb:0,oee:0,count:0};
+    htpMonthMap[m].htp   += Number(c.htp||0);
+    htpMonthMap[m].tb    += Number(c.temps||0);
+    htpMonthMap[m].oee   += Number(c.oee||0);
+    htpMonthMap[m].count += 1;
+  });
+  const htpMonthLabels = Object.keys(htpMonthMap).sort();
+  const htpMonthValues = htpMonthLabels.map(m=>parseFloat(htpMonthMap[m].htp.toFixed(2)));
+  const tbMonthValues  = htpMonthLabels.map(m=>parseFloat(htpMonthMap[m].tb.toFixed(2)));
+  const oeeMonthValues = htpMonthLabels.map(m=>
+    htpMonthMap[m].count>0?parseFloat((htpMonthMap[m].oee/htpMonthMap[m].count).toFixed(1)):0
+  );
+
+  // ── Évolution mensuelle TU / TD ──────────────────────────────────────
+  const tuTdMonthMap = {};
+  casements.forEach(c=>{
+    const m = c.date?c.date.slice(0,7):"N/A";
+    if(!tuTdMonthMap[m]) tuTdMonthMap[m]={tu:0,td:0,count:0};
+    tuTdMonthMap[m].tu    += Number(c.tu||0);
+    tuTdMonthMap[m].td    += Number(c.td||0);
+    tuTdMonthMap[m].count += 1;
+  });
+  const tuMonthValues = htpMonthLabels.map(m=>
+    tuTdMonthMap[m]?.count>0?parseFloat((tuTdMonthMap[m].tu/tuTdMonthMap[m].count).toFixed(1)):0
+  );
+  const tdMonthValues = htpMonthLabels.map(m=>
+    tuTdMonthMap[m]?.count>0?parseFloat((tuTdMonthMap[m].td/tuTdMonthMap[m].count).toFixed(1)):0
+  );
+
+  // ── Panneaux depuis Redux (panneauSlice) ─────────────────────────────
+  const panneauxRedux = useSelector((s)=>s.panneau?.list||[]);
+
+  // ── Performance par panneau ──────────────────────────────────────────
+  const panneauStats = {};
+  casements.forEach(c=>{
+    const p=c.panneau||"N/A";
+    if(!panneauStats[p]) panneauStats[p]={volume:0,htp:0,ops:0};
+    panneauStats[p].volume += Number(c.volume_saute||0);
+    panneauStats[p].htp    += Number(c.htp||0);
+    panneauStats[p].ops    += 1;
+  });
+  const panneauKeys    = Object.keys(panneauStats);
+  const panneauVolumes = panneauKeys.map(p=>panneauStats[p].volume);
+  const panneauHTP     = panneauKeys.map(p=>parseFloat(panneauStats[p].htp.toFixed(2)));
 
   // Engins
   const enginStats = {};
@@ -546,17 +739,117 @@ function StatistiqueCasement() {
 
   const recentCasements = [...casements].slice(-5).reverse();
 
+  // ── Chart data : HTP vs TB mensuel ─────────────────────────────────────
+  const htpTbChartData = {
+    labels: htpMonthLabels.length>0?htpMonthLabels:["Aucune donnée"],
+    datasets:[
+      {
+        label:"HM — Heures de Marche (h)", data:tbMonthValues.length>0?tbMonthValues:[0],
+        backgroundColor:"rgba(187,247,208,0.6)",
+        borderRadius:{topLeft:8,topRight:8},borderSkipped:false,
+        barPercentage:0.55,categoryPercentage:0.7,
+      },
+      {
+        label:"HTP — Heures Travail Pur (h)", data:htpMonthValues.length>0?htpMonthValues:[0],
+        backgroundColor:(ctx)=>{
+          const{chartArea,ctx:c}=ctx.chart;if(!chartArea)return"#16a34a";
+          const g=c.createLinearGradient(0,chartArea.top,0,chartArea.bottom);
+          g.addColorStop(0,"#16a34a");g.addColorStop(1,"#4ade80");return g;
+        },
+        borderRadius:{topLeft:8,topRight:8},borderSkipped:false,
+        barPercentage:0.55,categoryPercentage:0.7,
+      },
+    ],
+  };
+  const htpTbChartOpts = {
+    responsive:true,
+    plugins:{
+      legend:{position:"bottom",labels:{color:"#6b7280",font:{size:11},padding:14,usePointStyle:true}},
+      tooltip:{...baseTooltip,callbacks:{label:(c)=>` ${c.parsed.y.toFixed(2)} h`}},
+    },
+    scales:{
+      x:{grid:{display:false},border:{display:false},ticks:baseTick},
+      y:{grid:baseGrid,border:{display:false},
+        ticks:{...baseTick,callback:(v)=>`${v}h`},
+        title:{display:true,text:"Heures",color:"#9ca3af",font:{size:10}}},
+    },
+  };
+
+  // ── Chart data : OEE mensuel (Line) ─────────────────────────────────────
+  const oeeLineData = {
+    labels: htpMonthLabels.length>0?htpMonthLabels:["Aucune donnée"],
+    datasets:[{
+      label:"OEE moyen (%)", data:oeeMonthValues.length>0?oeeMonthValues:[0],
+      borderColor:"#2563eb", backgroundColor:"rgba(37,99,235,0.1)",
+      pointBackgroundColor:"#2563eb", pointBorderColor:"#fff",
+      pointBorderWidth:2, pointRadius:5, pointHoverRadius:8,
+      borderWidth:2.5, fill:true, tension:0.42,
+    }],
+  };
+  const oeeLineOpts = {
+    responsive:true,
+    plugins:{
+      legend:{display:false},
+      tooltip:{...baseTooltip,callbacks:{label:(c)=>` OEE : ${c.parsed.y}%`}},
+    },
+    scales:{
+      x:{grid:{display:false},border:{display:false},ticks:baseTick},
+      y:{grid:baseGrid,border:{display:false},min:0,max:100,
+        ticks:{...baseTick,callback:(v)=>`${v}%`}},
+    },
+  };
+
+  // ── Chart data : Performance par panneau ────────────────────────────────
+  const panneauBarData = {
+    labels: panneauKeys,
+    datasets:[
+      {
+        label:"Volume (m²)", data:panneauVolumes,
+        backgroundColor:(ctx)=>{
+          const{chartArea,ctx:c}=ctx.chart;if(!chartArea)return"#16a34a";
+          const g=c.createLinearGradient(0,chartArea.top,0,chartArea.bottom);
+          g.addColorStop(0,"#15803d");g.addColorStop(1,"#4ade80");return g;
+        },
+        borderRadius:{topLeft:8,topRight:8},borderSkipped:false,
+        barPercentage:0.5,categoryPercentage:0.65,yAxisID:"yVol",
+      },
+      {
+        label:"HTP total (h)", data:panneauHTP,
+        backgroundColor:"rgba(37,99,235,0.18)",
+        borderRadius:{topLeft:8,topRight:8},borderSkipped:false,
+        barPercentage:0.5,categoryPercentage:0.65,yAxisID:"yHTP",
+      },
+    ],
+  };
+  const panneauBarOpts = {
+    responsive:true,
+    plugins:{
+      legend:{position:"bottom",labels:{color:"#6b7280",font:{size:11},padding:14,usePointStyle:true}},
+      tooltip:{...baseTooltip},
+    },
+    scales:{
+      x:{grid:{display:false},border:{display:false},ticks:baseTick},
+      yVol:{position:"left",grid:baseGrid,border:{display:false},
+        ticks:{...baseTick},title:{display:true,text:"Volume (m²)",color:"#9ca3af",font:{size:10}}},
+      yHTP:{position:"right",grid:{display:false},border:{display:false},
+        ticks:{...baseTick,callback:(v)=>`${v}h`},title:{display:true,text:"HTP (h)",color:"#9ca3af",font:{size:10}}},
+    },
+  };
+
   // Export Excel
   const exportExcel = () => {
     const data = casements.map(c=>({
       Date:c.date, Panneau:c.panneau, Tranchée:c.tranchee, Niveau:c.niveau,
-      "Type Roche":c.type_roche, "Granulométrie(mm)":c.granulometrie,
-      "Nb Coups BRH":c.nombreCoups,
+      Profondeur:c.profondeur||"",
       Équipements:c.equipements?.join(", "),
       Conducteur:c.conducteur, Matricule:c.matricule, Poste:c.poste,
-      "Volume sauté(t)":c.volume_saute, "Heures Marche":c.temps,
-      Rendement:c.temps>0?(c.volume_saute/c.temps).toFixed(2):0,
+      "HM — Heures de Marche (h)":c.temps,
+      "HTP — Heures Travail Pur (h)":c.htp||"",
+      "OEE (%)":c.oee||"", "TU (%)":c.tu||"", "TD (%)":c.td||"",
+      "Volume sauté(m²)":c.volume_saute,
+      "Rendement (m²/h)":Number(c.temps)>0?(Number(c.volume_saute)/Number(c.temps)).toFixed(2):0,
       État:c.etatMachine, "Nature Arrêt":c.typeArret||"",
+      "Heure Début Arrêt":c.heureDebutArret||"", "Heure Fin Arrêt":c.heureFinArret||"",
     }));
     const ws=XLSX.utils.json_to_sheet(data);
     const wb=XLSX.utils.book_new();
@@ -571,17 +864,17 @@ function StatistiqueCasement() {
     ref:(el)=>{if(el)el.style.animationDelay=delay;},
   });
 
-  // ─── Table complète (identique Poussage, colonnes casement) ──────────────
+  // ─── Table complète  ──────────────
   const FullTable = ({data,showActions=false}) => (
     <div className="db-table-wrap">
       <table className="db-table">
         <thead>
           <tr>
-            <th>Date</th><th>Panneau</th><th>Tranchée</th><th>Niveau</th>
-            <th>Type Roche</th><th>Granulo.(mm)</th><th>Nb Coups</th>
-            <th>Volume (t)</th><th>Équipements</th>
+            <th>Date</th><th>Panneau</th><th>Tranchée</th><th>Niveau</th><th>Profondeur</th>
+            <th>Volume (m²)</th><th>Équipements</th>
             <th>Conducteur</th><th>Matricule</th><th>Poste</th>
-            <th>Heures</th><th>Rendement</th><th>État</th><th>Arrêt</th>
+            <th>HM (h)</th><th>HTP (h)</th><th>OEE %</th><th>TU %</th><th>TD %</th>
+            <th>Rendement</th><th>État</th><th>Arrêt</th>
             {showActions&&<th>Actions</th>}
           </tr>
         </thead>
@@ -596,9 +889,7 @@ function StatistiqueCasement() {
               <td>{c.panneau}</td>
               <td>{c.tranchee}</td>
               <td>{c.niveau}</td>
-              <td>{c.type_roche}</td>
-              <td>{c.granulometrie}</td>
-              <td><strong>{c.nombreCoups}</strong></td>
+              <td>{c.profondeur||"—"}</td>
               <td><strong>{Number(c.volume_saute).toLocaleString()}</strong></td>
               <td style={{maxWidth:130,overflow:"hidden",textOverflow:"ellipsis"}}>
                 {c.equipements?.join(", ")}
@@ -606,8 +897,12 @@ function StatistiqueCasement() {
               <td>{c.conducteur}</td>
               <td>{c.matricule}</td>
               <td>{c.poste}</td>
-              <td>{c.temps} h</td>
-              <td>{c.temps>0?(c.volume_saute/c.temps).toFixed(2):0} t/h</td>
+              <td><strong>{Number(c.temps||0).toFixed(2)}</strong></td>
+              <td><strong style={{color:"#15803d"}}>{c.htp?Number(c.htp).toFixed(2):"—"}</strong></td>
+              <td><span style={{color:"#1d4ed8",fontWeight:700}}>{c.oee?`${c.oee}%`:"—"}</span></td>
+              <td><span style={{color:"#b45309",fontWeight:700}}>{c.tu?`${c.tu}%`:"—"}</span></td>
+              <td><span style={{color:"#6d28d9",fontWeight:700}}>{c.td?`${c.td}%`:"—"}</span></td>
+              <td>{c.temps>0?(c.volume_saute/c.temps).toFixed(2):0} m²/h</td>
               <td>
                 <span className={c.etatMachine==="marche"?"badge-marche":"badge-arret"}>
                   {c.etatMachine}
@@ -697,9 +992,9 @@ function StatistiqueCasement() {
               <option>Phosphate</option><option>Silex</option>
               <option>Calcaire</option><option>Argile</option><option>Mixte</option>
             </select></div>
-          <div><label className="db-form-label">Nombre de Coups BRH</label>
+          <div><label className="db-form-label">Nombre de Coups </label>
             <input className="db-form-input" type="number" name="nombreCoups"
-              placeholder="coups BRH" value={formData.nombreCoups} onChange={handleChange}/></div>
+              placeholder="coups " value={formData.nombreCoups} onChange={handleChange}/></div>
           <div><label className="db-form-label">Heure de Début</label>
             <input className="db-form-input" type="time" name="heureDebut"
               value={formData.heureDebut} onChange={handleChange}/></div>
@@ -789,7 +1084,7 @@ function StatistiqueCasement() {
         title="Confirmer la suppression"
         msg={`Voulez-vous vraiment supprimer l'opération "${confirmDlg.label}" ? Cette action est irréversible.`}
         onConfirm={confirmDelete}
-        onCancel={()=>setConfirmDlg({open:false,index:null,label:""})}
+        onCancel={()=>setConfirmDlg({open:false,index:null,id:null,label:""})}
       />
       <div className="db-page" style={{
         minHeight:"100vh", background:"#f0fdf4",
@@ -837,53 +1132,29 @@ function StatistiqueCasement() {
         {/* ══ OVERVIEW ══════════════════════════════════════════════════════ */}
         {activeTab==="overview"&&(
           <>
-            <div className="db-grid3" style={{marginBottom:24}}>
+            {/* ── KPI Row 1 : volumétrie & temps ── */}
+            <div className="db-grid3" style={{marginBottom:16}}>
               {[
                 {
-                  icon:(
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                  ),
-                  label:"Volume sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
+                  icon:(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>),
+                  label:"Volume sauté", value:totalVolume, unit:"m²", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
                 },
                 {
-                  icon:(
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
-                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                  ),
-                  label:"Temps Total", value:totalTemps, unit:"h", accent:"#15803d", bg:"rgba(21,128,61,0.12)", delay:"0.16s"
+                  icon:(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>),
+                  label:"HM — Heures de Marche", value:parseFloat(totalTemps.toFixed(1)), unit:"h", accent:"#15803d", bg:"rgba(21,128,61,0.12)", delay:"0.16s"
                 },
                 {
-                  icon:(
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
-                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-                    </svg>
-                  ),
-                  label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", bg:"rgba(34,197,94,0.12)", delay:"0.24s"
+                  icon:(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>),
+                  label:"HTP — Heures Travail Pur", value:parseFloat(totalHTP.toFixed(1)), unit:"h", accent:"#0d9488", bg:"rgba(13,148,136,0.12)", delay:"0.24s"
                 },
                 {
-                  icon:(
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                    </svg>
-                  ),
-                  label:"En Marche", value:enMarcheCnt, unit:"", accent:"#86efac", bg:"rgba(134,239,172,0.18)", delay:"0.32s"
+                  icon:(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>),
+                  label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"m²/h", accent:"#22c55e", bg:"rgba(34,197,94,0.12)", delay:"0.32s"
                 },
               ].map(({icon,label,value,unit,accent,bg,delay})=>(
                 <div key={label} className="db-kpi" style={{animationDelay:delay}}>
                   <div className="db-kpi-shimmer"/>
-                  <div className="db-kpi-icon" style={{
-                    background:bg,
-                    color:accent,
-                    width:52,height:52,
-                    borderRadius:14,
-                    display:"flex",alignItems:"center",justifyContent:"center",
-                    marginBottom:12,
-                    boxShadow:`0 4px 14px ${bg}`,
-                    border:`1.5px solid ${accent}33`,
-                  }}>{icon}</div>
+                  <div className="db-kpi-icon" style={{background:bg,color:accent,width:52,height:52,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:12,boxShadow:`0 4px 14px ${bg}`,border:`1.5px solid ${accent}33`}}>{icon}</div>
                   <div className="db-kpi-label">{label}</div>
                   <div className="db-kpi-value" style={{color:accent,animationDelay:delay}}>
                     <AnimCount target={value}/><span className="db-kpi-unit">{unit}</span>
@@ -892,11 +1163,144 @@ function StatistiqueCasement() {
               ))}
             </div>
 
+            {/* ── KPI Row 2 : OEE / TU / TD / arrêts ── */}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:20}}>
+              {[
+                {label:"OEE Moyen",value:parseFloat(moyOEE),unit:"%",color:"#1d4ed8",bg:"rgba(37,99,235,0.09)",border:"rgba(37,99,235,0.2)"},
+                {label:"TU Moyen",value:parseFloat(moyTU),unit:"%",color:"#b45309",bg:"rgba(217,119,6,0.09)",border:"rgba(217,119,6,0.2)"},
+                {label:"TD Moyen",value:parseFloat(moyTD),unit:"%",color:"#6d28d9",bg:"rgba(109,40,217,0.09)",border:"rgba(109,40,217,0.2)"},
+                {label:"En Arrêt",value:enArretCnt,unit:"ops",color:"#dc2626",bg:"rgba(220,38,38,0.08)",border:"rgba(220,38,38,0.2)"},
+              ].map(({label,value,unit,color,bg,border})=>(
+                <div key={label} style={{background:bg,border:`1.5px solid ${border}`,borderRadius:14,padding:"14px 18px",textAlign:"center"}}>
+                  <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,fontWeight:700,letterSpacing:".12em",textTransform:"uppercase",color,opacity:.7,marginBottom:6}}>{label}</div>
+                  <div style={{fontSize:"1.8rem",fontWeight:800,color,lineHeight:1}}><AnimCount target={value}/><span style={{fontSize:14,marginLeft:3}}>{unit}</span></div>
+                </div>
+              ))}
+            </div>
+
+            {/* ── Topologie arrêts ── */}
+            {topArret&&(
+              <div style={{background:"#fffbeb",border:"1.5px solid rgba(217,119,6,0.25)",borderRadius:12,padding:"10px 18px",marginBottom:16,display:"flex",alignItems:"center",gap:12,fontSize:13,color:"#92400e",fontFamily:"'DM Mono',monospace"}}>
+                <span style={{fontSize:10,fontWeight:700,letterSpacing:".12em",textTransform:"uppercase",opacity:.6}}>Arrêt le + fréquent</span>
+                <strong>{topArret[0]}</strong>
+                <span style={{opacity:.6}}>— {topArret[1]} occurrence{topArret[1]>1?"s":""}</span>
+              </div>
+            )}
+
+            {/* ── OEE / TU / TD — Jauges + graphique évolution ── */}
+            <div className="db-section">Indicateurs de Performance</div>
+            <div className="csm-gauge-grid">
+              {[
+                {name:"OEE",label:"Efficience Globale",value:parseFloat(moyOEE),color:"#2563eb",stripe:"linear-gradient(90deg,#2563eb,#60a5fa)"},
+                {name:"TU", label:"Taux d'Utilisation",value:parseFloat(moyTU), color:"#d97706",stripe:"linear-gradient(90deg,#d97706,#fcd34d)"},
+                {name:"TD", label:"Taux de Disponibilité",value:parseFloat(moyTD),color:"#7c3aed",stripe:"linear-gradient(90deg,#7c3aed,#c4b5fd)"},
+              ].map(({name,label,value,color,stripe})=>{
+                const C=283;
+                const pct=Math.min(value,100)/100;
+                return(
+                  <div key={name} className="csm-gauge-card">
+                    <div className="csm-gauge-stripe" style={{background:stripe}}/>
+                    <div className="csm-gauge-name">{name}</div>
+                    <div className="csm-gauge-ring-wrap">
+                      <svg viewBox="0 0 100 100">
+                        <circle className="csm-gauge-track" cx="50" cy="50" r="45"/>
+                        <circle className="csm-gauge-fill" cx="50" cy="50" r="45"
+                          style={{stroke:color,strokeDashoffset:C*(1-pct)}}/>
+                      </svg>
+                      <div className="csm-gauge-center">
+                        <span className="csm-gauge-val" style={{color}}>{value>0?`${value}%`:"—"}</span>
+                        <span className="csm-gauge-unit">moyen</span>
+                      </div>
+                    </div>
+                    <div className="csm-gauge-sub">{label}</div>
+                    <div className="csm-gauge-bar-bg">
+                      <div className="csm-gauge-bar-fill" style={{width:`${Math.min(value,100)}%`,background:stripe}}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ── Graphique OEE / TU / TD mensuel ── */}
+            {htpMonthLabels.length>0&&(
+              <div className="db-card" {...anim("0.3s")} style={{marginBottom:20}}>
+                <div className="db-card-header">
+                  <div><p className="db-card-title">📈 OEE · TU · TD — Évolution Mensuelle</p>
+                    <p className="db-card-sub">Moyennes mensuelles des indicateurs de performance (%)</p></div>
+                  <span className="db-pill">{htpMonthLabels.length} mois</span>
+                </div>
+                <Line
+                  data={{
+                    labels:htpMonthLabels,
+                    datasets:[
+                      {label:"OEE (%)",data:oeeMonthValues,borderColor:"#2563eb",backgroundColor:"rgba(37,99,235,0.07)",pointBackgroundColor:"#2563eb",pointBorderColor:"#fff",pointBorderWidth:2,pointRadius:4,borderWidth:2.5,fill:false,tension:0.42},
+                      {label:"TU (%)", data:tuMonthValues, borderColor:"#d97706",backgroundColor:"rgba(217,119,6,0.07)",  pointBackgroundColor:"#d97706",pointBorderColor:"#fff",pointBorderWidth:2,pointRadius:4,borderWidth:2.5,fill:false,tension:0.42},
+                      {label:"TD (%)", data:tdMonthValues, borderColor:"#7c3aed",backgroundColor:"rgba(124,58,237,0.07)", pointBackgroundColor:"#7c3aed",pointBorderColor:"#fff",pointBorderWidth:2,pointRadius:4,borderWidth:2.5,fill:false,tension:0.42},
+                    ],
+                  }}
+                  options={{
+                    responsive:true,
+                    plugins:{
+                      legend:{position:"bottom",labels:{color:"#6b7280",font:{family:"'Plus Jakarta Sans',sans-serif",size:11},padding:16,usePointStyle:true,pointStyleWidth:8}},
+                      tooltip:{...baseTooltip,callbacks:{label:(c)=>` ${c.dataset.label} : ${c.parsed.y}%`}},
+                    },
+                    scales:{
+                      x:{grid:{display:false},border:{display:false},ticks:baseTick},
+                      y:{grid:baseGrid,border:{display:false},min:0,max:100,
+                        ticks:{...baseTick,callback:(v)=>`${v}%`},
+                        title:{display:true,text:"Pourcentage (%)",color:"#9ca3af",font:{size:10}}},
+                    },
+                  }}
+                />
+              </div>
+            )}
+
+            {/* ── Volume restant des panneaux ── */}
+            {panneauxRedux.length>0&&(
+              <>
+                <div className="db-section">Volume Restant par Panneau</div>
+                <div className="csm-panneaux-grid" style={{marginBottom:20}}>
+                  {panneauxRedux.map(p=>{
+                    const decape = p.volumeInitial - p.volumeRestant;
+                    const pct    = p.volumeInitial>0 ? Math.round((decape/p.volumeInitial)*100) : 0;
+                    const barColor = pct<50
+                      ? "linear-gradient(90deg,#16a34a,#4ade80)"
+                      : pct<80
+                        ? "linear-gradient(90deg,#f59e0b,#fcd34d)"
+                        : "linear-gradient(90deg,#ef4444,#fca5a5)";
+                    const opsCount = casements.filter(c=>c.panneau===p.panneau).length;
+                    return(
+                      <div key={p.id} className={`csm-panneau-card ${p.status}`}>
+                        <div className="csm-panneau-top">
+                          <div>
+                            <div className="csm-panneau-name">{p.panneau}</div>
+                            <div className="csm-panneau-tranchee">
+                              {p.tranchee||"—"} · {opsCount} op{opsCount!==1?"s":""}
+                            </div>
+                          </div>
+                          <span className={`csm-panneau-badge ${p.status}`}>{p.status}</span>
+                        </div>
+                        <div className="csm-panneau-bar-bg">
+                          <div className="csm-panneau-bar-fill" style={{width:`${pct}%`,background:barColor}}/>
+                        </div>
+                        <div className="csm-panneau-volumes">
+                          <span>Initial : <strong>{p.volumeInitial.toLocaleString()} m²</strong></span>
+                          <span className="csm-panneau-pct">{pct}% décapé</span>
+                          <span style={{color:p.volumeRestant<100?"#dc2626":"inherit"}}>
+                            Restant : <strong>{p.volumeRestant.toLocaleString()} m²</strong>
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
             <div className="db-grid2" style={{marginBottom:20}}>
               <div className="db-card" {...anim("0.18s")}>
                 <div className="db-card-header">
                   <div><p className="db-card-title">Volume par Engin</p>
-                    <p className="db-card-sub">Cumul de tous les casetments</p></div>
+                    <p className="db-card-sub">Cumul de tous les casements</p></div>
                   {enginLabels.length>0&&<span className="db-pill">{enginLabels.length} engins</span>}
                 </div>
                 {enginLabels.length>0?<Bar data={enginBarData} options={makeBarOpts(300)}/>
@@ -913,272 +1317,48 @@ function StatistiqueCasement() {
               </div>
             </div>
 
-            {trancheeKeys.length>0&&(
-              <div className="db-card" {...anim("0.36s")} style={{marginBottom:20}}>
-                <p className="db-card-title">Volume Total par Tranchée</p>
-                <p className="db-card-sub">Comparaison globale des volumes sautés</p>
-                <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
+            {/* ── HTP vs TB mensuel + OEE ── */}
+            {htpMonthLabels.length>0&&(
+              <div className="db-grid2" style={{marginBottom:20}}>
+                <div className="db-card" {...anim("0.32s")}>
+                  <div className="db-card-header">
+                    <div><p className="db-card-title">📊 HTP vs HM — Évolution Mensuelle</p>
+                      <p className="db-card-sub">Heures travail pur vs heures de marche</p></div>
+                    <span className="db-pill">{htpMonthLabels.length} mois</span>
+                  </div>
+                  <Bar data={htpTbChartData} options={htpTbChartOpts}/>
+                </div>
+                <div className="db-card" {...anim("0.38s")}>
+                  <div className="db-card-header">
+                    <div><p className="db-card-title">📈 OEE Mensuel</p>
+                      <p className="db-card-sub">Efficience globale équipement (%)</p></div>
+                  </div>
+                  <Line data={oeeLineData} options={oeeLineOpts}/>
+                </div>
               </div>
             )}
 
-            <div className="db-section">Dernières opérations</div>
-            <div className="db-card" {...anim("0.42s")}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-                <p className="db-card-title" style={{margin:0}}>
-                opération{recentCasements.length!==1?"s":""} récentes
-                </p>
-                <div style={{display:"flex",gap:8}}>
-                  <button className="db-btn-secondary"
-                    onClick={()=>navigate("/operations/casement/historique")}
-                    style={{fontSize:12,padding:"6px 12px"}}>Voir tout →</button>
-                  <button className="db-btn-primary"
-                    onClick={()=>navigate("/operations/casement/gestion")}
-                    style={{fontSize:12,padding:"6px 12px"}}>+ Ajouter</button>
-                </div>
-              </div>
-              {recentCasements.length>0?(
-                <div className="db-table-wrap">
-                  <table className="db-table">
-                    <thead><tr>
-                      <th>Date</th><th>Panneau</th><th>Tranchée</th>
-                      <th>Volume</th><th>Rendement</th><th>État</th><th>Actions</th>
-                    </tr></thead>
-                    <tbody>
-                      {recentCasements.map((c,i)=>(
-                        <tr key={i} style={{animationDelay:`${i*0.06}s`}}>
-                          <td>{c.date}</td><td>{c.panneau}</td><td>{c.tranchee}</td>
-                          <td><strong>{Number(c.volume_saute).toLocaleString()}</strong> t</td>
-                          <td>{c.temps>0?(c.volume_saute/c.temps).toFixed(2):0} t/h</td>
-                          <td><span className={c.etatMachine==="marche"?"badge-marche":"badge-arret"}>
-                            {c.etatMachine}</span></td>
-                          <td>
-                            <div style={{display:"flex",gap:5,justifyContent:"center"}}>
-                              <button
-                                title="Modifier"
-                                onClick={()=>handleEdit(c,casements.indexOf(c))}
-                                style={{
-                                  display:"inline-flex",alignItems:"center",gap:4,
-                                  padding:"4px 9px",borderRadius:7,border:"1.5px solid #22c55e",
-                                  background:"rgba(34,197,94,0.08)",color:"#15803d",
-                                  fontSize:11,fontWeight:600,cursor:"pointer",transition:"all .18s",
-                                }}
-                                onMouseEnter={e=>{e.currentTarget.style.background="#22c55e";e.currentTarget.style.color="#fff";}}
-                                onMouseLeave={e=>{e.currentTarget.style.background="rgba(34,197,94,0.08)";e.currentTarget.style.color="#15803d";}}
-                              >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{width:12,height:12}}>
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                                </svg>
-                                Modifier
-                              </button>
-                              <button
-                                title="Supprimer"
-                                onClick={()=>handleDelete(casements.indexOf(c))}
-                                style={{
-                                  display:"inline-flex",alignItems:"center",gap:4,
-                                  padding:"4px 9px",borderRadius:7,border:"1.5px solid #fca5a5",
-                                  background:"rgba(239,68,68,0.06)",color:"#dc2626",
-                                  fontSize:11,fontWeight:600,cursor:"pointer",transition:"all .18s",
-                                }}
-                                onMouseEnter={e=>{e.currentTarget.style.background="#ef4444";e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#ef4444";}}
-                                onMouseLeave={e=>{e.currentTarget.style.background="rgba(239,68,68,0.06)";e.currentTarget.style.color="#dc2626";e.currentTarget.style.borderColor="#fca5a5";}}
-                              >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{width:12,height:12}}>
-                                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                                  <path d="M10 11v6"/><path d="M14 11v6"/>
-                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                                </svg>
-                                Supprimer
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ):<div className="db-empty">Aucune opération enregistrée</div>}
-            </div>
-          </>
-        )}
-
-        {/* ══ SAISIE (Dashboard → formData) ════════════════════════════════ */}
-        {activeTab==="saisie"&&(
-          <>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-              <h2 style={{margin:0,fontSize:17,fontWeight:700,color:"#14532d",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
-                {editIndex!==null?"Modifier le casement":"Nouveau casement"}
-              </h2>
-              {!showForm&&(
-                <button className="db-btn-primary" onClick={()=>setShowForm(true)}>
-                  ＋ Ajouter les données
-                </button>
-              )}
-            </div>
-            {showForm&&<FormBlock/>}
-            <div className="db-section">Liste des casements</div>
-            <div className="db-card" {...anim("0.1s")}>
-              {casements.length>0
-                ?<FullTable data={casements} showActions={true}/>
-                :<div className="db-empty">Aucun casement enregistré. Cliquez sur "Ajouter les données" pour commencer.</div>}
-            </div>
-          </>
-        )}
-
-        {/* ══ HISTORIQUE ═══════════════════════════════════════════════════ */}
-        {activeTab==="historique"&&(
-          <>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-              <h2 style={{margin:0,fontSize:17,fontWeight:700,color:"#14532d",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
-                Historique Casement
-              </h2>
-              <div style={{display:"flex",gap:8}}>
-                {!showForm&&(
-                  <button className="db-btn-primary" onClick={()=>setShowForm(true)}>
-                    ＋ Ajouter
-                  </button>
-                )}
-                <button className="db-btn-excel" onClick={exportExcel}>⬇️ Télécharger Excel</button>
-              </div>
-            </div>
-            {showForm&&<FormBlock/>}
-            <div className="db-card" {...anim("0.1s")}>
-              {casements.length>0
-                ?<FullTable data={[...casements].reverse()} showActions={true}/>
-                :<div className="db-empty">Aucun historique disponible.</div>}
-            </div>
-          </>
-        )}
-
-        {/* ══ STATISTIQUES ═════════════════════════════════════════════════ */}
-        {(activeTab==="stats"||activeTab==="overview"&&false)&&(
-          <>
-            <div className="db-grid3" style={{marginBottom:24}}>
-              {[
-                {
-                  icon:(
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                  ),
-                  label:"Volume sauté", value:totalVolume, unit:"t", accent:"#16a34a", bg:"rgba(22,163,74,0.12)", delay:"0.08s"
-                },
-                {
-                  icon:(
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
-                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                  ),
-                  label:"Temps Total", value:totalTemps, unit:"h", accent:"#15803d", bg:"rgba(21,128,61,0.12)", delay:"0.16s"
-                },
-                {
-                  icon:(
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{width:26,height:26}}>
-                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-                    </svg>
-                  ),
-                  label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", bg:"rgba(34,197,94,0.12)", delay:"0.24s"
-                },
-              ].map(({icon,label,value,unit,accent,bg,delay})=>(
-                <div key={label} className="db-kpi" style={{animationDelay:delay}}>
-                  <div className="db-kpi-shimmer"/>
-                  <div className="db-kpi-icon" style={{
-                    background:bg,
-                    color:accent,
-                    width:52,height:52,
-                    borderRadius:14,
-                    display:"flex",alignItems:"center",justifyContent:"center",
-                    marginBottom:12,
-                    boxShadow:`0 4px 14px ${bg}`,
-                    border:`1.5px solid ${accent}33`,
-                  }}>{icon}</div>
-                  <div className="db-kpi-label">{label}</div>
-                  <div className="db-kpi-value" style={{color:accent,animationDelay:delay}}>
-                    <AnimCount target={value}/><span className="db-kpi-unit">{unit}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="db-section">Analyse par Engin</div>
-            <div className="db-grid2" style={{marginBottom:20}}>
-              <div className="db-card" {...anim("0.18s")}>
+            {/* ── Performance par panneau ── */}
+            {panneauKeys.length>0&&(
+              <div className="db-card" {...anim("0.42s")} style={{marginBottom:20}}>
                 <div className="db-card-header">
-                  <div><p className="db-card-title">Volume par Engin</p>
-                    <p className="db-card-sub">Répartition cumulative du volume sauté</p></div>
-                  {enginLabels.length>0&&<span className="db-pill">{enginLabels.length} engins</span>}
+                  <div><p className="db-card-title">🗺️ Performance par Panneau</p>
+                    <p className="db-card-sub">Volume sauté & HTP cumulés par zone</p></div>
+                  <span className="db-pill">{panneauKeys.length} panneaux</span>
                 </div>
-                {enginLabels.length>0?<Bar data={enginBarData} options={makeBarOpts(300)}/>
-                  :<div className="db-empty">Aucune donnée disponible</div>}
+                <Bar data={panneauBarData} options={panneauBarOpts}/>
               </div>
-              <div className="db-card" {...anim("0.28s")}>
-                <p className="db-card-title">Part de Volume par Engin</p>
-                <p className="db-card-sub">Distribution proportionnelle</p>
-                {enginLabels.length>0
-                  ?<div style={{maxWidth:300,margin:"0 auto"}}><Doughnut data={enginDoughnutData} options={doughnutOpts}/></div>
-                  :<div className="db-empty">Aucune donnée disponible</div>}
-              </div>
-            </div>
+            )}
 
-            <div className="db-section">Analyse par Tranchée</div>
+            {/* ── Volume par tranchée ── */}
             {trancheeKeys.length>0&&(
-              <div className="db-card" {...anim("0.32s")} style={{marginBottom:20}}>
+              <div className="db-card" {...anim("0.46s")} style={{marginBottom:20}}>
                 <p className="db-card-title">Volume Total par Tranchée</p>
                 <p className="db-card-sub">Comparaison globale des volumes sautés</p>
                 <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
               </div>
             )}
-            <div className="db-grid2">
-              {trancheeKeys.map((tranchee,idx)=>{
-                const ops   = trancheeGroups[tranchee];
-                const color = TRANCHEE_COLORS[idx%TRANCHEE_COLORS.length];
-                const labels  = ops.map((_,i)=>`Op ${i+1}`);
-                const volumes = ops.map(op=>Number(op.volume_saute||0));
-                const lineData = {
-                  labels,
-                  datasets:[{
-                    label:"Volume (t)", data:volumes,
-                    borderColor:color.main, backgroundColor:color.dim,
-                    pointBackgroundColor:color.main, pointBorderColor:"#fff",
-                    pointBorderWidth:2, pointRadius:5, pointHoverRadius:8,
-                    borderWidth:2.5, fill:true, tension:0.42,
-                  }],
-                };
-                const lineOpts = {
-                  responsive:true,
-                  animation:{duration:1000,easing:"easeOutQuart",
-                    delay(ctx){return ctx.type==="data"&&ctx.mode==="default"?ctx.dataIndex*60+idx*100:0;}},
-                  plugins:{legend:{display:false},
-                    tooltip:{...baseTooltip,callbacks:{label:(c)=>` ${c.parsed.y.toLocaleString()} t`}}},
-                  scales:{
-                    x:{grid:{display:false},border:{display:false},ticks:baseTick},
-                    y:{grid:baseGrid,border:{display:false},ticks:baseTick},
-                  },
-                };
-                return(
-                  <div key={tranchee} className="db-card"
-                    ref={(el)=>{if(el)el.style.animationDelay=`${0.36+idx*0.1}s`;}}>
-                    <div className="db-card-header">
-                      <div>
-                        <p className="db-card-title" style={{color:color.main}}>Tranchée {tranchee}</p>
-                        <p className="db-card-sub">
-                          {ops.length} opération{ops.length>1?"s":""} · courbe d'évolution
-                        </p>
-                      </div>
-                      <span className="db-pill" style={{background:color.dim,color:color.main}}>
-                        {volumes.reduce((a,b)=>a+b,0).toLocaleString()} t
-                      </span>
-                    </div>
-                    <Line data={lineData} options={lineOpts}/>
-                  </div>
-                );
-              })}
-              {trancheeKeys.length===0&&(
-                <div className="db-empty" style={{gridColumn:"1/-1"}}>
-                  Aucune donnée de tranchée disponible
-                </div>
-              )}
-            </div>
+
           </>
         )}
 

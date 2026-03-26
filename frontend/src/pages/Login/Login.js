@@ -7,15 +7,15 @@ import Navbar from "../Home/navBare";
 import Header from "../Home/Header";
 import Footer from "../Home/Footer";
 
-import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { FaUser, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import logo from "../../images/logo.png";
 
 export default function Login() {
-
   const navigate = useNavigate();
 
-  const [showPassword,setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(""); // ✅ error state
 
   const [formData, setFormData] = useState({
     username: "",
@@ -25,118 +25,147 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setErrorMsg(""); // ✅ reset error
 
     try {
+      const res = await axios.post("http://127.0.0.1:8000/api/login", {
+        username: formData.username,
+        password: formData.password
+      });
 
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/login",
-        {
-          username: formData.username,
-          password: formData.password
-        }
-      );
+      const user = res.data.user;
 
+      // ✅ stockage
       sessionStorage.setItem("token", res.data.token);
-      sessionStorage.setItem("user", JSON.stringify(res.data.user));
+      sessionStorage.setItem("user", JSON.stringify(user));
 
       if (formData.remember) {
         localStorage.setItem("token", res.data.token);
       }
 
-      if (res.data.user.role === "admin") {
-        navigate("/admin/users");
-      } else {
-        navigate("/dashboard");
-      }
+      // ✅ redirection
+      setTimeout(() => {
+        if (user.role === "admin") {
+          navigate("/admin/users");
+        } else {
+          switch (user.mode_operation) {
+            case "poussage":
+              navigate("/operations/poussage/dashboard");
+              break;
+            case "casement":
+              navigate("/operations/casement/dashboard");
+              break;
+            case "transport":
+              navigate("/operations/transport/dashboard");
+              break;
+            default:
+              navigate("/");
+          }
+        }
+      }, 300);
 
     } catch (error) {
-  console.log("ERROR:", error.response?.data);
-  console.log("STATUS:", error.response?.status);
-  alert("Login incorrect");
-}
+      // ✅ message UX propre
+      setErrorMsg("Nom d'utilisateur ou mot de passe incorrect");
+      setLoading(false);
+    }
   };
 
   return (
-    <>
-    
-      <Navbar/>
-      <Header/>
+    <div className="page-wrapper">
+      <Navbar />
+      <Header />
 
-      <div className="login-container">
+      <main className="login-container">
+        <div className="login-card">
 
-        <form className="login-form" onSubmit={handleLogin}>
-
-          <div className="logo-container">
-            <img src={logo} alt="logo"/>
+          {/* LOGO */}
+          <div className="logo-top">
+            <img src={logo} alt="logo" />
           </div>
 
           <h2>Se Connecter</h2>
 
-          {/* USERNAME */}
+         
 
-          <div className="form-group">
+          <form onSubmit={handleLogin}>
 
-            <label>Username</label>
-
-            <div className="input-icon">
-
-              <input
-                type="text"
-                placeholder="Nom d'utulisateur"
-                onChange={(e)=>setFormData({...formData, username:e.target.value})}
-                required
-              />
-
-              <FaUser className="icon"/>
-
+            {/* USERNAME */}
+            <div className="form-group">
+              <label htmlFor="username">Nom d'utilisateur:</label>
+              <div className="input-box">
+                <FaUser className="icon" />
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="Nom d'utilisateur"
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                  required
+                  disabled={loading}
+                />
+              </div>
             </div>
 
-          </div>
-
-          {/* PASSWORD */}
-
-          <div className="form-group">
-
-            <label>Password</label>
-
-            <div className="input-icon">
-
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Mot de passe"
-                onChange={(e)=>setFormData({...formData, password:e.target.value})}
-                required
-              />
-
-              <span
-                className="icon"
-                onClick={()=>setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash/> : <FaEye/>}
-              </span>
-
+            {/* PASSWORD */}
+            <div className="form-group">
+              <label htmlFor="password">Mot de passe:</label>
+              <div className="input-box">
+                <FaLock className="icon" />
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mot de passe"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  required
+                  disabled={loading}
+                />
+                <span
+                  className="toggle-pass"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
             </div>
 
-          </div>
+            {/* OPTIONS */}
+            <div className="options">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={formData.remember}
+                  onChange={(e) =>
+                    setFormData({ ...formData, remember: e.target.checked })
+                  }
+                  disabled={loading}
+                />
+                Se souvenir de moi
+              </label>
+            </div>
 
-          <div className="remember">
-            <input
-              type="checkbox"
-              onChange={(e)=>setFormData({...formData, remember:e.target.checked})}
-            />
-            <label>Se souvenir de moi</label>
-          </div>
+            {/* BUTTON */}
+            <button
+              type="submit"
+              className={`login-btn ${loading ? "loading" : ""}`}
+              disabled={loading}
+            >
+              {loading ? <span className="spinner"></span> : "Se Connecter"}
+            </button>
+            {/* ✅ ERROR تحت */}
+{errorMsg && <div className="error-msg">{errorMsg}</div>}
 
-          <button type="submit">
-            Se Connecter
-          </button>
+          </form>
+        </div>
+      </main>
 
-        </form>
-
-      </div>
-
-      <Footer/>
-
-    </>
+      <Footer />
+    </div>
   );
 }

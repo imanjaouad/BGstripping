@@ -298,7 +298,33 @@
     margin-bottom: 2rem;
     text-align: center;
   }
+  .nav-link {
+    font-size: 1.1rem; /* Texte plus gros sur mobile */
+  }
 
+  .nav-link::after {
+    display: none; /* Pas de soulignement sur mobile */
+  }
+
+  /* Actions (Boutons, Avatar) en colonne */
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 2rem;
+  }
+
+  .deconnexion-btn {
+    width: 100%; /* Bouton pleine largeur */
+    max-width: 300px;
+    text-align: center;
+  }
+
+  .logo-text {
+    font-size: 1.1rem;
+  }
   .nav-link {
     font-size: 1.1rem; /* Texte plus gros sur mobile */
   }
@@ -346,4 +372,5 @@
   color:white;
   transform:translateY(-2px);
   box-shadow:0 4px 8px var(--shadow-color);
+
 }
