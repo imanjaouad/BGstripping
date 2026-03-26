@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
+=======
+import React, { useEffect, useState, useRef, useCallback } from "react";
+>>>>>>> clean-IMANE
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPoussages } from "../../features/poussageSlice";
 import { fetchTransportJournaliers, saveTransportJournalier } from "../../features/transportSlice";
@@ -18,12 +22,17 @@ import {
 import { Bar } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+<<<<<<< HEAD
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import image from "../../images/ocpLogo.png";
 import procanLogo from "../../images/procanLogo.png";
 import transwinLogo from "../../images/transwinLogo.jpg";
 import { FaArrowLeft, FaCalendarAlt, FaBolt, FaCalendarCheck, FaHardHat, FaFileExcel, FaFilePdf, FaTruck, FaTruckLoading, FaTruckMonster, FaInbox, FaWarehouse, FaShuttleVan, FaMapMarkerAlt, FaLayerGroup, FaRulerVertical } from "react-icons/fa";
+=======
+import image from "../../images/ocpLogo.png";
+import { FaArrowLeft, FaCalendarAlt, FaBolt, FaCalendarCheck, FaHardHat, FaFileExcel, FaTruck, FaTruckLoading, FaTruckMonster, FaInbox, FaWarehouse, FaShuttleVan, FaMapMarkerAlt, FaLayerGroup, FaRulerVertical } from "react-icons/fa";
+>>>>>>> clean-IMANE
 import { useNavigate } from "react-router-dom";
 import TransportSidebar from "./TransportSidebar";
 
@@ -48,6 +57,7 @@ const CSS = `
   .db-kpi {
     background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
     padding:20px 22px; position:relative; overflow:hidden;
+<<<<<<< HEAD
     opacity:1; animation:db-fadeUp .5s ease both;
     transition:transform .2s,box-shadow .2s; cursor:default;
   }
@@ -57,6 +67,15 @@ const CSS = `
     background-size:200%;animation:db-shimmer 2.4s linear infinite; }
   .db-kpi::after { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:0; }
   .db-kpi:hover::after { opacity:1; animation:db-pulse 2s ease infinite; }
+=======
+    opacity:0; animation:db-fadeUp .5s ease forwards;
+    transition:transform .2s,box-shadow .2s; cursor:default;
+  }
+  .db-kpi:hover { transform:translateY(-5px); animation:db-pulse 2s ease infinite !important; }
+  .db-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
+    background-size:200%;animation:db-shimmer 2.4s linear infinite; }
+>>>>>>> clean-IMANE
   .db-kpi-shimmer { position:absolute;inset:0;
     background:linear-gradient(100deg,transparent 25%,rgba(255,255,255,.6) 50%,transparent 75%);
     background-size:600px 100%;animation:db-shimmer 2.8s linear infinite;pointer-events:none; }
@@ -137,8 +156,13 @@ const CSS = `
   }
   .company-title { font-size: 17px; font-weight: 800; color: #15803d; }
   .company-subtitle { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+<<<<<<< HEAD
   .company-icon { width: 100px; height: 60px; border-radius: 12px; display: flex;
     align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; padding: 4px; }
+=======
+  .company-icon { width: 44px; height: 44px; border-radius: 12px; display: flex;
+    align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+>>>>>>> clean-IMANE
 
   .moyen-tab {
     display: flex; gap: 8px; margin-bottom: 16px;
@@ -234,19 +258,25 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
   const [voyagesGrands, setVoyagesGrands] = useState(savedGrands?.nombre_voyages || 0);
   const [capaciteGrands, setCapaciteGrands] = useState(savedGrands?.capacite_camion || 50);
 
+<<<<<<< HEAD
   // Nouveaux inputs Panneau / Tranchée / Niveau
   const [panneauInput, setPanneauInput] = useState(savedPetits?.panneau || savedGrands?.panneau || "");
   const [trancheeInput, setTrancheeInput] = useState(savedPetits?.tranchee || savedGrands?.tranchee || "");
   const [niveauInput, setNiveauInput] = useState(savedPetits?.niveau || savedGrands?.niveau || "");
 
+=======
+>>>>>>> clean-IMANE
   // États d'erreur pour chaque champ
   const [errVoyagesPetits, setErrVoyagesPetits] = useState("");
   const [errCapacitePetits, setErrCapacitePetits] = useState("");
   const [errVoyagesGrands, setErrVoyagesGrands] = useState("");
   const [errCapaciteGrands, setErrCapaciteGrands] = useState("");
+<<<<<<< HEAD
   const [errPanneau, setErrPanneau] = useState("");
   const [errTranchee, setErrTranchee] = useState("");
   const [errNiveau, setErrNiveau] = useState("");
+=======
+>>>>>>> clean-IMANE
 
   // Règles de validation
   const MAX_VOYAGES = 9999; // plafond raisonnable par jour
@@ -259,8 +289,13 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
   }
 
   function validateCapacite(v) {
+<<<<<<< HEAD
     if (v <= 0) return "La capacité doit être supérieure à 0 m³";
     if (v > MAX_CAPACITE) return `La capacité ne peut pas dépasser ${MAX_CAPACITE} m³`;
+=======
+    if (v <= 0) return "La capacité doit être supérieure à 0 t";
+    if (v > MAX_CAPACITE) return `La capacité ne peut pas dépasser ${MAX_CAPACITE} t`;
+>>>>>>> clean-IMANE
     return "";
   }
 
@@ -270,6 +305,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
     setCapacitePetits(savedPetits?.capacite_camion || 20);
     setVoyagesGrands(savedGrands?.nombre_voyages || 0);
     setCapaciteGrands(savedGrands?.capacite_camion || 50);
+<<<<<<< HEAD
     setPanneauInput(savedPetits?.panneau || savedGrands?.panneau || "");
     setTrancheeInput(savedPetits?.tranchee || savedGrands?.tranchee || "");
     setNiveauInput(savedPetits?.niveau || savedGrands?.niveau || "");
@@ -364,6 +400,53 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
   const handleNiveauChange = (val) => {
     setNiveauInput(val);
     if (val.trim()) setErrNiveau("");
+=======
+    // Réinitialise les erreurs quand la date change
+    setErrVoyagesPetits(""); setErrCapacitePetits("");
+    setErrVoyagesGrands(""); setErrCapaciteGrands("");
+  }, [selectedDate, savedPetits?.nombre_voyages, savedPetits?.capacite_camion, savedGrands?.nombre_voyages, savedGrands?.capacite_camion]);
+
+  // Sauvegarde automatique avec délai (debounce)
+  const timerRef = useRef(null);
+  const autoSave = useCallback((typeMoyen, voyages, capacite) => {
+    if (!selectedDate) return;
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      dispatch(saveTransportJournalier({
+        operation_date: selectedDate,
+        entreprise: entrepriseKey,
+        type_moyen: typeMoyen,
+        nombre_voyages: voyages,
+        capacite_camion: capacite,
+      }));
+    }, 800);
+  }, [selectedDate, entrepriseKey, dispatch]);
+
+  // Gestionnaires de changement avec validation intégrée
+  const handleVoyagesPetits = (v) => {
+    setVoyagesPetits(v);
+    const err = validateVoyages(v);
+    setErrVoyagesPetits(err);
+    if (!err) { autoSave("petits", v, capacitePetits); onVolumeDecapeChange?.(v * capacitePetits + voyagesGrands * capaciteGrands); }
+  };
+  const handleCapacitePetits = (v) => {
+    setCapacitePetits(v);
+    const err = validateCapacite(v);
+    setErrCapacitePetits(err);
+    if (!err) { autoSave("petits", voyagesPetits, v); onVolumeDecapeChange?.(voyagesPetits * v + voyagesGrands * capaciteGrands); }
+  };
+  const handleVoyagesGrands = (v) => {
+    setVoyagesGrands(v);
+    const err = validateVoyages(v);
+    setErrVoyagesGrands(err);
+    if (!err) { autoSave("grands", v, capaciteGrands); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + v * capaciteGrands); }
+  };
+  const handleCapaciteGrands = (v) => {
+    setCapaciteGrands(v);
+    const err = validateCapacite(v);
+    setErrCapaciteGrands(err);
+    if (!err) { autoSave("grands", voyagesGrands, v); onVolumeDecapeChange?.(voyagesPetits * capacitePetits + voyagesGrands * v); }
+>>>>>>> clean-IMANE
   };
 
   // Volume sauté total pour la date sélectionnée (tous conducteurs)
@@ -378,7 +461,11 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
   return (
     <div className="company-block" style={{ animationDelay: "0.2s", borderColor: color, borderTopWidth: 3 }}>
       <div className="company-header">
+<<<<<<< HEAD
         <div className="company-icon" style={{ background: "#fff", border: "1.5px solid #f1f5f9" }}>
+=======
+        <div className="company-icon" style={{ background: color + "22" }}>
+>>>>>>> clean-IMANE
           {icon}
         </div>
         <div>
@@ -418,7 +505,11 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
                     Volume Sauté Initial
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: "#15803d" }}>
+<<<<<<< HEAD
                     {volumeSaute.toLocaleString()} <span style={{ fontSize: 12, color: "#9ca3af", fontWeight: 500 }}>m³</span>
+=======
+                    {volumeSaute.toLocaleString()} <span style={{ fontSize: 12, color: "#9ca3af", fontWeight: 500 }}>t</span>
+>>>>>>> clean-IMANE
                   </div>
                 </div>
               </div>
@@ -428,11 +519,19 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: restantColor, lineHeight: 1.1 }}>
                   {isOver ? "−" : ""}{Math.abs(volumeRestant).toLocaleString()}
+<<<<<<< HEAD
                   <span style={{ fontSize: 12, color: "#9ca3af", fontWeight: 500, marginLeft: 3 }}>m³</span>
                 </div>
                 {isOver && (
                   <div style={{ fontSize: 10, color: "#dc2626", fontWeight: 700, marginTop: 2 }}>
                     ⚠ Dépassé de {Math.abs(volumeRestant).toLocaleString()} m³
+=======
+                  <span style={{ fontSize: 12, color: "#9ca3af", fontWeight: 500, marginLeft: 3 }}>t</span>
+                </div>
+                {isOver && (
+                  <div style={{ fontSize: 10, color: "#dc2626", fontWeight: 700, marginTop: 2 }}>
+                    ⚠ Dépassé de {Math.abs(volumeRestant).toLocaleString()} t
+>>>>>>> clean-IMANE
                   </div>
                 )}
                 {isDone && (
@@ -446,7 +545,11 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             {/* Barre de progression */}
             <div style={{ marginTop: 4 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#9ca3af", marginBottom: 4 }}>
+<<<<<<< HEAD
                 <span>Transporté : <strong style={{ color: "#2563eb" }}>{volumeDecapeTotal.toLocaleString()} m³</strong></span>
+=======
+                <span>Transporté : <strong style={{ color: "#2563eb" }}>{volumeDecapeTotal.toLocaleString()} t</strong></span>
+>>>>>>> clean-IMANE
                 <span>{pct.toFixed(1)}%</span>
               </div>
               <div style={{ background: "#e2e8f0", borderRadius: 20, height: 8, overflow: "hidden" }}>
@@ -516,6 +619,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
         );
       })()}
 
+<<<<<<< HEAD
       {/* ── Saisie Manuelle : Panneau / Tranchée / Niveau ── */}
       <div style={{
         background: "#fff", border: "1.5px solid #bbf7d0", borderRadius: 12,
@@ -572,6 +676,8 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
         </div>
       </div>
 
+=======
+>>>>>>> clean-IMANE
       {/* Tabs */}
       <div className="moyen-tab">
         <button className={activeTab === "petits" ? "active" : ""} onClick={() => setActiveTab("petits")} style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -608,7 +714,11 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
               )}
             </div>
             <div>
+<<<<<<< HEAD
               <div className="camion-label">Capacité Camion (m³)</div>
+=======
+              <div className="camion-label">Capacité Camion (t)</div>
+>>>>>>> clean-IMANE
               {isLimited ? (
                 <div className="camion-value">{capacitePetits}</div>
               ) : (
@@ -631,12 +741,20 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             </div>
             <div>
               <div className="camion-label">Volume Décapé</div>
+<<<<<<< HEAD
               <div className="camion-decape">{volumeDecapePetits.toLocaleString()} m³</div>
+=======
+              <div className="camion-decape">{volumeDecapePetits.toLocaleString()} t</div>
+>>>>>>> clean-IMANE
             </div>
             <div>
               <div className="camion-label">Calcul</div>
               <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 500 }}>
+<<<<<<< HEAD
                 {voyagesPetits} voyage{voyagesPetits !== 1 ? "s" : ""} × {capacitePetits} m³
+=======
+                {voyagesPetits} voyage{voyagesPetits !== 1 ? "s" : ""} × {capacitePetits} t
+>>>>>>> clean-IMANE
               </div>
             </div>
           </div>
@@ -669,7 +787,11 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
               )}
             </div>
             <div>
+<<<<<<< HEAD
               <div className="camion-label">Capacité Camion (m³)</div>
+=======
+              <div className="camion-label">Capacité Camion (t)</div>
+>>>>>>> clean-IMANE
               {isLimited ? (
                 <div className="camion-value">{capaciteGrands}</div>
               ) : (
@@ -692,12 +814,20 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             </div>
             <div>
               <div className="camion-label">Volume Décapé</div>
+<<<<<<< HEAD
               <div className="camion-decape">{volumeDecapeGrands.toLocaleString()} m³</div>
+=======
+              <div className="camion-decape">{volumeDecapeGrands.toLocaleString()} t</div>
+>>>>>>> clean-IMANE
             </div>
             <div>
               <div className="camion-label">Calcul</div>
               <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 500 }}>
+<<<<<<< HEAD
                 {voyagesGrands} voyage{voyagesGrands !== 1 ? "s" : ""} × {capaciteGrands} m³
+=======
+                {voyagesGrands} voyage{voyagesGrands !== 1 ? "s" : ""} × {capaciteGrands} t
+>>>>>>> clean-IMANE
               </div>
             </div>
           </div>
@@ -715,7 +845,11 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             Volume Décapé Total (Petits + Grands)
           </div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#2563eb" }}>
+<<<<<<< HEAD
             {volumeDecapeTotal.toLocaleString()} <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>m³</span>
+=======
+            {volumeDecapeTotal.toLocaleString()} <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>t</span>
+>>>>>>> clean-IMANE
           </div>
         </div>
         <div>
@@ -731,6 +865,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             Volume Sauté Poussage
           </div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#d97706" }}>
+<<<<<<< HEAD
             {volumeSaute.toLocaleString()} <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>m³</span>
           </div>
         </div>
@@ -766,6 +901,12 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
           )}
         </div>
       )}
+=======
+            {volumeSaute.toLocaleString()} <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>t</span>
+          </div>
+        </div>
+      </div>
+>>>>>>> clean-IMANE
     </div>
   );
 }
@@ -832,7 +973,11 @@ export default function TransportDashboard() {
     labels: dayLabels,
     datasets: [
       {
+<<<<<<< HEAD
         label: "Volume Sauté (m³)",
+=======
+        label: "Volume Sauté (t)",
+>>>>>>> clean-IMANE
         data: volumeParJour,
         backgroundColor: last7Days.map((d) =>
           d === selectedDate ? "#16a34a" : "#bbf7d0"
@@ -856,7 +1001,11 @@ export default function TransportDashboard() {
         bodyColor: "#6b7280",
         padding: 12,
         cornerRadius: 10,
+<<<<<<< HEAD
         callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} m³` },
+=======
+        callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` },
+>>>>>>> clean-IMANE
       },
     },
     scales: {
@@ -867,23 +1016,34 @@ export default function TransportDashboard() {
       y: {
         grid: { color: "rgba(22,163,74,0.07)", drawBorder: false },
         ticks: { color: "#9ca3af", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 } },
+<<<<<<< HEAD
         title: { display: true, text: "Volume (m³)", color: "#6b7280", font: { size: 10 } },
+=======
+        title: { display: true, text: "Volume (t)", color: "#6b7280", font: { size: 10 } },
+>>>>>>> clean-IMANE
       },
     },
   };
 
   // Excel export
   const exportExcel = () => {
+<<<<<<< HEAD
     if (filteredPoussages.length === 0) {
       alert("Il n'y a aucune donnée à exporter pour ce jour.");
       return;
     }
+=======
+>>>>>>> clean-IMANE
     const rows = filteredPoussages.map((p) => ({
       Date: p.date,
       Conducteur: p.conducteur,
       Panneau: p.panneau,
       Tranchée: p.tranchee,
+<<<<<<< HEAD
       "Volume Sauté (m³)": p.volume_soté,
+=======
+      "Volume Sauté (t)": p.volume_soté,
+>>>>>>> clean-IMANE
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -894,6 +1054,7 @@ export default function TransportDashboard() {
     );
   };
 
+<<<<<<< HEAD
   // PDF export
   const exportPDF = () => {
     if (filteredPoussages.length === 0) {
@@ -966,6 +1127,8 @@ export default function TransportDashboard() {
     doc.save(`rapport_poussage_${selectedDate}.pdf`);
   };
 
+=======
+>>>>>>> clean-IMANE
   return (
     <>
       <style>{CSS}</style>
@@ -1050,10 +1213,17 @@ export default function TransportDashboard() {
               <div className="db-kpi-label">Volume Sauté Restant</div>
               <div className="db-kpi-value" style={{ color: "#15803d" }}>
                 <AnimCount target={totalVolumeRestant} />
+<<<<<<< HEAD
                 <span className="db-kpi-unit">m³</span>
               </div>
               <div style={{ fontSize: 9, color: "#9ca3af", marginTop: 4 }}>
                 Initial : {totalVolumeSaute.toLocaleString()} m³
+=======
+                <span className="db-kpi-unit">t</span>
+              </div>
+              <div style={{ fontSize: 9, color: "#9ca3af", marginTop: 4 }}>
+                Initial : {totalVolumeSaute.toLocaleString()} t
+>>>>>>> clean-IMANE
               </div>
             </div>
 
@@ -1090,7 +1260,11 @@ export default function TransportDashboard() {
                 <p className="db-card-title">Volume Sauté par Jour</p>
                 <p className="db-card-sub">7 derniers jours — données depuis le formulaire Poussage</p>
               </div>
+<<<<<<< HEAD
               <span className="db-pill"> Poussage</span>
+=======
+              <span className="db-pill">📊 Poussage</span>
+>>>>>>> clean-IMANE
             </div>
             <div style={{ height: 280 }}>
               <Bar data={barData} options={barOpts} />
@@ -1106,7 +1280,11 @@ export default function TransportDashboard() {
           <div id="section-procaneq">
             <CompanySection
               name="Procaneq"
+<<<<<<< HEAD
               icon={<img src={procanLogo} alt="Procaneq" style={{ width: 90, height: 50, objectFit: "contain", mixBlendMode: "multiply" }} />}
+=======
+              icon={<FaWarehouse style={{ color: "#f59e0b", fontSize: 22 }} />}
+>>>>>>> clean-IMANE
               color="#f59e0b"
               filteredPoussages={filteredPoussages}
               selectedDate={selectedDate}
@@ -1121,7 +1299,11 @@ export default function TransportDashboard() {
           <div id="section-transwine">
             <CompanySection
               name="Transwine"
+<<<<<<< HEAD
               icon={<img src={transwinLogo} alt="Transwine" style={{ width: 90, height: 50, objectFit: "contain", mixBlendMode: "multiply", filter: "brightness(1.1) contrast(1.1)" }} />}
+=======
+              icon={<FaShuttleVan style={{ color: "#3b82f6", fontSize: 22 }} />}
+>>>>>>> clean-IMANE
               color="#3b82f6"
               filteredPoussages={filteredPoussages}
               selectedDate={selectedDate}
@@ -1144,6 +1326,7 @@ export default function TransportDashboard() {
               <p className="db-card-title" style={{ margin: 0 }}>
                 {filteredPoussages.length} opération(s) ce jour
               </p>
+<<<<<<< HEAD
               <div style={{ display: "flex", gap: 10 }}>
                 <button className="db-btn-excel" onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                   <FaFileExcel /> Exporter Excel
@@ -1152,6 +1335,11 @@ export default function TransportDashboard() {
                   <FaFilePdf /> Exporter PDF
                 </button>
               </div>
+=======
+              <button className="db-btn-excel" onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <FaFileExcel /> Exporter Excel
+              </button>
+>>>>>>> clean-IMANE
             </div>
 
             {filteredPoussages.length > 0 ? (
@@ -1164,7 +1352,11 @@ export default function TransportDashboard() {
                       <th>Panneau</th>
                       <th>Tranchée</th>
                       <th>Niveau</th>
+<<<<<<< HEAD
                       <th>Volume Sauté (m³)</th>
+=======
+                      <th>Volume Sauté (t)</th>
+>>>>>>> clean-IMANE
                       <th>Poste</th>
                     </tr>
                   </thead>
@@ -1177,7 +1369,11 @@ export default function TransportDashboard() {
                         <td>{p.tranchee || "—"}</td>
                         <td>{p.niveau || "—"}</td>
                         <td style={{ color: "#16a34a", fontWeight: 700 }}>
+<<<<<<< HEAD
                           {Number(p.volume_soté || 0).toLocaleString()} m³
+=======
+                          {Number(p.volume_soté || 0).toLocaleString()} t
+>>>>>>> clean-IMANE
                         </td>
                         <td>{p.poste || "—"}</td>
                       </tr>

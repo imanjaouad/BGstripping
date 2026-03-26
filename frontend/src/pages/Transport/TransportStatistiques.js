@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+<<<<<<< HEAD
 import { fetchTransportJournaliers, deleteTransportJournalier, updateTransportJournalier } from "../../features/transportSlice";
 import { fetchPoussages } from "../../features/poussageSlice";
 import { FaBolt, FaHardHat, FaTruck, FaTruckLoading, FaChartBar, FaFileExcel, FaFilePdf, FaInbox, FaSpinner, FaEdit, FaTrashAlt, FaTimes, FaSave } from "react-icons/fa";
+=======
+import { fetchTransportJournaliers } from "../../features/transportSlice";
+import { fetchPoussages } from "../../features/poussageSlice";
+import { FaBolt, FaHardHat, FaTruck, FaTruckLoading, FaChartBar, FaFileExcel, FaInbox, FaSpinner } from "react-icons/fa";
+>>>>>>> clean-IMANE
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend, Filler, ArcElement,
@@ -10,8 +16,11 @@ import {
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+<<<<<<< HEAD
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+=======
+>>>>>>> clean-IMANE
 import image from "../../images/ocpLogo.png";
 import TransportSidebar from "./TransportSidebar";
 
@@ -31,6 +40,7 @@ const CSS = `
   .ts-kpi {
     background:#fff; border:1.5px solid #bbf7d0; border-radius:16px;
     padding:20px 22px; position:relative; overflow:hidden;
+<<<<<<< HEAD
     opacity:1; animation:ts-fadeUp .5s ease both;
     transition:transform .2s,box-shadow .2s; cursor:default;
   }
@@ -40,6 +50,15 @@ const CSS = `
     background-size:200%; animation:ts-shimmer 2.4s linear infinite; }
   .ts-kpi::after { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:0; }
   .ts-kpi:hover::after { opacity:1; animation:ts-pulse 2s ease infinite; }
+=======
+    opacity:0; animation:ts-fadeUp .5s ease forwards;
+    transition:transform .2s,box-shadow .2s; cursor:default;
+  }
+  .ts-kpi:hover { transform:translateY(-5px); animation:ts-pulse 2s ease infinite !important; }
+  .ts-kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,#16a34a,#4ade80,#16a34a);
+    background-size:200%; animation:ts-shimmer 2.4s linear infinite; }
+>>>>>>> clean-IMANE
   .ts-kpi-shimmer { position:absolute;inset:0;
     background:linear-gradient(100deg,transparent 25%,rgba(255,255,255,.6) 50%,transparent 75%);
     background-size:600px 100%;animation:ts-shimmer 2.8s linear infinite;pointer-events:none; }
@@ -72,6 +91,7 @@ const CSS = `
   .ts-grid4 { display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px; }
 
   .ts-table-wrap { overflow-x:auto; border-radius:12px; border:1.5px solid #bbf7d0; }
+<<<<<<< HEAD
   .ts-table { width:100%;border-collapse:collapse;font-size:11.5px; }
   .ts-table thead tr { background:#15803d; }
   .ts-table th { padding:10px 8px;text-align:left;font-size:9.5px;font-weight:700;
@@ -80,6 +100,16 @@ const CSS = `
   .ts-table tbody tr:hover { background:#f0fdf4; }
   .ts-table tbody tr:last-child { border-bottom:none; }
   .ts-table td { padding:8px 8px;color:#374151;vertical-align:middle;white-space:nowrap; }
+=======
+  .ts-table { width:100%;border-collapse:collapse;font-size:12.5px; }
+  .ts-table thead tr { background:#15803d; }
+  .ts-table th { padding:11px 13px;text-align:left;font-size:10px;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:#fff;white-space:nowrap; }
+  .ts-table tbody tr { border-bottom:1px solid #f0fdf4; animation:ts-rowIn .4s ease both; transition:background .15s; }
+  .ts-table tbody tr:hover { background:#f0fdf4; }
+  .ts-table tbody tr:last-child { border-bottom:none; }
+  .ts-table td { padding:10px 13px;color:#374151;vertical-align:middle;white-space:nowrap; }
+>>>>>>> clean-IMANE
   .ts-table td:first-child { font-weight:600;color:#14532d; }
 
   .ts-btn-excel { background:#166534;color:#fff;border:none;border-radius:10px;
@@ -102,6 +132,7 @@ const CSS = `
   .ts-progress-bar  { height:100%; border-radius:20px;
     background:linear-gradient(90deg,#16a34a,#4ade80);
     transition:width .8s cubic-bezier(.4,0,.2,1); }
+<<<<<<< HEAD
 
   /* ── CRUD Buttons ── */
   .ts-btn-edit {
@@ -168,6 +199,8 @@ const CSS = `
     font-family:'Plus Jakarta Sans',sans-serif;
   }
   .ts-btn-cancel2:hover { background:#e5e7eb; }
+=======
+>>>>>>> clean-IMANE
 `;
 
 const COLOR_PALETTE = [
@@ -205,12 +238,16 @@ export default function TransportStatistiques() {
   const transportData = useSelector((s) => s.transport?.list || []);
   const poussages = useSelector((s) => s.poussage?.list || []);
   const loading = useSelector((s) => s.transport?.loading);
+<<<<<<< HEAD
   const saving = useSelector((s) => s.transport?.saving);
+=======
+>>>>>>> clean-IMANE
 
   const [period, setPeriod] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+<<<<<<< HEAD
   // ── Edit modal state ──
   const [editRecord, setEditRecord] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -240,6 +277,8 @@ export default function TransportStatistiques() {
     dispatch(deleteTransportJournalier(r.id));
   };
 
+=======
+>>>>>>> clean-IMANE
   useEffect(() => {
     dispatch(fetchTransportJournaliers());
     dispatch(fetchPoussages());
@@ -269,10 +308,17 @@ export default function TransportStatistiques() {
   });
 
   // ─── KPIs ──────────────────────────────────────────────────────────────────
+<<<<<<< HEAD
   const totalVoyages = filtered.reduce((s, r) => s + r.nombre_voyages, 0);
   const totalVolumeDecape = filtered.reduce((s, r) => s + r.volume_decape, 0);
   const totalOps = filtered.length;
   const avgCapacite = totalOps > 0 ? (filtered.reduce((s, r) => s + r.capacite_camion, 0) / totalOps).toFixed(1) : 0;
+=======
+  const totalVoyages      = filtered.reduce((s, r) => s + r.nombre_voyages, 0);
+  const totalVolumeDecape = filtered.reduce((s, r) => s + r.volume_decape, 0);
+  const totalOps          = filtered.length;
+  const avgCapacite       = totalOps > 0 ? (filtered.reduce((s, r) => s + r.capacite_camion, 0) / totalOps).toFixed(1) : 0;
+>>>>>>> clean-IMANE
 
   // Volume sauté depuis Sautage (Poussage), filtré par la même période
   const filteredPoussages = poussages.filter((p) => {
@@ -299,6 +345,7 @@ export default function TransportStatistiques() {
   const totalVolumeSaute = filteredPoussages.reduce((s, p) => s + Number(p.volume_soté || 0), 0);
 
   // ─── Volume décapé par entreprise ─────────────────────────────────────────
+<<<<<<< HEAD
   const procaneqData = filtered.filter((r) => r.entreprise === "procaneq");
   const transwineData = filtered.filter((r) => r.entreprise === "transwine");
 
@@ -306,6 +353,15 @@ export default function TransportStatistiques() {
   const volTranswine = transwineData.reduce((s, r) => s + r.volume_decape, 0);
 
   const voyProcaneq = procaneqData.reduce((s, r) => s + r.nombre_voyages, 0);
+=======
+  const procaneqData  = filtered.filter((r) => r.entreprise === "procaneq");
+  const transwineData = filtered.filter((r) => r.entreprise === "transwine");
+
+  const volProcaneq  = procaneqData.reduce((s, r) => s + r.volume_decape, 0);
+  const volTranswine = transwineData.reduce((s, r) => s + r.volume_decape, 0);
+
+  const voyProcaneq  = procaneqData.reduce((s, r) => s + r.nombre_voyages, 0);
+>>>>>>> clean-IMANE
   const voyTranswine = transwineData.reduce((s, r) => s + r.nombre_voyages, 0);
 
   // ─── Volume décapé par jour (last 30 days) ────────────────────────────────
@@ -335,7 +391,11 @@ export default function TransportStatistiques() {
     responsive: true, maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
+<<<<<<< HEAD
       tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} m³` } },
+=======
+      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` } },
+>>>>>>> clean-IMANE
     },
     scales: {
       x: { grid: { display: false }, ticks: baseTick },
@@ -349,7 +409,11 @@ export default function TransportStatistiques() {
     interaction: { mode: "index", intersect: false },
     plugins: {
       legend: { display: false },
+<<<<<<< HEAD
       tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} m³` } },
+=======
+      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` } },
+>>>>>>> clean-IMANE
     },
     scales: {
       x: { grid: { display: false }, ticks: { ...baseTick, maxTicksLimit: 10 } },
@@ -363,26 +427,38 @@ export default function TransportStatistiques() {
     animation: { duration: 1200, easing: "easeOutBack" },
     plugins: {
       legend: { position: "bottom", labels: { color: "#6b7280", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 }, padding: 14, usePointStyle: true } },
+<<<<<<< HEAD
       tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.label}: ${c.parsed.toLocaleString()} m³` } },
+=======
+      tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.label}: ${c.parsed.toLocaleString()} t` } },
+>>>>>>> clean-IMANE
     },
   };
 
   // ─── Excel export ─────────────────────────────────────────────────────────
   const exportExcel = () => {
+<<<<<<< HEAD
     if (filtered.length === 0) {
       alert("Il n'y a aucune donnée à exporter pour la période sélectionnée.");
       return;
     }
+=======
+>>>>>>> clean-IMANE
     const rows = filtered.map((r) => ({
       Date: r.date,
       Entreprise: r.entreprise,
       "Type Moyen": r.type_moyen,
       "Nombre Voyages": r.nombre_voyages,
+<<<<<<< HEAD
       "Capacité Camion (m³)": r.capacite_camion,
       "Volume Décapé (m³)": r.volume_decape,
       Panneau: r.panneau || "—",
       Tranchée: r.tranchee || "—",
       Niveau: r.niveau || "—",
+=======
+      "Capacité Camion (t)": r.capacite_camion,
+      "Volume Décapé (t)": r.volume_decape,
+>>>>>>> clean-IMANE
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -390,6 +466,7 @@ export default function TransportStatistiques() {
     saveAs(new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })]), "statistiques_transport.xlsx");
   };
 
+<<<<<<< HEAD
   // ─── PDF export ───────────────────────────────────────────────────────────
   const exportPDF = () => {
     if (filtered.length === 0) {
@@ -469,6 +546,8 @@ export default function TransportStatistiques() {
     doc.save(`rapport_transport_${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
+=======
+>>>>>>> clean-IMANE
   const anim = (d) => ({ style: { animationDelay: d } });
 
   return (
@@ -512,18 +591,30 @@ export default function TransportStatistiques() {
 
           {/* Loading */}
           {loading && (
+<<<<<<< HEAD
             <div style={{ textAlign: "center", padding: 40, color: "#16a34a", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
               <FaSpinner style={{ animation: "spin 1s linear infinite" }} /> Chargement des données transport...
+=======
+            <div style={{ textAlign: "center", padding: 40, color: "#16a34a", fontWeight: 700, display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+              <FaSpinner style={{animation:"spin 1s linear infinite"}}/> Chargement des données transport...
+>>>>>>> clean-IMANE
             </div>
           )}
 
           {/* KPIs */}
           <div className="ts-grid4" style={{ marginBottom: 24 }}>
             {[
+<<<<<<< HEAD
               { icon: <FaBolt />, label: "Volume Sauté", value: Math.round(totalVolumeSaute), unit: "m³", color: "#16a34a", delay: "0.05s" },
               { icon: <FaHardHat />, label: "Volume Décapé Total", value: Math.round(totalVolumeDecape), unit: "m³", color: "#2563eb", delay: "0.10s" },
               { icon: <FaTruck />, label: "Nombre de Voyages", value: totalVoyages, unit: "voyages", color: "#15803d", delay: "0.15s" },
               { icon: <FaTruckLoading />, label: "Capacité Moy. Camion", value: parseFloat(avgCapacite), unit: "m³", color: "#f59e0b", delay: "0.20s" },
+=======
+              { icon: <FaBolt/>,        label: "Volume Sauté",        value: Math.round(totalVolumeSaute),    unit: "t",       color: "#16a34a", delay: "0.05s" },
+              { icon: <FaHardHat/>,      label: "Volume Décapé Total",  value: Math.round(totalVolumeDecape),   unit: "t",       color: "#2563eb", delay: "0.10s" },
+              { icon: <FaTruck/>,        label: "Nombre de Voyages",    value: totalVoyages,                    unit: "voyages", color: "#15803d", delay: "0.15s" },
+              { icon: <FaTruckLoading/>, label: "Capacité Moy. Camion", value: parseFloat(avgCapacite),         unit: "t",       color: "#f59e0b", delay: "0.20s" },
+>>>>>>> clean-IMANE
             ].map(({ icon, label, value, unit, color, delay }) => (
               <div key={label} className="ts-kpi" style={{ animationDelay: delay, borderColor: color, borderTopWidth: 3 }}>
                 <div className="ts-kpi-shimmer" />
@@ -544,14 +635,22 @@ export default function TransportStatistiques() {
                 <p className="ts-card-title">Volume Décapé par Jour</p>
                 <p className="ts-card-sub">Évolution sur les 30 derniers jours (toutes entreprises)</p>
               </div>
+<<<<<<< HEAD
               <span className="ts-pill" style={{ display: "flex", alignItems: "center", gap: 5 }}><FaChartBar size={10} /> Tendance</span>
+=======
+              <span className="ts-pill" style={{display:"flex",alignItems:"center",gap:5}}><FaChartBar size={10}/> Tendance</span>
+>>>>>>> clean-IMANE
             </div>
             <div style={{ height: 280 }}>
               <Line
                 data={{
                   labels: dayLabels,
                   datasets: [{
+<<<<<<< HEAD
                     label: "Volume Décapé (m³)", data: volParJour,
+=======
+                    label: "Volume Décapé (t)", data: volParJour,
+>>>>>>> clean-IMANE
                     borderColor: "#16a34a", backgroundColor: "rgba(22,163,74,0.08)",
                     fill: true, tension: 0.35, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2,
                   }],
@@ -577,7 +676,11 @@ export default function TransportStatistiques() {
                   data={{
                     labels: ["Procaneq", "Transwine"],
                     datasets: [{
+<<<<<<< HEAD
                       label: "Volume Décapé (m³)",
+=======
+                      label: "Volume Décapé (t)",
+>>>>>>> clean-IMANE
                       data: [volProcaneq, volTranswine],
                       backgroundColor: ["#f59e0b", "#3b82f6"],
                       borderRadius: { topLeft: 8, topRight: 8 }, barPercentage: 0.5,
@@ -674,6 +777,7 @@ export default function TransportStatistiques() {
               <p className="ts-card-title" style={{ margin: 0 }}>
                 {filtered.length} enregistrement(s)
               </p>
+<<<<<<< HEAD
               <div style={{ display: "flex", gap: 10 }}>
                 <button className="ts-btn-excel" onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                   <FaFileExcel /> Exporter Excel
@@ -682,6 +786,11 @@ export default function TransportStatistiques() {
                   <FaFilePdf /> Exporter PDF
                 </button>
               </div>
+=======
+            <button className="ts-btn-excel" onClick={exportExcel} style={{display:"flex",alignItems:"center",gap:7}}>
+              <FaFileExcel/> Exporter Excel
+            </button>
+>>>>>>> clean-IMANE
             </div>
             {filtered.length > 0 ? (
               <div className="ts-table-wrap">
@@ -692,12 +801,17 @@ export default function TransportStatistiques() {
                       <th>Entreprise</th>
                       <th>Type Moyen</th>
                       <th>Voyages</th>
+<<<<<<< HEAD
                       <th>Capacité (m³)</th>
                       <th>Volume Décapé (m³)</th>
                       <th>Panneau</th>
                       <th>Tranchée</th>
                       <th>Niveau</th>
                       <th style={{ textAlign: "center" }}>Actions</th>
+=======
+                      <th>Capacité (t)</th>
+                      <th>Volume Décapé (t)</th>
+>>>>>>> clean-IMANE
                     </tr>
                   </thead>
                   <tbody>
@@ -715,6 +829,7 @@ export default function TransportStatistiques() {
                         </td>
                         <td style={{ textTransform: "capitalize" }}>{r.type_moyen}</td>
                         <td style={{ fontWeight: 700 }}>{r.nombre_voyages}</td>
+<<<<<<< HEAD
                         <td>{r.capacite_camion} m³</td>
                         <td style={{ color: "#16a34a", fontWeight: 700 }}>{r.volume_decape.toLocaleString()} m³</td>
                         <td style={{ color: "#15803d", fontWeight: 600 }}>{r.panneau || "—"}</td>
@@ -730,14 +845,23 @@ export default function TransportStatistiques() {
                             </button>
                           </div>
                         </td>
+=======
+                        <td>{r.capacite_camion} t</td>
+                        <td style={{ color: "#16a34a", fontWeight: 700 }}>{r.volume_decape.toLocaleString()} t</td>
+>>>>>>> clean-IMANE
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             ) : (
+<<<<<<< HEAD
               <div className="ts-empty" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
                 <FaInbox size={38} style={{ color: "#d1fae5" }} />
+=======
+              <div className="ts-empty" style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
+                <FaInbox size={38} style={{color:"#d1fae5"}}/>
+>>>>>>> clean-IMANE
                 Aucune donnée transport pour la période sélectionnée
               </div>
             )}
@@ -745,6 +869,7 @@ export default function TransportStatistiques() {
 
         </div>
       </div>
+<<<<<<< HEAD
 
       {/* ── Edit Modal ────────────────────────────────────────────────────────── */}
       {editRecord && (
@@ -821,6 +946,8 @@ export default function TransportStatistiques() {
           </div>
         </div>
       )}
+=======
+>>>>>>> clean-IMANE
     </>
   );
 }

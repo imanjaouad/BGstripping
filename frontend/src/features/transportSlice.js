@@ -2,8 +2,11 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchTransportJournaliersAPI,
   createTransportJournalierAPI,
+<<<<<<< HEAD
   updateTransportJournalierAPI,
   deleteTransportJournalierAPI,
+=======
+>>>>>>> clean-IMANE
 } from "../services/api";
 
 // ─── Fonction utilitaire ───────────────────────────────────────────────────────
@@ -22,9 +25,12 @@ function mapRecord(r) {
     nombre_voyages: Number(r.nombre_voyages) || 0,
     capacite_camion: Number(r.capacite_camion) || 0,
     volume_decape: Number(r.volume_decape) || 0,
+<<<<<<< HEAD
     panneau: r.panneau || "",
     tranchee: r.tranchee || "",
     niveau: r.niveau || "",
+=======
+>>>>>>> clean-IMANE
   };
 }
 
@@ -65,6 +71,7 @@ export const saveTransportJournalier = createAsyncThunk(
   }
 );
 
+<<<<<<< HEAD
 /** Supprime un enregistrement transport par son ID */
 export const deleteTransportJournalier = createAsyncThunk(
   "transport/delete",
@@ -92,6 +99,8 @@ export const updateTransportJournalier = createAsyncThunk(
   }
 );
 
+=======
+>>>>>>> clean-IMANE
 // ─── Slice Redux ───────────────────────────────────────────────────────────────
 
 const initialState = {
@@ -136,6 +145,7 @@ const transportSlice = createSlice({
       .addCase(saveTransportJournalier.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload;
+<<<<<<< HEAD
       })
 
       // ── Delete ──────────────────────────────────────────────────────────────
@@ -153,6 +163,8 @@ const transportSlice = createSlice({
       .addCase(updateTransportJournalier.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload;
+=======
+>>>>>>> clean-IMANE
       });
   },
 });

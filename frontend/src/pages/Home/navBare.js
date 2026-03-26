@@ -12,4 +12,8 @@ const Navbar = ({ closeMenu }) => {
   );
 };
 
+<<<<<<< HEAD
 export default Navbar
+=======
+export default Navbar;
+>>>>>>> clean-IMANE

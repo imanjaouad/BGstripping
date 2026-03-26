@@ -2,8 +2,11 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { FaArrowLeft, FaTruck, FaChartBar, FaWarehouse, FaShuttleVan } from "react-icons/fa";
 import image from "../../images/image.jpeg";
+<<<<<<< HEAD
 import procanLogo from "../../images/procanLogo.png";
 import transwinLogo from "../../images/transwinLogo.jpg";
+=======
+>>>>>>> clean-IMANE
 
 // ─── CSS injected once ─────────────────────────────────────────────────────────
 const SIDEBAR_CSS = `
@@ -216,9 +219,13 @@ function TransportSidebar() {
                 document.getElementById("section-procaneq")?.scrollIntoView({ behavior: "smooth", block: "start" })
               }
             >
+<<<<<<< HEAD
               <span className="tr-link-icon" style={{ background: "transparent", width: 80, height: 44, overflow: "hidden", flexShrink: 0 }}>
                 <img src={procanLogo} alt="Procaneq" style={{ width: 80, height: 44, objectFit: "contain", mixBlendMode: "screen" }} />
               </span>
+=======
+              <span className="tr-link-icon"><FaWarehouse style={{color:"#f59e0b"}} /></span>
+>>>>>>> clean-IMANE
               <span>Procaneq</span>
             </button>
           </li>
@@ -229,9 +236,13 @@ function TransportSidebar() {
                 document.getElementById("section-transwine")?.scrollIntoView({ behavior: "smooth", block: "start" })
               }
             >
+<<<<<<< HEAD
               <span className="tr-link-icon" style={{ background: "transparent", width: 80, height: 44, overflow: "hidden", flexShrink: 0 }}>
                 <img src={transwinLogo} alt="Transwine" style={{ width: 80, height: 44, objectFit: "contain", mixBlendMode: "screen" }} />
               </span>
+=======
+              <span className="tr-link-icon"><FaShuttleVan style={{color:"#3b82f6"}} /></span>
+>>>>>>> clean-IMANE
               <span>Transwine</span>
             </button>
           </li>

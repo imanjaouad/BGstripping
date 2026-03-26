@@ -22,8 +22,18 @@ export function AuthProvider({ children }) {
 
   // ── Auth ───────────────────────────────────────────────
   const [user, setUser] = useState(() => {
+<<<<<<< HEAD
     // Restaure la session depuis localStorage ou sessionStorage au rechargement
     const saved = localStorage.getItem("user") || sessionStorage.getItem("user");
+=======
+<<<<<<< HEAD
+    // Restaure la session depuis localStorage au rechargement
+    const saved = localStorage.getItem("user");
+=======
+    // Restaure la session depuis localStorage ou sessionStorage au rechargement
+    const saved = localStorage.getItem("user") || sessionStorage.getItem("user");
+>>>>>>> main
+>>>>>>> clean-IMANE
     return saved ? JSON.parse(saved) : null;
   });
 

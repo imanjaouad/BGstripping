@@ -29,7 +29,10 @@ class Poussage extends Model
         'type_arret',
         'arret_heure_debut',
         'arret_heure_fin',
+<<<<<<< HEAD
         'HTP',
+=======
+>>>>>>> clean-IMANE
     ];
 
     protected $casts = [
