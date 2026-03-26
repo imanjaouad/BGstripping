@@ -18,6 +18,7 @@ import PrivateRoute from "./components/PrivateRoute";
 // Styles
 import "./style/PoussageForm.css";
 import "./style/ReportsSection.css";
+import Securite from "./pages/Home/Securite";
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
       {/* PUBLIC */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/securite" element={<Securite />} />
+    
 
 
       {/* ADMIN */}

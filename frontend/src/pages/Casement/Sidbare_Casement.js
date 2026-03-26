@@ -221,8 +221,8 @@ const NAV_ITEMS = [
   { to: `${BASE}/dashboard`,               icon: <IcoDash/>,    label: "Tableau de bord" },
   { to: `${BASE}/gestion`,                 icon: <IcoEdit/>,    label: "Gestion"          },
   { to: `${BASE}/statistique`,             icon: <IcoStats/>,   label: "Statistiques"    },
-  { to: `${BASE}/historique`,              icon: <IcoHistory/>, label: "Historique"      },
   { to: `${BASE}/couts`,                   icon: <IcoMoney/>,   label: "Coûts"           },
+  { to: `${BASE}/historique`,              icon: <IcoHistory/>, label: "Historique"      },
 ];
 
 function SidebarCasement({ isOpen, toggleSidebar }) {

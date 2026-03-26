@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import "../../style/Home.css";
 
+import image1 from "../../images/700.jpg";
+import image2 from "../../images/7001.jpeg"
+import image3 from "../../images/ph.jpg"
+
 const operations = [
   {
     href: "/operations/poussage",
@@ -16,10 +20,8 @@ const operations = [
   {
     href: "/operations/casement",
     images: [
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/storage-cumenage-ZzsNsRJNE7LE4jDf8GxtCw.webp",
-      "https://images.unsplash.com/photo-1553413077-190dd305871c?w=600&q=80",
-      "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?w=600&q=80",
-      "https://images.unsplash.com/photo-1601598851547-4302969d0614?w=600&q=80",
+      image1,image2,image3
+
     ],
     title: "Casement",
     description: "Gestion des lieux de stockage et des matériaux entreposés.",
@@ -144,7 +146,7 @@ const toggleTheme = () => {
   }, []);
 
   return (
-    <section className="ops-section">
+    <section className="ops-section" id="operations">
       <div className="ops-container">
         <div ref={titleRef} className={`ops-header ${titleVisible ? "visible" : ""}`}>
           

@@ -1,3 +1,4 @@
+
 /* ============================================
 - HOME PAGE STYLES 
    ============================================ */
@@ -83,11 +84,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-section {
   min-height: 600px;
+  height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
+  background-size: cover;        /* ← ajouter */
+  background-position: center;   /* ← ajouter */
+  background-repeat: no-repeat;  /* ← ajouter */
 }
 
 .hero-image {
@@ -108,11 +113,29 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 2;
+  /* L'image est passée via style={{ backgroundImage }} dans Hero.js */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #1a3a2a; /* fallback si l'image ne charge pas */
+}
+
+/* .hero-image supprimé — on utilise background-image sur la section */
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(10, 40, 20, 0.4) 100%
+  );
+  z-index: 1;
 }
 
 .hero-content {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   max-width: 600px;
 }
 
@@ -161,59 +184,139 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-2px);
 }
 
-.hero-section {
-  height: 100vh;
+/* ============================================
+   HERO SECTION — ANIMATIONS
+   ============================================ */
+
+/* ---------- Keyframes ---------- */
+@keyframes hero-zoom {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1); }
+}
+
+@keyframes hero-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes hero-title-in {
+  0%   { opacity: 0; transform: translateY(40px) skewY(1.5deg); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0) skewY(0deg);      filter: blur(0); }
+}
+
+@keyframes hero-text-in {
+  0%   { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hero-btn-in {
+  0%   { opacity: 0; transform: translateY(16px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes hero-line-grow {
+  from { width: 0; opacity: 0; }
+  to   { width: 60px; opacity: 1; }
+}
+
+@keyframes hero-scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
+
+/* ---------- Image — Ken Burns doux ---------- */
+.hero-image {
+  animation: hero-zoom 1.8s cubic-bezier(0.22, 0.68, 0, 1) forwards;
+  will-change: transform;
+}
+
+/* ---------- Overlay — Fondu à l'entrée ---------- */
+.hero-overlay {
+  animation: hero-overlay-in 1.2s ease forwards;
+}
+
+/* ---------- Titre H1 ---------- */
+.hero-content h1 {
+  opacity: 0;
+  animation: hero-title-in 0.9s cubic-bezier(0.22, 0.68, 0, 1.1) 0.3s forwards;
+  will-change: transform, opacity;
+}
+
+/* Ligne décorative sous le titre */
+.hero-content h1::after {
+  content: "";
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+  border-radius: 2px;
+  margin-top: 14px;
+  opacity: 0;
+  animation: hero-line-grow 0.7s cubic-bezier(0.22, 0.68, 0, 1.2) 0.95s forwards;
+}
+
+/* ---------- Paragraph ---------- */
+.hero-content p {
+  opacity: 0;
+  animation: hero-text-in 0.8s cubic-bezier(0.22, 0.68, 0, 1.1) 0.65s forwards;
+}
+
+/* ---------- Boutons ---------- */
+.hero-content .btn-success,
+.hero-content .btn-outline-light {
+  opacity: 0;
+}
+
+.hero-content .btn-success {
+  animation: hero-btn-in 0.7s cubic-bezier(0.22, 0.68, 0, 1.2) 0.9s forwards;
+}
+
+.hero-content .btn-outline-light {
+  animation: hero-btn-in 0.7s cubic-bezier(0.22, 0.68, 0, 1.2) 1.05s forwards;
+}
+
+/* ---------- Hover boutons (amélioré) ---------- */
+.btn-success,
+.btn-outline-light {
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.22, 0.68, 0, 1.4),
+              box-shadow 0.3s ease,
+              background-color 0.3s ease;
 }
 
-.hero-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.2);
-  animation: hero-zoom 10s ease-out forwards;
-}
-
-/* mouvement très lent */
-@keyframes hero-zoom {
-  0% {
-    transform: scale(1.25) translateY(-20px);
-  }
-  100% {
-    transform: scale(1.05) translateY(0px);
-  }
-}.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    rgba(0,0,0,0.7),
-    rgba(0,0,0,0.4),
-    rgba(22,163,74,0.2)
-  );
-  backdrop-filter: blur(2px);
-}
-
-/* lumière qui bouge */
-.hero-overlay::before {
+/* Shine effect sur les boutons */
+.btn-success::before,
+.btn-outline-light::before {
   content: "";
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
-  animation: lightMove 8s linear infinite;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
 }
 
-@keyframes lightMove {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn-success:hover::before,
+.btn-outline-light:hover::before {
+  left: 130%;
+}
+
+.btn-success:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.4);
+}
+
+.btn-outline-light:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
 }
 /* ============================================
    DefinitionSection 
@@ -447,7 +550,7 @@ h1, h2, h3, h4, h5, h6 {
   --green-light: #dcfce7;
   --green-mid: #f0fdf4;
   --text-dark: #111827;
-  --text-mutedOPS: #0e0f11;
+  --text-muted: #6b7280;
 }
 /* ============================================
    DARK MODE — OPERATIONS SECTION
@@ -558,7 +661,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .ops-subtitle {
   font-size: 17px;
-  color: var(--text-mutedOPS);
+  color: var(--text-muted);
   max-width: 480px;
   margin: 0 auto;
   line-height: 1.7;
@@ -613,7 +716,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ---------- Image Area ---------- */
 .ops-card-img-wrap {
   position: relative;
-  height: 220px;
+  height: 290px;
   overflow: hidden;
 }
 
@@ -623,6 +726,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-fit: contain;
   opacity: 0;
   transform: scale(1);
   transition: opacity 0.5s ease, transform 0.6s ease;
@@ -726,7 +830,7 @@ h1, h2, h3, h4, h5, h6 {
 .ops-card-desc {
   margin: 0 0 auto 0;
   font-size: 13.5px;
-  color: var(--text-mutedOPS);
+  color: var(--text-muted);
   line-height: 1.6;
 }
 

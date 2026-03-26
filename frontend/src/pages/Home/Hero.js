@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
-import "../../style/Home.css"
-import IMGHero from "../../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png"
+import "../../style/Home.css";
+import IMGHero from "../../images/photoBackground.png";
+
 export default function Hero() {
   return (
-    <section className="hero-section position-relative overflow-hidden">
-      <img
-        src={IMGHero}
-        alt="Phosphate mining"
-        className="hero-image"
-      />
+    <section
+      className="hero-section position-relative overflow-hidden"
+      style={{ backgroundImage: `url(${IMGHero})` }}
+    >
       <div className="hero-overlay"></div>
       <div className="container position-relative h-100 d-flex align-items-center">
         <div className="hero-content text-white">
@@ -18,7 +17,6 @@ export default function Hero() {
           <p className="lead mb-4">
             Optimisez vos opérations d'extraction, de stockage et de transport avec notre plateforme de gestion intégrée.
           </p>
-          
         </div>
       </div>
     </section>

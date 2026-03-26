@@ -4,6 +4,7 @@ import "../../style/Home.css"
 export default function CTASection() {
   return (
     <section className="py-5 cta-section text-white text-center">
+<<<<<<< HEAD
       <div className="container">
         <h2 className="display-5 fw-bold mb-3">
           Rapports & Administration
@@ -18,6 +19,9 @@ export default function CTASection() {
           </Link>
         </div>
       </div>
+=======
+
+>>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
     </section>
   );
 }
