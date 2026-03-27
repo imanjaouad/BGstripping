@@ -9,6 +9,21 @@ use Illuminate\Support\Facades\Validator;
 
 class SecuriteController extends Controller
 {
+    public function download($id)
+{
+    $file = Securite::findOrFail($id);
+
+    $path = storage_path('app/public/' . $file->path);
+
+    if (!file_exists($path)) {
+        return response()->json(['message' => 'Fichier introuvable'], 404);
+    }
+
+    return response()->file($path, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="'.$file->filename.'"'
+    ]);
+}
     /**
      * Liste des documents et images de sécurité.
      */

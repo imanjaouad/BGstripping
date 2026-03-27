@@ -18,7 +18,6 @@ class TransportJournalier extends Model
         'nombre_voyages',
         'capacite_camion',
         'volume_decape',
-<<<<<<< HEAD
         'panneau',
         'tranchee',
         'niveau',
@@ -29,14 +28,9 @@ class TransportJournalier extends Model
         'nombre_voyages' => 'integer',
         'capacite_camion' => 'decimal:2',
         'volume_decape' => 'decimal:2',
-=======
     ];
 
-    protected $casts = [
-        'operation_date'  => 'date',
-        'nombre_voyages'  => 'integer',
-        'capacite_camion' => 'decimal:2',
-        'volume_decape'   => 'decimal:2',
->>>>>>> clean-IMANE
-    ];
+   
+
+    
 }

@@ -38,7 +38,7 @@ return new class extends Migration
 
     $table->time('arret_heure_debut')->nullable(); // AJOUT
     $table->time('arret_heure_fin')->nullable();   // AJOUT
-
+    $table->decimal('HTP', 8, 2)->nullable(); // ou integer() selon besoin
     $table->timestamps();
 });
     }

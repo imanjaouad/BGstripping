@@ -27,7 +27,7 @@ Route::middleware(['auth:sanctum','role:admin,superadmin'])->group(function () {
 
 // Routes pour la gestion de la sécurité (documents et images)
 Route::prefix('securite')->group(function () {
-    Route::get('/', [SecuriteController::class, 'index']);      // Lister les fichiers
+   Route::get('/securite/{id}/download', [SecuriteController::class, 'download']);     // Lister les fichiers
     Route::post('/', [SecuriteController::class, 'store']);     // Ajouter un fichier
     Route::delete('/{id}', [SecuriteController::class, 'destroy']); // Supprimer un fichier
 });
