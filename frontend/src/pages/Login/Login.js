@@ -57,7 +57,7 @@ export default function Login() {
               navigate("/operations/casement/dashboard");
               break;
             case "transport":
-              navigate("/operations/transport/dashboard");
+              navigate("/operations/transport");
               break;
             default:
               navigate("/");
@@ -158,7 +158,7 @@ export default function Login() {
             >
               {loading ? <span className="spinner"></span> : "Se Connecter"}
             </button>
-            {/* ✅ ERROR تحت */}
+            {/* ✅ ERROR au dessous*/}
 {errorMsg && <div className="error-msg">{errorMsg}</div>}
 
           </form>

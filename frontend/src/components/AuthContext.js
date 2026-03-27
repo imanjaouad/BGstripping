@@ -22,10 +22,8 @@ export function AuthProvider({ children }) {
 
   // ── Auth ───────────────────────────────────────────────
   const [user, setUser] = useState(() => {
-
     // Restaure la session depuis localStorage ou sessionStorage au rechargement
     const saved = localStorage.getItem("user") || sessionStorage.getItem("user");
-
     return saved ? JSON.parse(saved) : null;
   });
 

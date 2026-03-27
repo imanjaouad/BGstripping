@@ -9,6 +9,10 @@ const modeRoutes = {
   casement: "/operations/casement",
 =======
 <<<<<<< HEAD
+  poussage: "/poussage",
+  casement: "/operations/casement",
+=======
+<<<<<<< HEAD
   poussage: "/operations/poussage",
   encasement: "/operations/encasement",
 =======
@@ -16,6 +20,7 @@ const modeRoutes = {
   casement: "/operations/casement",
 >>>>>>> main
 >>>>>>> clean-IMANE
+>>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
   transport: "/operations/transport",
 };
 
@@ -51,11 +56,15 @@ export default function LoginPage() {
         body: JSON.stringify({ username: email, password, modeOpiration: mode }),
 =======
 <<<<<<< HEAD
+        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
+=======
+<<<<<<< HEAD
         body: JSON.stringify({ email, password }),
 =======
         body: JSON.stringify({ username: email, password, modeOpiration: mode }),
 >>>>>>> main
 >>>>>>> clean-IMANE
+>>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
       });
 
       const payload = await response.json();
@@ -132,11 +141,15 @@ export default function LoginPage() {
                 <option value="casement">Casement</option>
 =======
 <<<<<<< HEAD
+                <option value="casement">Casement</option>
+=======
+<<<<<<< HEAD
                 <option value="encasement">Encasement</option>
 =======
                 <option value="casement">Casement</option>
 >>>>>>> main
 >>>>>>> clean-IMANE
+>>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
                 <option value="transport">Transport</option>
               </select>
             </label>
