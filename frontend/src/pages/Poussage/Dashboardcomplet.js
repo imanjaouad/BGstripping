@@ -299,6 +299,69 @@ const CSS = `
     font-family:'Plus Jakarta Sans',sans-serif;
   }
   .db-search-input:focus { border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,0.10); }
+
+  /* ── Modal édition inline ── */
+  .db-edit-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    display:flex; align-items:center; justify-content:center;
+    z-index:1000; animation:db-fadeUp .2s ease both; padding:20px;
+  }
+  .db-edit-modal {
+    background:#fff; border-radius:18px; padding:28px;
+    width:100%; max-width:820px; max-height:90vh; overflow-y:auto;
+    box-shadow:0 24px 60px rgba(0,0,0,0.2);
+  }
+  .db-edit-title {
+    font-size:18px; font-weight:800; color:#14532d; margin-bottom:20px;
+    padding-bottom:14px; border-bottom:1.5px solid #bbf7d0;
+  }
+  .db-edit-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:16px; margin-bottom:20px;
+  }
+  .db-edit-label {
+    font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.07em; color:#6b7280; margin-bottom:5px; display:block;
+  }
+  .db-edit-input, .db-edit-select {
+    width:100%; border:1.5px solid #d1fae5; border-radius:9px;
+    padding:9px 12px; font-size:13px; color:#1f2937; background:#f8fafc;
+    outline:none; transition:border .18s,box-shadow .18s;
+    box-sizing:border-box; font-family:inherit;
+  }
+  .db-edit-input:focus, .db-edit-select:focus {
+    border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,0.10);
+  }
+  .db-edit-input[readOnly] { background:#f0fdf4; color:#15803d; font-weight:700; }
+  .db-edit-select-danger {
+    border-color:rgba(217,119,6,0.4)!important;
+    background-color:#fef3c7!important; color:#92400e!important;
+  }
+  .db-edit-equip-wrap { grid-column:1 / -1; }
+  .db-edit-equip-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .db-edit-chip {
+    padding:5px 14px; border-radius:20px; border:1.5px solid #bbf7d0;
+    font-size:12px; font-weight:600; color:#374151; cursor:pointer;
+    transition:all .15s; background:#fff;
+  }
+  .db-edit-chip:hover { background:#f0fdf4; border-color:#16a34a; }
+  .db-edit-chip.sel { background:#16a34a; color:#fff; border-color:#15803d; }
+  .db-edit-footer {
+    display:flex; gap:12px; justify-content:flex-end;
+    padding-top:18px; border-top:1.5px solid #f0fdf4;
+  }
+  .db-edit-save {
+    background:#16a34a; color:#fff; border:none; border-radius:10px;
+    padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer;
+    transition:all .18s; font-family:inherit;
+  }
+  .db-edit-save:hover { background:#15803d; transform:translateY(-1px); }
+  .db-edit-cancel-btn {
+    background:#f3f4f6; color:#4b5563; border:none; border-radius:10px;
+    padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer;
+    transition:all .18s; font-family:inherit;
+  }
+  .db-edit-cancel-btn:hover { background:#e5e7eb; }
 `;
 
 // ─── Chart config ─────────────────────────────────────────────────────────────
@@ -796,6 +859,86 @@ function DashboardComplet() {
   const [equipOpts, setEquipOpts] = useState(["T1","T2","T3","T4","T5","T6","T7"]);
   const [formData,  setFormData]  = useState(EMPTY_FORM);
 
+  // ── Modal édition inline ──
+  const [editTarget,  setEditTarget]  = useState(null);
+  const [editForm,    setEditForm]    = useState({});
+
+  const openInlineEdit = (p) => {
+    setEditTarget(p);
+    setEditForm({
+      date:            p.date || "",
+      panneau:         p.panneau || "",
+      tranchee:        p.tranchee || "",
+      niveau:          p.niveau || "",
+      "volume_soté":   p.volume_soté ?? "",
+      profendeur:      p.profendeur || "",
+      equipements:     p.equipements || [],
+      conducteur:      p.conducteur || "",
+      matricule:       p.matricule || "",
+      heureDebut:      (p.heureDebut || "").substring(0, 5),
+      heureFin:        (p.heureFin   || "").substring(0, 5),
+      temps:           p.temps || "",
+      poste:           p.poste || "",
+      etatMachine:     p.etatMachine || "En marche",
+      typeArret:       p.typeArret || "",
+      heureDebutArret: (p.heureDebutArret || "").substring(0, 5),
+      heureFinArret:   (p.heureFinArret   || "").substring(0, 5),
+      heures_arret:    p.heures_arret || 0,
+      htp:             p.htp || "",
+    });
+  };
+  const closeInlineEdit = () => { setEditTarget(null); };
+
+  const handleInlineEditChange = (e) => {
+    const { name, value } = e.target;
+    const updated = { ...editForm, [name]: value };
+    if (name === "heureDebut" || name === "heureFin") {
+      const debut = name === "heureDebut" ? value : editForm.heureDebut;
+      const fin   = name === "heureFin"   ? value : editForm.heureFin;
+      updated.temps = calcTemps(debut, fin) || editForm.temps;
+    }
+    if (name === "heureDebutArret" || name === "heureFinArret") {
+      const d = name === "heureDebutArret" ? value : editForm.heureDebutArret;
+      const f = name === "heureFinArret"   ? value : editForm.heureFinArret;
+      const [dh2, dm2] = (d||"").split(":").map(Number);
+      const [fh2, fm2] = (f||"").split(":").map(Number);
+      if (!isNaN(dh2) && !isNaN(fh2)) {
+        let mins = (fh2 * 60 + fm2) - (dh2 * 60 + dm2);
+        if (mins < 0) mins += 24 * 60;
+        updated.heures_arret = parseFloat((mins / 60).toFixed(2));
+      }
+    }
+    if (name === "etatMachine" && value === "En marche") {
+      updated.typeArret = ""; updated.heureDebutArret = "";
+      updated.heureFinArret = ""; updated.heures_arret = 0;
+    }
+    setEditForm(updated);
+  };
+
+  const toggleInlineEquip = (eq) => {
+    const list = editForm.equipements || [];
+    setEditForm({
+      ...editForm,
+      equipements: list.includes(eq) ? list.filter(x => x !== eq) : [...list, eq],
+    });
+  };
+
+  const saveInlineEdit = () => {
+    if (!editTarget) return;
+    const idx = poussages.indexOf(editTarget);
+    if (idx === -1) return;
+    const updatedData = {
+      ...editTarget,
+      ...editForm,
+      htp:          parseFloat(editForm.htp)           || 0,
+      heures_arret: parseFloat(editForm.heures_arret)  || 0,
+      temps:        parseFloat(editForm.temps)          || 0,
+      "volume_soté": parseFloat(editForm["volume_soté"]) || 0,
+    };
+    dispatch(updatePoussage({ index: idx, data: updatedData }));
+    closeInlineEdit();
+  };
+
   const [annualCost, setAnnualCost] = useState(500000);
   const [searchTerm,  setSearchTerm]  = useState("");
   const [meterCost,  setMeterCost]  = useState(120);
@@ -851,11 +994,7 @@ function DashboardComplet() {
   };
 
   const handleEdit = (p, i) => {
-    setFormData({ ...EMPTY_FORM, ...p, equipements: p.equipements || [] });
-    setEditIndex(i);
-    setShowForm(true);
-    navigate("/poussage");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    openInlineEdit(p);
   };
 
   const handleDelete = (i) => {
@@ -1624,6 +1763,101 @@ function DashboardComplet() {
             </div>
           </>  )}
       </div>
+
+      {/* ══ MODAL ÉDITION INLINE ══ */}
+      {editTarget && (
+        <div className="db-edit-overlay" onClick={closeInlineEdit}>
+          <div className="db-edit-modal" onClick={e => e.stopPropagation()}>
+            <div className="db-edit-title">
+              ✏️ Modifier l'opération — {editTarget.date}
+            </div>
+            <div className="db-edit-grid">
+              {[
+                { label:"Date",             name:"date",         type:"date"   },
+                { label:"Panneau",          name:"panneau",      type:"text",   ph:"Ex: P1"    },
+                { label:"Tranchée",         name:"tranchee",     type:"text",   ph:"Ex: TR12"  },
+                { label:"Niveau",           name:"niveau",       type:"text",   ph:"Ex: N1"    },
+                { label:"HTP (h)",          name:"htp",          type:"number", ph:"0", step:"0.1", min:"0", max:"24" },
+                { label:"Profondeur (m)",   name:"profendeur",   type:"number", ph:"0.00", step:"0.01" },
+                { label:"Volume Souté (t)", name:"volume_soté",  type:"number", ph:"0.00", step:"0.01" },
+                { label:"Conducteur",       name:"conducteur",   type:"text",   ph:"Nom"       },
+                { label:"Matricule",        name:"matricule",    type:"text",   ph:"Matricule" },
+                { label:"Poste",            name:"poste",        type:"text",   ph:"Ex: Matin" },
+                { label:"Heure Début",      name:"heureDebut",   type:"time"   },
+                { label:"Heure Fin",        name:"heureFin",     type:"time"   },
+              ].map(({ label, name, type, ph, step, min, max }) => (
+                <div key={name}>
+                  <label className="db-edit-label">{label}</label>
+                  <input
+                    type={type} className="db-edit-input" name={name}
+                    value={editForm[name] ?? ""} onChange={handleInlineEditChange}
+                    placeholder={ph} step={step} min={min} max={max}
+                  />
+                </div>
+              ))}
+              <div>
+                <label className="db-edit-label">Heures Marche (auto)</label>
+                <input type="number" className="db-edit-input" readOnly
+                  value={editForm.temps || 0}
+                  style={{ background:"#f0fdf4", color:"#15803d", fontWeight:700 }} />
+              </div>
+              <div style={{ gridColumn:"span 2" }}>
+                <label className="db-edit-label">État Machine</label>
+                <select
+                  className={`db-edit-select${editForm.etatMachine === "En arrêt" ? " db-edit-select-danger" : ""}`}
+                  name="etatMachine" value={editForm.etatMachine || "En marche"}
+                  onChange={handleInlineEditChange}
+                >
+                  <option value="En marche">En marche</option>
+                  <option value="En arrêt">En arrêt</option>
+                </select>
+              </div>
+              {editForm.etatMachine === "En arrêt" && (
+                <div style={{ gridColumn:"1 / -1", background:"linear-gradient(135deg,#fef3c7,#fff9ec)",
+                  border:"1.5px solid rgba(217,119,6,0.25)", borderRadius:12, padding:"18px 20px" }}>
+                  <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
+                    letterSpacing:".1em", color:"#b45309", marginBottom:14 }}>⚠️ Détails de l'arrêt</div>
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))", gap:14 }}>
+                    {[
+                      { label:"Nature d'arrêt",      name:"typeArret",       type:"text" },
+                      { label:"Heure Début Arrêt",   name:"heureDebutArret", type:"time" },
+                      { label:"Heure Fin Arrêt",     name:"heureFinArret",   type:"time" },
+                    ].map(({ label, name, type }) => (
+                      <div key={name}>
+                        <label className="db-edit-label" style={{ color:"#92400e" }}>{label}</label>
+                        <input type={type} className="db-edit-input" name={name}
+                          value={editForm[name] || ""} onChange={handleInlineEditChange} />
+                      </div>
+                    ))}
+                    <div>
+                      <label className="db-edit-label" style={{ color:"#92400e" }}>Heures Arrêt (auto)</label>
+                      <input type="number" className="db-edit-input" readOnly
+                        value={editForm.heures_arret || 0}
+                        style={{ background:"#fef3c7", color:"#92400e", fontWeight:700 }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className="db-edit-equip-wrap">
+                <label className="db-edit-label">Équipements mobilisés</label>
+                <div className="db-edit-equip-grid">
+                  {equipOpts.map(eq => (
+                    <div key={eq}
+                      className={`db-edit-chip${(editForm.equipements || []).includes(eq) ? " sel" : ""}`}
+                      onClick={() => toggleInlineEquip(eq)}
+                    >{eq}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="db-edit-footer">
+              <button className="db-edit-cancel-btn" onClick={closeInlineEdit}>Annuler</button>
+              <button className="db-edit-save" onClick={saveInlineEdit}>💾 Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
