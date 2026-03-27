@@ -1,208 +1,271 @@
+/* ══════════════════════════════════════════
+   Securite.css
+══════════════════════════════════════════ */
+
 .securite-container {
-  padding: 40px 20px;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #1a4d2e; /* Vert foncé typique OCP */
+  padding: 24px 20px 60px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #1e293b;
 }
 
-.securite-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 30px;
-  text-align: left;
-}
-
-.upload-section {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.upload-label {
-  font-size: 16px;
-  margin-bottom: 15px;
-  font-weight: 500;
-}
-
-.upload-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.btn-browse, .btn-add-file, .btn-add-image {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: opacity 0.2s;
-}
-
-.btn-browse {
-  background-color: #14532d; /* Vert foncé OCP */
-  color: white;
-  border-radius: 8px;
-}
-
-.btn-add-file {
-  background-color: #1d4ed8; /* Bleu plus soutenu */
-  color: white;
-  border-radius: 8px;
-}
-
-.banner-red {
-  background-color: #dc2626; /* Rouge vif */
-  color: white;
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.warning-icon {
-  font-size: 24px;
-}
-
-.image-display-area {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f9fafb;
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.no-image-text {
-  color: #9ca3af;
-  font-size: 16px;
-}
-
-.preview-img {
-  max-width: 1000px;
-  max-height: 500px;
-  object-fit: contain;
-}
-
-.add-image-footer {
-  text-align: center;
-}
-
-.btn-add-image {
-  background-color: #1a4d2e; /* Vert foncé */
-  color: white;
-  display: inline-block;
-}
-
-.btn-browse:hover, .btn-add-file:hover, .btn-add-image:hover {
-  opacity: 0.9;
-}
-
-/* ── Bouton Retour ── */
-.back-btn-container {
-  margin-bottom: 20px;
-}
+/* ── Bouton retour ── */
+.back-btn-container { margin-bottom: 16px; }
 
 .btn-back {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: transparent;
-  border: 1.5px solid #1a4d2e;
-  color: #1a4d2e;
-  padding: 8px 16px;
+  background: none;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-back:hover {
-  background-color: #1a4d2e;
-  color: white;
-  transform: translateX(-4px);
-}
-
-/* ── Tableau des fichiers importés ── */
-.files-table-container {
-  margin-top: 50px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-}
-
-.table-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #14532d;
-}
-
-.securite-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.securite-table th, .securite-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.securite-table th {
-  background-color: #f9fafb;
-  color: #4b5563;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 0.05em;
-}
-
-.securite-table td {
+  padding: 8px 16px;
   font-size: 14px;
-  color: #1f2937;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-back:hover { background: #f1f5f9; color: #1e293b; border-color: #94a3b8; }
+
+/* ── Titre ── */
+.securite-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 20px;
 }
 
-.btn-read-file {
-  display: inline-block;
-  padding: 6px 12px;
-  background-color: #14532d;
+/* ── Bannière rouge ── */
+.banner-red {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
   color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  transition: background-color 0.2s;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  padding: 14px 24px;
+  border-radius: 10px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.warning-icon { font-size: 18px; }
+
+/* ── Cartes section ── */
+.section-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.btn-read-file:hover {
-  background-color: #166534;
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 20px;
+}
+.section-icon { font-size: 1.3rem; }
+
+.section-badge {
+  margin-left: auto;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.section-badge--local { background: #dcfce7; color: #15803d; }
+
+/* ── Upload ── */
+.upload-section {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.upload-label { font-weight: 600; font-size: 14px; color: #374151; margin: 0 0 12px; }
+
+.upload-buttons { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.btn-browse {
+  background: #16a34a; color: white; border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-browse:hover:not(:disabled) { background: #15803d; }
+.btn-browse:disabled { background: #86efac; cursor: not-allowed; }
+
+.btn-add-file {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #2563eb; color: white; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; user-select: none;
+}
+.btn-add-file:hover { background: #1d4ed8; }
+
+.file-ready-text {
+  margin: 10px 0 0; font-size: 13px; color: #16a34a;
+  background: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px 12px; border-radius: 6px;
+}
+
+/* ── Tableau ── */
+.files-table-container {
+  overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0;
 }
 
 .no-files-msg {
-  text-align: center;
-  color: #9ca3af;
-  font-style: italic;
-  padding: 20px;
+  text-align: center; color: #94a3b8; font-style: italic; padding: 24px; margin: 0;
 }
 
-.file-ready-text {
-  font-size: 12px;
-  color: #14532d;
-  margin-top: 10px;
-  text-align: center;
-  font-style: italic;
+.securite-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.securite-table thead { background: #f1f5f9; }
+.securite-table th {
+  text-align: left; padding: 12px 16px; font-weight: 600; color: #475569;
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0;
+}
+.securite-table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; color: #374151; vertical-align: middle; }
+.securite-table tr:last-child td { border-bottom: none; }
+.securite-table tr:hover td { background: #fafafa; }
+.securite-table tr.row-active td { background: #eff6ff; }
+
+.filename-cell { display: flex; align-items: center; gap: 8px; }
+.file-icon { font-size: 16px; }
+
+.actions-cell { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* ── Boutons tableau ── */
+.btn-read-file {
+  background: #0ea5e9; color: white; border: none; border-radius: 6px;
+  padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; white-space: nowrap;
+}
+.btn-read-file:hover:not(:disabled) { background: #0284c7; }
+.btn-read-file:disabled { background: #7dd3fc; cursor: not-allowed; }
+.btn-read-file.btn-read-active { background: #64748b; }
+.btn-read-file.btn-read-active:hover { background: #475569; }
+
+.btn-download-file {
+  background: #7c3aed; color: white; border: none; border-radius: 6px;
+  padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; white-space: nowrap; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.btn-download-file:hover { background: #6d28d9; }
+
+.btn-delete-file {
+  background: #ef4444; color: white; border: none; border-radius: 6px;
+  padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-delete-file:hover:not(:disabled) { background: #dc2626; }
+.btn-delete-file:disabled { background: #fca5a5; cursor: not-allowed; }
+
+/* ── Chargement PDF ── */
+.pdf-loading {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 16px; padding: 16px 20px;
+  background: #f0f9ff; border: 1px solid #bae6fd;
+  border-radius: 10px; color: #0369a1; font-size: 14px; font-weight: 500;
+}
+.pdf-spinner {
+  width: 20px; height: 20px; border: 3px solid #bae6fd;
+  border-top-color: #0ea5e9; border-radius: 50%;
+  animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Erreur PDF ── */
+.pdf-error {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 16px; padding: 14px 20px;
+  background: #fef2f2; border: 1px solid #fecaca;
+  border-radius: 10px; color: #dc2626; font-size: 14px; font-weight: 500;
+}
+
+/* ── Visionneuse PDF ── */
+.pdf-viewer-container {
+  margin-top: 20px; border: 2px solid #0ea5e9;
+  border-radius: 12px; overflow: hidden;
+}
+
+.pdf-viewer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; background: #0ea5e9; color: white;
+  font-weight: 600; font-size: 14px; gap: 12px;
+}
+
+.btn-download-viewer {
+  background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-download-viewer:hover { background: rgba(255,255,255,0.35); }
+
+.btn-close-viewer {
+  background: rgba(255,255,255,0.15); color: white; border: none;
+  border-radius: 6px; padding: 5px 12px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-close-viewer:hover { background: rgba(255,255,255,0.3); }
+
+.pdf-iframe {
+  width: 100%; height: 650px; border: none; display: block; background: #f8fafc;
+}
+
+/* ── Images locales ── */
+.add-image-footer { margin-bottom: 20px; }
+
+.btn-add-image {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #f59e0b; color: white; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; user-select: none;
+}
+.btn-add-image:hover { background: #d97706; }
+
+.images-gallery {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;
+}
+
+.image-card {
+  border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;
+  background: #f8fafc; transition: box-shadow 0.2s;
+}
+.image-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+
+.gallery-img { width: 100%; height: 150px; object-fit: cover; display: block; }
+
+.image-card-footer { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+
+.image-name {
+  font-size: 13px; font-weight: 600; color: #1e293b;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.image-date { font-size: 11px; color: #94a3b8; }
+
+.btn-delete-image {
+  background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;
+  border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; width: 100%; text-align: center;
+}
+.btn-delete-image:hover { background: #ef4444; color: white; border-color: #ef4444; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .securite-title { font-size: 1.5rem; }
+  .actions-cell { flex-direction: column; }
+  .images-gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .pdf-iframe { height: 400px; }
+  .section-badge { display: none; }
 }
