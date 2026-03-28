@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import UseAuth from "../../components/UseAuth";
 import {
   addPoussage,
   deletePoussage,
@@ -303,35 +304,36 @@ const CSS = `
 
 // ─── Chart config ─────────────────────────────────────────────────────────────
 const PALETTE = {
-  emerald:"#16a34a", sky:"#22c55e", amber:"#4ade80",
-  violet:"#15803d",  rose:"#86efac",
-  bg:"#f0fdf4", card:"#fff", border:"#bbf7d0",
-  text:"#14532d", muted:"#6b7280",
+  emerald: "#16a34a", sky: "#22c55e", amber: "#4ade80",
+  violet: "#15803d", rose: "#86efac",
+  bg: "#f0fdf4", card: "#fff", border: "#bbf7d0",
+  text: "#14532d", muted: "#6b7280",
 };
 
 const baseTooltip = {
-  backgroundColor:"#fff", borderColor:"#bbf7d0", borderWidth:1.5,
-  titleColor:"#14532d", bodyColor:"#6b7280", padding:12, cornerRadius:10,
+  backgroundColor: "#fff", borderColor: "#bbf7d0", borderWidth: 1.5,
+  titleColor: "#14532d", bodyColor: "#6b7280", padding: 12, cornerRadius: 10,
 };
-const baseGrid = { color:"rgba(22,163,74,0.07)", drawBorder:false };
-const baseTick = { color:"#9ca3af", font:{family:"'Plus Jakarta Sans',sans-serif", size:11} };
+const baseGrid = { color: "rgba(22,163,74,0.07)", drawBorder: false };
+const baseTick = { color: "#9ca3af", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 } };
 
 function makeBarOpts(delayOffset = 0) {
   return {
     responsive: true,
     animation: {
       duration: 900, easing: "easeOutQuart",
-      delay(ctx) { return ctx.type==="data"&&ctx.mode==="default" ? ctx.dataIndex*80+delayOffset : 0; },
+      delay(ctx) { return ctx.type === "data" && ctx.mode === "default" ? ctx.dataIndex * 80 + delayOffset : 0; },
     },
     plugins: {
       legend: { display: false },
       tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.parsed.y.toLocaleString()} t` } },
     },
     scales: {
-      x: { grid:{display:false}, border:{display:false}, ticks:baseTick },
-      y: { grid:baseGrid, border:{display:false},
-        ticks: { ...baseTick, callback:(v)=>v.toLocaleString() },
-        title: { display:true, text:"Volume (t)", color:PALETTE.muted, font:{size:10} },
+      x: { grid: { display: false }, border: { display: false }, ticks: baseTick },
+      y: {
+        grid: baseGrid, border: { display: false },
+        ticks: { ...baseTick, callback: (v) => v.toLocaleString() },
+        title: { display: true, text: "Volume (t)", color: PALETTE.muted, font: { size: 10 } },
       },
     },
   };
@@ -339,12 +341,16 @@ function makeBarOpts(delayOffset = 0) {
 
 const doughnutOpts = {
   responsive: true, cutout: "68%",
-  animation: { duration:1200, easing:"easeOutBack" },
+  animation: { duration: 1200, easing: "easeOutBack" },
   plugins: {
-    legend: { position:"bottom", labels:{ color:PALETTE.muted,
-      font:{family:"'Plus Jakarta Sans',sans-serif",size:11}, padding:14,
-      usePointStyle:true, pointStyleWidth:7 }},
-    tooltip: { ...baseTooltip, callbacks:{ label:(c)=>` ${c.label}: ${c.parsed.toLocaleString()} t` }},
+    legend: {
+      position: "bottom", labels: {
+        color: PALETTE.muted,
+        font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 }, padding: 14,
+        usePointStyle: true, pointStyleWidth: 7
+      }
+    },
+    tooltip: { ...baseTooltip, callbacks: { label: (c) => ` ${c.label}: ${c.parsed.toLocaleString()} t` } },
   },
 };
 
@@ -374,7 +380,7 @@ function fmtMAD(n) {
 
 // ─── CostEvolution Component ──────────────────────────────────────────────────
 function CostEvolution() {
-  const chartRef      = useRef(null);
+  const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
   const [history, setHistory] = useState(() => {
@@ -383,7 +389,7 @@ function CostEvolution() {
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
-const [poussages, setPoussages] = useState([]);
+  const [poussages, setPoussages] = useState([]);
   useEffect(() => {
     const onStorage = () => {
       try {
@@ -404,15 +410,15 @@ const [poussages, setPoussages] = useState([]);
   const monthKeys = Object.keys(byMonth);
 
   const monthSummary = monthKeys.map(m => {
-    const entries   = byMonth[m];
-    const totalM    = entries.reduce((s, e) => s + e.cost, 0);
-    const avgMeter  = entries.reduce((s, e) => s + e.meterCost, 0) / entries.length;
+    const entries = byMonth[m];
+    const totalM = entries.reduce((s, e) => s + e.cost, 0);
+    const avgMeter = entries.reduce((s, e) => s + e.meterCost, 0) / entries.length;
     const avgAnnual = entries.reduce((s, e) => s + e.annualCost, 0) / entries.length;
     return { month: m, total: totalM, avgMeter, avgAnnual, count: entries.length };
   });
 
   const totalCost = monthSummary.reduce((s, m) => s + m.total, 0);
-  const maxCost   = monthSummary.length > 0 ? Math.max(...monthSummary.map(m => m.total)) : 0;
+  const maxCost = monthSummary.length > 0 ? Math.max(...monthSummary.map(m => m.total)) : 0;
 
   // ── % budget annuel de chaque mois ──
   const percents = monthSummary.map(ms =>
@@ -421,25 +427,25 @@ const [poussages, setPoussages] = useState([]);
 
   // ── Couleur selon % ──
   function pctColor(p) {
-    if (p > 40) return { bg:"rgba(239,68,68,0.75)",  border:"#EF4444" };
-    if (p > 20) return { bg:"rgba(245,158,11,0.75)", border:"#F59E0B" };
-    return            { bg:"rgba(22,163,74,0.75)",   border:"#16A34A" };
+    if (p > 40) return { bg: "rgba(239,68,68,0.75)", border: "#EF4444" };
+    if (p > 20) return { bg: "rgba(245,158,11,0.75)", border: "#F59E0B" };
+    return { bg: "rgba(22,163,74,0.75)", border: "#16A34A" };
   }
-useEffect(() => {
-  fetch("http://127.0.0.1:8000/api/poussages")
-    .then(res => res.json())
-    .then(data => {
-      console.log("API:", data);
-      setPoussages(data.data); 
-    });
-}, []);
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/poussages")
+      .then(res => res.json())
+      .then(data => {
+        console.log("API:", data);
+        setPoussages(data.data);
+      });
+  }, []);
 
   // ── Chart.js ──
   useEffect(() => {
     if (!chartRef.current || monthSummary.length === 0) return;
     if (chartInstance.current) { chartInstance.current.destroy(); chartInstance.current = null; }
 
-    const ctx    = chartRef.current.getContext("2d");
+    const ctx = chartRef.current.getContext("2d");
     const colors = percents.map(p => pctColor(p));
 
     chartInstance.current = new ChartJS(ctx, {
@@ -452,7 +458,7 @@ useEffect(() => {
             label: "% du Budget Annuel",
             data: percents,
             backgroundColor: colors.map(c => c.bg),
-            borderColor:     colors.map(c => c.border),
+            borderColor: colors.map(c => c.border),
             borderWidth: 2, borderRadius: 10, borderSkipped: false,
             yAxisID: "yPct",
           },
@@ -479,7 +485,7 @@ useEffect(() => {
             position: "top",
             labels: {
               color: "#374151", padding: 16,
-              font: { family:"'Plus Jakarta Sans',sans-serif", size: 12 },
+              font: { family: "'Plus Jakarta Sans',sans-serif", size: 12 },
               usePointStyle: true, pointStyleWidth: 8,
             },
           },
@@ -500,25 +506,25 @@ useEffect(() => {
         scales: {
           x: {
             grid: { display: false }, border: { display: false },
-            ticks: { color:"#9ca3af", font:{ family:"'Plus Jakarta Sans',sans-serif", size:11 } },
+            ticks: { color: "#9ca3af", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 } },
           },
           yPct: {
             type: "linear", position: "left",
-            grid: { color:"rgba(22,163,74,0.07)" }, border: { display:false },
+            grid: { color: "rgba(22,163,74,0.07)" }, border: { display: false },
             ticks: {
-              callback: v => v + "%", color:"#9ca3af",
-              font:{ family:"'Plus Jakarta Sans',sans-serif", size:11 },
+              callback: v => v + "%", color: "#9ca3af",
+              font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 },
             },
-            title: { display:true, text:"% Budget", color:"#9ca3af", font:{size:10} },
+            title: { display: true, text: "% Budget", color: "#9ca3af", font: { size: 10 } },
           },
           yCost: {
             type: "linear", position: "right",
-            grid: { display:false }, border: { display:false },
+            grid: { display: false }, border: { display: false },
             ticks: {
-              callback: v => fmtMAD(v) + " MAD", color:"#9ca3af",
-              font:{ family:"'Plus Jakarta Sans',sans-serif", size:10 },
+              callback: v => fmtMAD(v) + " MAD", color: "#9ca3af",
+              font: { family: "'Plus Jakarta Sans',sans-serif", size: 10 },
             },
-            title: { display:true, text:"Coût (MAD)", color:"#9ca3af", font:{size:10} },
+            title: { display: true, text: "Coût (MAD)", color: "#9ca3af", font: { size: 10 } },
           },
         },
       },
@@ -534,17 +540,17 @@ useEffect(() => {
   const prev = monthSummary.length >= 2 ? monthSummary[monthSummary.length - 2] : null;
   let diffAbs = 0, diffPct = 0, trendDir = "same";
   if (prev && last) {
-    diffAbs  = last.total - prev.total;
-    diffPct  = prev.total > 0 ? ((diffAbs / prev.total) * 100) : 0;
+    diffAbs = last.total - prev.total;
+    diffPct = prev.total > 0 ? ((diffAbs / prev.total) * 100) : 0;
     trendDir = diffAbs > 0 ? "up" : diffAbs < 0 ? "down" : "same";
   }
-  const trendIcon      = trendDir === "up" ? "📈" : trendDir === "down" ? "📉" : "➡️";
+  const trendIcon = trendDir === "up" ? "📈" : trendDir === "down" ? "📉" : "➡️";
   const trendDiffClass = trendDir === "up" ? "db-cost-diff-pos" : trendDir === "down" ? "db-cost-diff-neg" : "db-cost-diff-neu";
 
   if (history.length === 0) {
     return (
-      <div className="db-cost-evo-card" style={{ animationDelay:"0.44s" }}>
-        <div className="db-card-header" style={{ marginBottom:8 }}>
+      <div className="db-cost-evo-card" style={{ animationDelay: "0.44s" }}>
+        <div className="db-card-header" style={{ marginBottom: 8 }}>
           <div>
             <p className="db-card-title">💰 Répartition du Budget Annuel & Comparaison Mensuelle</p>
             <p className="db-card-sub">Données depuis Gestion des Coûts</p>
@@ -558,10 +564,10 @@ useEffect(() => {
   }
 
   return (
-    <div className="db-cost-evo-card" style={{ animationDelay:"0.44s" }}>
+    <div className="db-cost-evo-card" style={{ animationDelay: "0.44s" }}>
 
       {/* ── Titre ── */}
-      <div className="db-card-header" style={{ marginBottom:16 }}>
+      <div className="db-card-header" style={{ marginBottom: 16 }}>
         <div>
           <p className="db-card-title">💰 Répartition du Budget Annuel & Comparaison Mensuelle</p>
           <p className="db-card-sub">% consommé par mois · évolution des coûts · hausse / baisse</p>
@@ -570,14 +576,14 @@ useEffect(() => {
       </div>
 
       {/* ── Mini KPIs ── */}
-      <div className="db-cost-evo-summary" style={{ marginBottom:18 }}>
+      <div className="db-cost-evo-summary" style={{ marginBottom: 18 }}>
         {[
-          { val: fmtMAD(totalCost),                          label:"Coût Total MAD",      delay:"0.46s" },
-          { val: fmtMAD(totalCost / (monthSummary.length||1)), label:"Moyenne / Mois MAD", delay:"0.52s" },
-          { val: fmtMAD(maxCost),                             label:"Pic Mensuel MAD",     delay:"0.58s" },
-          { val: (Math.max(...percents)).toFixed(1) + "%",   label:"% Max d'un mois",     delay:"0.64s" },
+          { val: fmtMAD(totalCost), label: "Coût Total MAD", delay: "0.46s" },
+          { val: fmtMAD(totalCost / (monthSummary.length || 1)), label: "Moyenne / Mois MAD", delay: "0.52s" },
+          { val: fmtMAD(maxCost), label: "Pic Mensuel MAD", delay: "0.58s" },
+          { val: (Math.max(...percents)).toFixed(1) + "%", label: "% Max d'un mois", delay: "0.64s" },
         ].map(({ val, label, delay }) => (
-          <div className="db-cost-evo-mini" key={label} style={{ animationDelay:delay }}>
+          <div className="db-cost-evo-mini" key={label} style={{ animationDelay: delay }}>
             <div className="db-cost-evo-mini-val">{val}</div>
             <div className="db-cost-evo-mini-label">{label}</div>
           </div>
@@ -586,9 +592,9 @@ useEffect(() => {
 
       {/* ── Bandeau comparaison dernier vs précédent ── */}
       {prev && last && (
-        <div className="db-cost-last-compare" style={{ marginBottom:20 }}>
+        <div className="db-cost-last-compare" style={{ marginBottom: 20 }}>
           <div className="db-cost-last-compare-icon">{trendIcon}</div>
-          <div style={{ flex:1 }}>
+          <div style={{ flex: 1 }}>
             <div className="db-cost-last-compare-label">{last.month} vs {prev.month}</div>
             <div className="db-cost-last-compare-val">{fmtMAD(last.total)} MAD</div>
             <div className={trendDiffClass}>
@@ -598,10 +604,10 @@ useEffect(() => {
             </div>
           </div>
           <div style={{
-            background: trendDir==="up"?"rgba(220,38,38,0.18)": trendDir==="down"?"rgba(22,163,74,0.18)":"rgba(107,114,128,0.15)",
-            color: trendDir==="up"?"#fde68a": trendDir==="down"?"#a7f3d0":"rgba(255,255,255,.7)",
-            borderRadius:20, padding:"6px 16px",
-            fontWeight:700, fontSize:13, whiteSpace:"nowrap",
+            background: trendDir === "up" ? "rgba(220,38,38,0.18)" : trendDir === "down" ? "rgba(22,163,74,0.18)" : "rgba(107,114,128,0.15)",
+            color: trendDir === "up" ? "#fde68a" : trendDir === "down" ? "#a7f3d0" : "rgba(255,255,255,.7)",
+            borderRadius: 20, padding: "6px 16px",
+            fontWeight: 700, fontSize: 13, whiteSpace: "nowrap",
           }}>
             {trendDir === "up" ? "⬆ Hausse" : trendDir === "down" ? "⬇ Baisse" : "— Stable"}
           </div>
@@ -609,56 +615,62 @@ useEffect(() => {
       )}
 
       {/* ── Graphique mixte Barres (%) + Ligne (MAD) ── */}
-      <div style={{ position:"relative", height:300, marginBottom:24 }}>
+      <div style={{ position: "relative", height: 300, marginBottom: 24 }}>
         <canvas ref={chartRef} />
       </div>
 
       {/* ── Barres visuelles horizontales avec % budget ── */}
-      <div style={{ marginBottom:22 }}>
-        <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
-          letterSpacing:".12em", color:"#9ca3af", marginBottom:10 }}>
+      <div style={{ marginBottom: 22 }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, textTransform: "uppercase",
+          letterSpacing: ".12em", color: "#9ca3af", marginBottom: 10
+        }}>
           Répartition visuelle du budget annuel
         </div>
         {monthSummary.map((ms, idx) => {
-          const pct     = totalCost > 0 ? (ms.total / totalCost) * 100 : 0;
-          const col     = pctColor(pct);
-          const prevMs  = idx > 0 ? monthSummary[idx - 1] : null;
-          const mDiff   = prevMs ? ms.total - prevMs.total : 0;
-          const mTrend  = prevMs ? (mDiff > 0 ? "up" : mDiff < 0 ? "down" : "same") : "ref";
-          const mIcon   = mTrend === "up" ? "▲" : mTrend === "down" ? "▼" : mTrend === "ref" ? "◎" : "—";
-          const mColor  = mTrend === "up" ? "#ef4444" : mTrend === "down" ? "#16a34a" : "#9ca3af";
+          const pct = totalCost > 0 ? (ms.total / totalCost) * 100 : 0;
+          const col = pctColor(pct);
+          const prevMs = idx > 0 ? monthSummary[idx - 1] : null;
+          const mDiff = prevMs ? ms.total - prevMs.total : 0;
+          const mTrend = prevMs ? (mDiff > 0 ? "up" : mDiff < 0 ? "down" : "same") : "ref";
+          const mIcon = mTrend === "up" ? "▲" : mTrend === "down" ? "▼" : mTrend === "ref" ? "◎" : "—";
+          const mColor = mTrend === "up" ? "#ef4444" : mTrend === "down" ? "#16a34a" : "#9ca3af";
 
           return (
             <div key={ms.month} className="db-cost-month-row"
-              style={{ animationDelay:`${0.48 + idx * 0.06}s`, marginBottom:6 }}>
+              style={{ animationDelay: `${0.48 + idx * 0.06}s`, marginBottom: 6 }}>
               {/* Mois */}
               <span className="db-cost-month-name">{ms.month}</span>
 
               {/* Barre % */}
-              <div style={{ flex:1, margin:"0 12px" }}>
-                <div style={{ display:"flex", justifyContent:"space-between",
-                  fontSize:10, color:"#9ca3af", marginBottom:3 }}>
+              <div style={{ flex: 1, margin: "0 12px" }}>
+                <div style={{
+                  display: "flex", justifyContent: "space-between",
+                  fontSize: 10, color: "#9ca3af", marginBottom: 3
+                }}>
                   <span>% Budget annuel</span>
-                  <span style={{ fontWeight:700, color: col.border }}>{pct.toFixed(1)}%</span>
+                  <span style={{ fontWeight: 700, color: col.border }}>{pct.toFixed(1)}%</span>
                 </div>
                 <div className="db-cost-bar-wrap">
                   <div className="db-cost-bar-fill"
-                    style={{ width:`${pct}%`,
-                      background:`linear-gradient(90deg,${col.border},${col.bg})`,
-                      animationDelay:`${0.5 + idx * 0.07}s` }}/>
+                    style={{
+                      width: `${pct}%`,
+                      background: `linear-gradient(90deg,${col.border},${col.bg})`,
+                      animationDelay: `${0.5 + idx * 0.07}s`
+                    }} />
                 </div>
               </div>
 
               {/* Valeur */}
-              <span className="db-cost-month-val" style={{ minWidth:130 }}>
+              <span className="db-cost-month-val" style={{ minWidth: 130 }}>
                 {fmtMAD(ms.total)} MAD
               </span>
 
               {/* Badge tendance vs mois précédent */}
               <span style={{
-                minWidth:90, textAlign:"right", fontWeight:700, fontSize:12, color:mColor,
-                animation:`db-trendPop .4s ${0.52 + idx * 0.06}s ease both`,
-                display:"inline-block",
+                minWidth: 90, textAlign: "right", fontWeight: 700, fontSize: 12, color: mColor,
+                animation: `db-trendPop .4s ${0.52 + idx * 0.06}s ease both`,
+                display: "inline-block",
               }}>
                 {mIcon} {prevMs
                   ? `${mDiff >= 0 ? "+" : ""}${fmtMAD(mDiff)}`
@@ -670,9 +682,11 @@ useEffect(() => {
       </div>
 
       {/* ── Tableau comparaison détaillé ── */}
-      <div style={{ marginBottom:6 }}>
-        <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase",
-          letterSpacing:".12em", color:"#9ca3af", marginBottom:10 }}>
+      <div style={{ marginBottom: 6 }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, textTransform: "uppercase",
+          letterSpacing: ".12em", color: "#9ca3af", marginBottom: 10
+        }}>
           Tableau comparatif mois par mois
         </div>
         <div className="db-table-wrap">
@@ -691,48 +705,52 @@ useEffect(() => {
             </thead>
             <tbody>
               {monthSummary.map((ms, idx) => {
-                const pct     = totalCost > 0 ? (ms.total / totalCost) * 100 : 0;
-                const col     = pctColor(pct);
-                const prevMs  = idx > 0 ? monthSummary[idx - 1] : null;
-                const mDiff   = prevMs ? ms.total - prevMs.total : null;
-                const mDiffPct= prevMs && prevMs.total > 0 ? (mDiff / prevMs.total) * 100 : null;
-                const mTrend  = mDiff === null ? "ref" : mDiff > 0 ? "up" : mDiff < 0 ? "down" : "same";
+                const pct = totalCost > 0 ? (ms.total / totalCost) * 100 : 0;
+                const col = pctColor(pct);
+                const prevMs = idx > 0 ? monthSummary[idx - 1] : null;
+                const mDiff = prevMs ? ms.total - prevMs.total : null;
+                const mDiffPct = prevMs && prevMs.total > 0 ? (mDiff / prevMs.total) * 100 : null;
+                const mTrend = mDiff === null ? "ref" : mDiff > 0 ? "up" : mDiff < 0 ? "down" : "same";
                 const arrowColor = mTrend === "up" ? "#ef4444" : mTrend === "down" ? "#16a34a" : "#9ca3af";
 
                 return (
-                  <tr key={ms.month} style={{ animationDelay:`${idx * 0.04}s` }}>
-                    <td style={{ fontWeight:700, color:"#14532d" }}>{ms.month}</td>
-                    <td style={{ fontWeight:700 }}>{fmtMAD(ms.total)} MAD</td>
+                  <tr key={ms.month} style={{ animationDelay: `${idx * 0.04}s` }}>
+                    <td style={{ fontWeight: 700, color: "#14532d" }}>{ms.month}</td>
+                    <td style={{ fontWeight: 700 }}>{fmtMAD(ms.total)} MAD</td>
                     <td>
-                      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                        <div style={{ width:60, height:7, background:"#f0fdf4",
-                          borderRadius:20, overflow:"hidden", flexShrink:0 }}>
-                          <div style={{ height:"100%", width:`${pct}%`,
-                            background:col.border, borderRadius:20,
-                            transition:"width .7s ease" }}/>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{
+                          width: 60, height: 7, background: "#f0fdf4",
+                          borderRadius: 20, overflow: "hidden", flexShrink: 0
+                        }}>
+                          <div style={{
+                            height: "100%", width: `${pct}%`,
+                            background: col.border, borderRadius: 20,
+                            transition: "width .7s ease"
+                          }} />
                         </div>
-                        <span style={{ fontWeight:700, color:col.border, fontSize:12 }}>
+                        <span style={{ fontWeight: 700, color: col.border, fontSize: 12 }}>
                           {pct.toFixed(1)}%
                         </span>
                       </div>
                     </td>
                     <td>{fmtMAD(ms.avgMeter)} MAD/m²</td>
-                    <td style={{ textAlign:"center" }}>{ms.count}</td>
-                    <td style={{ color: arrowColor, fontWeight:700 }}>
+                    <td style={{ textAlign: "center" }}>{ms.count}</td>
+                    <td style={{ color: arrowColor, fontWeight: 700 }}>
                       {mDiff !== null
                         ? `${mDiff >= 0 ? "+" : ""}${fmtMAD(mDiff)} MAD`
-                        : <span style={{ color:"#9ca3af", fontWeight:400 }}>—</span>}
+                        : <span style={{ color: "#9ca3af", fontWeight: 400 }}>—</span>}
                     </td>
-                    <td style={{ color: arrowColor, fontWeight:700 }}>
+                    <td style={{ color: arrowColor, fontWeight: 700 }}>
                       {mDiffPct !== null
                         ? `${mDiffPct >= 0 ? "+" : ""}${mDiffPct.toFixed(1)}%`
-                        : <span style={{ color:"#9ca3af", fontWeight:400 }}>Référence</span>}
+                        : <span style={{ color: "#9ca3af", fontWeight: 400 }}>Référence</span>}
                     </td>
                     <td>
-                      {mTrend === "up"   && <span style={{ background:"#fef2f2", color:"#dc2626", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>⬆ Hausse</span>}
-                      {mTrend === "down" && <span style={{ background:"#f0fdf4", color:"#16a34a", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>⬇ Baisse</span>}
-                      {mTrend === "same" && <span style={{ background:"#f3f4f6", color:"#6b7280", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>— Stable</span>}
-                      {mTrend === "ref"  && <span style={{ background:"#eff6ff", color:"#3b82f6", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>◎ Réf.</span>}
+                      {mTrend === "up" && <span style={{ background: "#fef2f2", color: "#dc2626", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>⬆ Hausse</span>}
+                      {mTrend === "down" && <span style={{ background: "#f0fdf4", color: "#16a34a", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>⬇ Baisse</span>}
+                      {mTrend === "same" && <span style={{ background: "#f3f4f6", color: "#6b7280", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>— Stable</span>}
+                      {mTrend === "ref" && <span style={{ background: "#eff6ff", color: "#3b82f6", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>◎ Réf.</span>}
                     </td>
                   </tr>
                 );
@@ -743,15 +761,17 @@ useEffect(() => {
       </div>
 
       {/* ── Légende couleurs ── */}
-      <div style={{ marginTop:14, display:"flex", flexWrap:"wrap", gap:10,
-        padding:"10px 14px", background:"#f8fffe",
-        borderRadius:10, border:"1px solid #e6faf0", fontSize:11, color:"#9ca3af" }}>
+      <div style={{
+        marginTop: 14, display: "flex", flexWrap: "wrap", gap: 10,
+        padding: "10px 14px", background: "#f8fffe",
+        borderRadius: 10, border: "1px solid #e6faf0", fontSize: 11, color: "#9ca3af"
+      }}>
         <span>🎨 Couleurs % budget :</span>
-        <span style={{ color:"#16a34a", fontWeight:700 }}>● vert ≤ 20%</span>
-        <span style={{ color:"#f59e0b", fontWeight:700 }}>● ambre 20–40%</span>
-        <span style={{ color:"#ef4444", fontWeight:700 }}>● rouge &gt; 40%</span>
-        <span style={{ marginLeft:"auto" }}>
-          💡 Données depuis <strong style={{ color:"#16a34a" }}>Gestion des Coûts</strong>
+        <span style={{ color: "#16a34a", fontWeight: 700 }}>● vert ≤ 20%</span>
+        <span style={{ color: "#f59e0b", fontWeight: 700 }}>● ambre 20–40%</span>
+        <span style={{ color: "#ef4444", fontWeight: 700 }}>● rouge &gt; 40%</span>
+        <span style={{ marginLeft: "auto" }}>
+          💡 Données depuis <strong style={{ color: "#16a34a" }}>Gestion des Coûts</strong>
         </span>
       </div>
 
@@ -761,11 +781,11 @@ useEffect(() => {
 
 // ─── Initial form state ───────────────────────────────────────────────────────
 const EMPTY_FORM = {
-  date:"", panneau:"", tranchee:"", niveau:"", volume_soté:"",
-  profendeur:"", equipements:[], conducteur:"", matricule:"",
-  heureDebut:"", heureFin:"", temps:"",
-  etatMachine:"En marche", typeArret:"",
-   htp: "",
+  date: "", panneau: "", tranchee: "", niveau: "", volume_soté: "",
+  profendeur: "", equipements: [], conducteur: "", matricule: "",
+  heureDebut: "", heureFin: "", temps: "",
+  etatMachine: "En marche", typeArret: "",
+  htp: "",
   heures_arret: "",
 };
 
@@ -781,25 +801,25 @@ function calcTemps(debut, fin) {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 function DashboardComplet() {
-  const dispatch  = useDispatch();
+  const dispatch = useDispatch();
   const poussages = useSelector((s) => s.poussage?.list || []);
-
+  const { isAdmin } = UseAuth();
   const location = useLocation();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const activeTab = location.pathname === "/statistique" ? "stats"
     : location.pathname === "/historique" ? "historique"
-    : location.pathname === "/couts"      ? "couts"
-    : "overview";
+      : location.pathname === "/couts" ? "couts"
+        : "overview";
 
-  const [showForm,  setShowForm]  = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  const [equipOpts, setEquipOpts] = useState(["T1","T2","T3","T4","T5","T6","T7"]);
-  const [formData,  setFormData]  = useState(EMPTY_FORM);
+  const [equipOpts, setEquipOpts] = useState(["T1", "T2", "T3", "T4", "T5", "T6", "T7"]);
+  const [formData, setFormData] = useState(EMPTY_FORM);
 
   const [annualCost, setAnnualCost] = useState(500000);
-  const [searchTerm,  setSearchTerm]  = useState("");
-  const [meterCost,  setMeterCost]  = useState(120);
-  const [costSaved,  setCostSaved]  = useState({ annualCost:500000, meterCost:120 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [meterCost, setMeterCost] = useState(120);
+  const [costSaved, setCostSaved] = useState({ annualCost: 500000, meterCost: 120 });
 
   // 🔍 AJOUT: Débogage pour voir les données
   useEffect(() => {
@@ -820,7 +840,7 @@ function DashboardComplet() {
     const updated = { ...formData, [name]: value };
     if (name === "heureDebut" || name === "heureFin") {
       const debut = name === "heureDebut" ? value : formData.heureDebut;
-      const fin   = name === "heureFin"   ? value : formData.heureFin;
+      const fin = name === "heureFin" ? value : formData.heureFin;
       updated.temps = calcTemps(debut, fin);
     }
     setFormData(updated);
@@ -834,11 +854,13 @@ function DashboardComplet() {
   });
 
   const addEquip = () => {
+    if (!isAdmin) return;
     const n = prompt("Nom du nouvel équipement");
     if (n && !equipOpts.includes(n)) setEquipOpts([...equipOpts, n]);
   };
 
   const handleSubmit = (e) => {
+    if (!isAdmin) return;
     e.preventDefault();
     if (editIndex !== null) {
       dispatch(updatePoussage({ index: editIndex, data: formData }));
@@ -851,6 +873,7 @@ function DashboardComplet() {
   };
 
   const handleEdit = (p, i) => {
+    if (!isAdmin) return;
     setFormData({ ...EMPTY_FORM, ...p, equipements: p.equipements || [] });
     setEditIndex(i);
     setShowForm(true);
@@ -859,6 +882,7 @@ function DashboardComplet() {
   };
 
   const handleDelete = (i) => {
+    if (!isAdmin) return;
     if (window.confirm("Supprimer ce poussage ?")) dispatch(deletePoussage(i));
   };
 
@@ -866,11 +890,11 @@ function DashboardComplet() {
     ? (formData.volume_soté / formData.temps).toFixed(2) : 0;
 
   // ── Stats ────────────────────────────────────────────────────────────────────
-  const totalOps    = poussages.length;
-  const totalTemps  = poussages.reduce((a, p) => a + Number(p.temps || 0), 0);
+  const totalOps = poussages.length;
+  const totalTemps = poussages.reduce((a, p) => a + Number(p.temps || 0), 0);
   const enMarcheCnt = poussages.filter(p => p.etatMachine === "En marche").length;
- const enArret = poussages.filter(p => p.etatMachine === "En arrêt").length;
-  
+  const enArret = poussages.filter(p => p.etatMachine === "En arrêt").length;
+
   // ✅ CORRECTION: Calcul du volume total avec gestion des valeurs nulles
   const totalVolume = poussages.reduce((a, p) => {
     // Convertir en nombre et s'assurer que c'est un nombre valide
@@ -886,9 +910,9 @@ function DashboardComplet() {
 
   const rendMoyen = totalOps > 0
     ? (poussages.reduce((a, p) => {
-        const v = Number(p.volume_soté || 0), t = Number(p.temps || 0);
-        return a + (t > 0 ? v / t : 0);
-      }, 0) / totalOps).toFixed(2)
+      const v = Number(p.volume_soté || 0), t = Number(p.temps || 0);
+      return a + (t > 0 ? v / t : 0);
+    }, 0) / totalOps).toFixed(2)
     : 0;
 
   // Engins
@@ -896,7 +920,7 @@ function DashboardComplet() {
   poussages.forEach(p => (p.equipements || []).forEach(eq => {
     enginStats[eq] = (enginStats[eq] || 0) + Number(p.volume_soté || 0);
   }));
-  const enginLabels  = Object.keys(enginStats);
+  const enginLabels = Object.keys(enginStats);
   const enginVolumes = Object.values(enginStats);
 
   const enginBarData = {
@@ -909,16 +933,18 @@ function DashboardComplet() {
         const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
         g.addColorStop(0, "#16a34a"); g.addColorStop(1, "#4ade80"); return g;
       },
-      borderRadius: { topLeft:8, topRight:8 }, borderSkipped: false,
+      borderRadius: { topLeft: 8, topRight: 8 }, borderSkipped: false,
       barPercentage: 0.6, categoryPercentage: 0.7,
     }],
   };
 
   const enginDoughnutData = {
     labels: enginLabels,
-    datasets: [{ data: enginVolumes,
-      backgroundColor: ["#f10f0f","#131fce","#f1b50e","#86efac","#15803d"],
-      borderWidth: 0, hoverOffset: 10 }],
+    datasets: [{
+      data: enginVolumes,
+      backgroundColor: ["#f10f0f", "#131fce", "#f1b50e", "#86efac", "#15803d"],
+      borderWidth: 0, hoverOffset: 10
+    }],
   };
 
   // Tranchées
@@ -928,7 +954,7 @@ function DashboardComplet() {
     if (!trancheeGroups[t]) trancheeGroups[t] = [];
     trancheeGroups[t].push(p);
   });
-  const trancheeKeys    = Object.keys(trancheeGroups);
+  const trancheeKeys = Object.keys(trancheeGroups);
   const trancheeVolumes = trancheeKeys.map(t =>
     trancheeGroups[t].reduce((s, op) => s + Number(op.volume_soté || 0), 0)
   );
@@ -942,7 +968,7 @@ function DashboardComplet() {
         const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
         g.addColorStop(0, "#22c55e"); g.addColorStop(1, "#86efac"); return g;
       },
-      borderRadius: { topLeft:8, topRight:8 }, borderSkipped: false,
+      borderRadius: { topLeft: 8, topRight: 8 }, borderSkipped: false,
       barPercentage: 0.55, categoryPercentage: 0.7,
     }],
   };
@@ -951,25 +977,25 @@ function DashboardComplet() {
 
   const filteredOps = searchTerm.trim()
     ? poussages.filter(p => {
-        const q = searchTerm.toLowerCase();
-        return (
-          (p.date        || "").toLowerCase().includes(q) ||
-          (p.panneau     || "").toLowerCase().includes(q) ||
-          (p.tranchee    || "").toLowerCase().includes(q) ||
-          (p.conducteur  || "").toLowerCase().includes(q) ||
-          (p.matricule   || "").toLowerCase().includes(q) ||
-          (p.etatMachine || "").toLowerCase().includes(q) ||
-          (p.typeArret   || "").toLowerCase().includes(q) ||
-          (p.equipements || []).join(" ").toLowerCase().includes(q)
-        );
-      })
+      const q = searchTerm.toLowerCase();
+      return (
+        (p.date || "").toLowerCase().includes(q) ||
+        (p.panneau || "").toLowerCase().includes(q) ||
+        (p.tranchee || "").toLowerCase().includes(q) ||
+        (p.conducteur || "").toLowerCase().includes(q) ||
+        (p.matricule || "").toLowerCase().includes(q) ||
+        (p.etatMachine || "").toLowerCase().includes(q) ||
+        (p.typeArret || "").toLowerCase().includes(q) ||
+        (p.equipements || []).join(" ").toLowerCase().includes(q)
+      );
+    })
     : poussages;
 
   // ── Helper : plage horaire totale (heureDebut → heureFin) ────────────────────
   // Utilisé comme base HTP quand htp n'est pas saisi (= 0)
   function calcPlage(p) {
     const debut = (p.heureDebut || "").substring(0, 5); // "HH:MM"
-    const fin   = (p.heureFin   || "").substring(0, 5);
+    const fin = (p.heureFin || "").substring(0, 5);
     if (!debut || !fin) return 0;
     const [dh, dm] = debut.split(":").map(Number);
     const [fh, fm] = fin.split(":").map(Number);
@@ -998,13 +1024,13 @@ function DashboardComplet() {
   // OEE / TU / TD par date pour graphes
   const oeeByDate = {};
   poussages.forEach(p => {
-    const d      = p.date || "N/A";
+    const d = p.date || "N/A";
     const htpRaw = Number(p.htp || 0);
-    const htp    = htpRaw > 0 ? htpRaw : calcPlage(p); // fallback plage
-    const tm     = Number(p.temps || 0);
-    const ha     = Number(p.heures_arret || 0);
+    const htp = htpRaw > 0 ? htpRaw : calcPlage(p); // fallback plage
+    const tm = Number(p.temps || 0);
+    const ha = Number(p.heures_arret || 0);
     if (!oeeByDate[d]) oeeByDate[d] = { htp: 0, temps: 0, arret: 0 };
-    oeeByDate[d].htp   += htp;
+    oeeByDate[d].htp += htp;
     oeeByDate[d].temps += tm;
     oeeByDate[d].arret += ha;
   });
@@ -1027,11 +1053,11 @@ function DashboardComplet() {
   const exportExcel = () => {
     const data = poussages.map(p => {
       const htpRaw = Number(p.htp || 0);
-      const htp  = htpRaw > 0 ? htpRaw : calcPlage(p);
-      const tm   = Number(p.temps || 0);
-      const ha   = Number(p.heures_arret || 0);
-      const tuV  = htp > 0 ? parseFloat(((tm / htp) * 100).toFixed(1)) : 0;
-      const tdV  = htp > 0 ? parseFloat(((ha / htp) * 100).toFixed(1)) : 0;
+      const htp = htpRaw > 0 ? htpRaw : calcPlage(p);
+      const tm = Number(p.temps || 0);
+      const ha = Number(p.heures_arret || 0);
+      const tuV = htp > 0 ? parseFloat(((tm / htp) * 100).toFixed(1)) : 0;
+      const tdV = htp > 0 ? parseFloat(((ha / htp) * 100).toFixed(1)) : 0;
       const oeeV = htp > 0 ? parseFloat((tuV * (1 - tdV / 100)).toFixed(1)) : 0;
       return {
         Date: p.date, Panneau: p.panneau, Tranchée: p.tranchee,
@@ -1048,14 +1074,15 @@ function DashboardComplet() {
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Historique");
-    saveAs(new Blob([XLSX.write(wb, { bookType:"xlsx", type:"array" })], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+    saveAs(new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    }),
       "historique_poussage.xlsx");
   };
 
   const anim = (delay) => ({
     style: { animationDelay: delay },
-    ref:   (el) => { if (el) el.style.animationDelay = delay; },
+    ref: (el) => { if (el) el.style.animationDelay = delay; },
   });
 
   const FullTable = ({ data, showActions = false }) => (
@@ -1068,21 +1095,21 @@ function DashboardComplet() {
             <th>Conducteur</th><th>Matricule</th><th>HTP</th><th>Heures</th>
             <th>H. Arrêt</th><th>OEE</th><th>TU</th><th>TD</th>
             <th>Rendement</th><th>État</th><th>Arrêt</th>
-            {showActions && <th>Actions</th>}
+            {isAdmin && showActions && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {data.map((p, i) => {
             const htpRaw = Number(p.htp || 0);
             const htp = htpRaw > 0 ? htpRaw : calcPlage(p);
-            const tm  = Number(p.temps || 0);
-            const ha  = Number(p.heures_arret || 0);
-            const tuV  = htp > 0 ? parseFloat(((tm / htp) * 100).toFixed(1)) : 0;
-            const tdV  = htp > 0 ? parseFloat(((ha / htp) * 100).toFixed(1)) : 0;
+            const tm = Number(p.temps || 0);
+            const ha = Number(p.heures_arret || 0);
+            const tuV = htp > 0 ? parseFloat(((tm / htp) * 100).toFixed(1)) : 0;
+            const tdV = htp > 0 ? parseFloat(((ha / htp) * 100).toFixed(1)) : 0;
             const oeeV = htp > 0 ? parseFloat((tuV * (1 - tdV / 100)).toFixed(1)) : 0;
             const oee = htp > 0 ? oeeV + "%" : "—";
-            const tu  = htp > 0 ? tuV  + "%" : "—";
-            const td  = htp > 0 ? tdV  + "%" : "—";
+            const tu = htp > 0 ? tuV + "%" : "—";
+            const td = htp > 0 ? tdV + "%" : "—";
             return (
               <tr key={i} style={{ animationDelay: `${i * 0.04}s` }}>
                 <td>{p.date}</td>
@@ -1090,32 +1117,37 @@ function DashboardComplet() {
                 <td>{p.tranchee}</td>
                 <td>{p.profendeur}</td>
                 <td><strong>{Number(p.volume_soté).toLocaleString()}</strong></td>
-                <td style={{ maxWidth:130, overflow:"hidden", textOverflow:"ellipsis" }}>
+                <td style={{ maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis" }}>
                   {p.equipements?.join(", ")}
                 </td>
                 <td>{p.conducteur}</td>
                 <td>{p.matricule}</td>
-                <td style={{ fontWeight:600, color:"#15803d" }}>{htpRaw > 0 ? htpRaw : <span style={{color:"#9ca3af",fontSize:11}}>auto {htp}h</span>}</td>
+                <td style={{ fontWeight: 600, color: "#15803d" }}>{htpRaw > 0 ? htpRaw : <span style={{ color: "#9ca3af", fontSize: 11 }}>auto {htp}h</span>}</td>
                 <td>{p.temps} h</td>
                 <td style={{ color: ha > 0 ? "#dc2626" : "#9ca3af", fontWeight: ha > 0 ? 700 : 400 }}>{ha > 0 ? ha + " h" : "—"}</td>
-                <td><span style={{ background:"#eff6ff", color:"#2563eb", padding:"2px 8px", borderRadius:20, fontSize:11, fontWeight:700 }}>{oee}</span></td>
-                <td><span style={{ background:"#dcfce7", color:"#15803d", padding:"2px 8px", borderRadius:20, fontSize:11, fontWeight:700 }}>{tu}</span></td>
-                <td><span style={{ background: ha > 0 ? "#fef3c7" : "#f3f4f6", color: ha > 0 ? "#92400e" : "#9ca3af", padding:"2px 8px", borderRadius:20, fontSize:11, fontWeight:700 }}>{td}</span></td>
+                <td><span style={{ background: "#eff6ff", color: "#2563eb", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{oee}</span></td>
+                <td><span style={{ background: "#dcfce7", color: "#15803d", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{tu}</span></td>
+                <td><span style={{ background: ha > 0 ? "#fef3c7" : "#f3f4f6", color: ha > 0 ? "#92400e" : "#9ca3af", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{td}</span></td>
                 <td>{p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : 0} t/h</td>
                 <td>
                   <span className={p.etatMachine === "En marche" ? "badge-marche" : "badge-arret"}>
                     {p.etatMachine}
                   </span>
                 </td>
-                <td style={{ color:"#9ca3af", fontSize:12 }}>{p.typeArret || "—"}</td>
-                {showActions && (
+                <td style={{ color: "#9ca3af", fontSize: 12 }}>{p.typeArret || "—"}</td>
+                {isAdmin && showActions && (
                   <td>
-                    <button className="db-btn-edit"
-                      onClick={() => handleEdit(p, poussages.indexOf(p))}>
+                    <button
+                      className="db-btn-edit"
+                      onClick={() => handleEdit(p, poussages.indexOf(p))}
+                    >
                       ✏️ Modifier
                     </button>
-                    <button className="db-btn-del"
-                      onClick={() => handleDelete(poussages.indexOf(p))}>
+
+                    <button
+                      className="db-btn-del"
+                      onClick={() => handleDelete(poussages.indexOf(p))}
+                    >
                       🗑️ Supprimer
                     </button>
                   </td>
@@ -1133,29 +1165,33 @@ function DashboardComplet() {
     <>
       <style>{CSS}</style>
       <div className="db-page" style={{
-        minHeight:"100vh", background:PALETTE.bg,
-        padding:"28px 24px 60px", color:PALETTE.text,
+        minHeight: "100vh", background: PALETTE.bg,
+        padding: "28px 24px 60px", color: PALETTE.text,
       }}>
 
         {/* ── HEADER ─────────────────────────────────────────────────────────── */}
         <div className="db-card" style={{
-          marginBottom:24, padding:"18px 24px",
-          display:"flex", alignItems:"center", justifyContent:"space-between",
+          marginBottom: 24, padding: "18px 24px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
           ...anim("0s").style,
         }}>
           <div>
-            <div style={{ fontSize:10, fontWeight:700, letterSpacing:".16em",
-              textTransform:"uppercase", color:PALETTE.muted, marginBottom:4 }}>
-             Statistique
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: ".16em",
+              textTransform: "uppercase", color: PALETTE.muted, marginBottom: 4
+            }}>
+              Statistique
             </div>
-            <h1 style={{ margin:0, fontSize:24, fontWeight:800,
-              background:"linear-gradient(135deg,#15803d,#22c55e)",
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-              Gestion Décapage <span style={{ WebkitTextFillColor:"#16a34a" }}>ZD11</span>
+            <h1 style={{
+              margin: 0, fontSize: 24, fontWeight: 800,
+              background: "linear-gradient(135deg,#15803d,#22c55e)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
+            }}>
+              Gestion Décapage <span style={{ WebkitTextFillColor: "#16a34a" }}>ZD11</span>
             </h1>
           </div>
           <img src={image} alt="logo" style={{
-            height:46, borderRadius:10, boxShadow:"0 4px 14px rgba(22,163,74,0.2)",
+            height: 46, borderRadius: 10, boxShadow: "0 4px 14px rgba(22,163,74,0.2)",
           }} />
         </div>
 
@@ -1165,25 +1201,25 @@ function DashboardComplet() {
         {activeTab === "overview" && (
           <>
             {/* KPI Cards */}
-            <div className="db-grid3" style={{ marginBottom:24 }}>
+            <div className="db-grid3" style={{ marginBottom: 24 }}>
               {[
-                { icon:"⛏️", label:"Volume Total",    value:totalVolume,           unit:"t",   accent:"#16a34a", delay:"0.08s" },
-                { icon:"⏱️", label:"Temps Total",     value:totalTemps,            unit:"h",   accent:"#15803d", delay:"0.16s" },
-                { icon:"📈", label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", delay:"0.24s" },
-                { icon:"🔢", label:"En arret",      value:enArret,              unit:"op",  accent:"#4ade80", delay:"0.32s" },
-                { icon:"✅", label:"En Marche",       value:enMarcheCnt,           unit:"",    accent:"#86efac", delay:"0.40s" },
-                { icon:"⚙️", label:"OEE",              value: parseFloat(avgOEE), unit:"%", accent:"#3b82f6", delay:"0.48s" },
-                { icon:"📊", label:"TU",               value: parseFloat(avgTU),  unit:"%", accent:"#16a34a", delay:"0.56s" },
-                { icon:"⏸️", label:"TD Arrêt",         value: parseFloat(avgTD),  unit:"%", accent:"#f59e0b", delay:"0.64s" },
-                { icon:"🛑", label:"H. Arrêt Total",   value: Math.round(totalHeuresArret * 10) / 10,   unit:"h", accent:"#ef4444", delay:"0.72s" },
+                { icon: "⛏️", label: "Volume Total", value: totalVolume, unit: "t", accent: "#16a34a", delay: "0.08s" },
+                { icon: "⏱️", label: "Temps Total", value: totalTemps, unit: "h", accent: "#15803d", delay: "0.16s" },
+                { icon: "📈", label: "Rendement Moyen", value: parseFloat(rendMoyen), unit: "t/h", accent: "#22c55e", delay: "0.24s" },
+                { icon: "🔢", label: "En arret", value: enArret, unit: "op", accent: "#4ade80", delay: "0.32s" },
+                { icon: "✅", label: "En Marche", value: enMarcheCnt, unit: "", accent: "#86efac", delay: "0.40s" },
+                { icon: "⚙️", label: "OEE", value: parseFloat(avgOEE), unit: "%", accent: "#3b82f6", delay: "0.48s" },
+                { icon: "📊", label: "TU", value: parseFloat(avgTU), unit: "%", accent: "#16a34a", delay: "0.56s" },
+                { icon: "⏸️", label: "TD Arrêt", value: parseFloat(avgTD), unit: "%", accent: "#f59e0b", delay: "0.64s" },
+                { icon: "🛑", label: "H. Arrêt Total", value: Math.round(totalHeuresArret * 10) / 10, unit: "h", accent: "#ef4444", delay: "0.72s" },
               ].map(({ icon, label, value, unit, accent, delay }) => (
-                <div key={label} className="db-kpi" style={{ animationDelay:delay }}>
-                  <div className="db-kpi-shimmer"/>
+                <div key={label} className="db-kpi" style={{ animationDelay: delay }}>
+                  <div className="db-kpi-shimmer" />
                   <div className="db-kpi-icon">{icon}</div>
                   <div className="db-kpi-label">{label}</div>
-                  <div className="db-kpi-value" style={{ color:accent}}>
+                  <div className="db-kpi-value" style={{ color: accent }}>
                     {/* ✅ CORRECTION: S'assurer que value est un nombre valide */}
-                    <AnimCount target={isNaN(value) ? 0 : value}/>
+                    <AnimCount target={isNaN(value) ? 0 : value} />
                     <span className="db-kpi-unit">{unit}</span>
                   </div>
                 </div>
@@ -1191,7 +1227,7 @@ function DashboardComplet() {
             </div>
 
             {/* Charts */}
-            <div className="db-grid2" style={{ marginBottom:20 }}>
+            <div className="db-grid2" style={{ marginBottom: 20 }}>
               <div className="db-card" {...anim("0.18s")}>
                 <div className="db-card-header">
                   <div>
@@ -1203,7 +1239,7 @@ function DashboardComplet() {
                   )}
                 </div>
                 {enginLabels.length > 0
-                  ? <Bar data={enginBarData} options={makeBarOpts(300)}/>
+                  ? <Bar data={enginBarData} options={makeBarOpts(300)} />
                   : <div className="db-empty">Aucune donnée</div>}
               </div>
               <div className="db-card" {...anim("0.28s")}>
@@ -1214,23 +1250,23 @@ function DashboardComplet() {
                   </div>
                 </div>
                 {enginLabels.length > 0
-                  ? <div style={{ maxWidth:280, margin:"0 auto" }}>
-                      <Doughnut data={enginDoughnutData} options={doughnutOpts}/>
-                    </div>
+                  ? <div style={{ maxWidth: 280, margin: "0 auto" }}>
+                    <Doughnut data={enginDoughnutData} options={doughnutOpts} />
+                  </div>
                   : <div className="db-empty">Aucune donnée</div>}
               </div>
             </div>
 
             {trancheeKeys.length > 0 && (
-              <div className="db-card" {...anim("0.36s")} style={{ marginBottom:20 }}>
+              <div className="db-card" {...anim("0.36s")} style={{ marginBottom: 20 }}>
                 <p className="db-card-title">Volume Total par Tranchée</p>
                 <p className="db-card-sub">Comparaison globale des volumes soutirés</p>
-                <Bar data={trancheeBarData} options={makeBarOpts(200)}/>
+                <Bar data={trancheeBarData} options={makeBarOpts(200)} />
               </div>
             )}
 
             <div className="db-section">Toutes les Opérations</div>
-            <div className="db-card" {...anim("0.38s")} style={{ marginBottom:20 }}>
+            <div className="db-card" {...anim("0.38s")} style={{ marginBottom: 20 }}>
               <div className="db-ops-header">
                 <div>
                   <p className="db-card-title">Tableau des Opérations</p>
@@ -1239,7 +1275,7 @@ function DashboardComplet() {
                     {searchTerm && ` trouvée${filteredOps.length !== 1 ? "s" : ""} sur ${poussages.length}`}
                   </p>
                 </div>
-                <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap" }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                   <input
                     type="text"
                     className="db-search-input"
@@ -1265,12 +1301,12 @@ function DashboardComplet() {
             <div className="db-section">Performance OEE · TU · TD</div>
 
             {/* KPI Cards OEE */}
-            <div className="db-oee-grid" style={{ marginBottom:20 }}>
+            <div className="db-oee-grid" style={{ marginBottom: 20 }}>
               {[
-                { cls:"oee",   icon:"⚙️", label:"OEE — Efficacité Globale",   value: avgOEE, unit:"%", gauge: parseFloat(avgOEE), delay:"0.08s" },
-                { cls:"tu",    icon:"✅", label:"TU — Taux d'Utilisation",     value: avgTU,  unit:"%", gauge: parseFloat(avgTU),  delay:"0.16s" },
-                { cls:"td",    icon:"⚠️", label:"TD — Taux de Disponibilité",  value: (100 - parseFloat(avgTD)).toFixed(1), unit:"%", gauge: 100 - parseFloat(avgTD), delay:"0.24s" },
-                { cls:"arret", icon:"🛑", label:"Heures d'Arrêt Total",        value: totalHeuresArret.toFixed(1), unit:"h", gauge: totalHTP > 0 ? Math.min((totalHeuresArret / totalHTP) * 100, 100) : 0, delay:"0.32s" },
+                { cls: "oee", icon: "⚙️", label: "OEE — Efficacité Globale", value: avgOEE, unit: "%", gauge: parseFloat(avgOEE), delay: "0.08s" },
+                { cls: "tu", icon: "✅", label: "TU — Taux d'Utilisation", value: avgTU, unit: "%", gauge: parseFloat(avgTU), delay: "0.16s" },
+                { cls: "td", icon: "⚠️", label: "TD — Taux de Disponibilité", value: (100 - parseFloat(avgTD)).toFixed(1), unit: "%", gauge: 100 - parseFloat(avgTD), delay: "0.24s" },
+                { cls: "arret", icon: "🛑", label: "Heures d'Arrêt Total", value: totalHeuresArret.toFixed(1), unit: "h", gauge: totalHTP > 0 ? Math.min((totalHeuresArret / totalHTP) * 100, 100) : 0, delay: "0.32s" },
               ].map(({ cls, icon, label, value, unit, gauge, delay }) => (
                 <div key={label} className={`db-oee-card ${cls}`} style={{ animationDelay: delay }}>
                   <div className={`db-oee-icon ${cls}`}>{icon}</div>
@@ -1279,7 +1315,7 @@ function DashboardComplet() {
                     {value}<span className="db-oee-unit">{unit}</span>
                   </div>
                   <div className="db-oee-gauge-wrap">
-                    <div className={`db-oee-gauge-bar ${cls}`} style={{ width:`${Math.min(gauge, 100)}%` }}/>
+                    <div className={`db-oee-gauge-bar ${cls}`} style={{ width: `${Math.min(gauge, 100)}%` }} />
                   </div>
                 </div>
               ))}
@@ -1289,7 +1325,7 @@ function DashboardComplet() {
             {oeeDates.length > 0 && (
               <>
                 {/* Graphe OEE + TU + TD — Line chart */}
-                <div className="db-card" {...anim("0.36s")} style={{ marginBottom:20 }}>
+                <div className="db-card" {...anim("0.36s")} style={{ marginBottom: 20 }}>
                   <div className="db-card-header">
                     <div>
                       <p className="db-card-title">Évolution OEE · TU · TD par Date</p>
@@ -1405,7 +1441,7 @@ function DashboardComplet() {
                         <p className="db-card-title">Heures d'Arrêt par Date</p>
                         <p className="db-card-sub">Durée cumulée des arrêts journaliers</p>
                       </div>
-                      <span className="db-pill" style={{ background:"#fef2f2", color:"#dc2626" }}>
+                      <span className="db-pill" style={{ background: "#fef2f2", color: "#dc2626" }}>
                         {totalHeuresArret.toFixed(1)} h total
                       </span>
                     </div>
@@ -1455,21 +1491,21 @@ function DashboardComplet() {
                     <span className="db-pill">{totalHTP} h HTP total</span>
                   </div>
                   {totalHTP > 0 ? (() => {
-                    const marche  = Math.max(0, totalTemps);
-                    const arret   = Math.max(0, totalHeuresArret);
+                    const marche = Math.max(0, totalTemps);
+                    const arret = Math.max(0, totalHeuresArret);
                     const inactif = Math.max(0, totalHTP - marche - arret);
                     const dData = {
                       labels: ["En Marche", "En Arrêt", "Inactif"],
                       datasets: [{
                         data: [marche.toFixed(1), arret.toFixed(1), inactif.toFixed(1)],
                         backgroundColor: ["#16a34a", "#f59e0b", "#e5e7eb"],
-                        borderColor:     ["#15803d", "#d97706", "#d1d5db"],
+                        borderColor: ["#15803d", "#d97706", "#d1d5db"],
                         borderWidth: 2, hoverOffset: 12,
                       }],
                     };
                     return (
-                      <div style={{ display:"flex", alignItems:"center", gap:24, flexWrap:"wrap" }}>
-                        <div style={{ maxWidth:260, flex:"0 0 260px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+                        <div style={{ maxWidth: 260, flex: "0 0 260px" }}>
                           <Doughnut data={dData} options={{
                             responsive: true, cutout: "65%",
                             animation: { duration: 1200, easing: "easeOutBack" },
@@ -1479,16 +1515,16 @@ function DashboardComplet() {
                             },
                           }} />
                         </div>
-                        <div style={{ flex:1, display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:12 }}>
+                        <div style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 12 }}>
                           {[
-                            { label:"En Marche", val:`${marche.toFixed(1)} h`, pct:`${totalHTP > 0 ? ((marche/totalHTP)*100).toFixed(1) : 0}%`, bg:"#dcfce7", color:"#15803d", border:"#bbf7d0" },
-                            { label:"En Arrêt",  val:`${arret.toFixed(1)} h`,  pct:`${totalHTP > 0 ? ((arret/totalHTP)*100).toFixed(1) : 0}%`,  bg:"#fef3c7", color:"#92400e", border:"#fde68a" },
-                            { label:"Inactif",   val:`${inactif.toFixed(1)} h`,pct:`${totalHTP > 0 ? ((inactif/totalHTP)*100).toFixed(1) : 0}%`,bg:"#f3f4f6", color:"#6b7280", border:"#e5e7eb" },
+                            { label: "En Marche", val: `${marche.toFixed(1)} h`, pct: `${totalHTP > 0 ? ((marche / totalHTP) * 100).toFixed(1) : 0}%`, bg: "#dcfce7", color: "#15803d", border: "#bbf7d0" },
+                            { label: "En Arrêt", val: `${arret.toFixed(1)} h`, pct: `${totalHTP > 0 ? ((arret / totalHTP) * 100).toFixed(1) : 0}%`, bg: "#fef3c7", color: "#92400e", border: "#fde68a" },
+                            { label: "Inactif", val: `${inactif.toFixed(1)} h`, pct: `${totalHTP > 0 ? ((inactif / totalHTP) * 100).toFixed(1) : 0}%`, bg: "#f3f4f6", color: "#6b7280", border: "#e5e7eb" },
                           ].map(({ label, val, pct, bg, color, border }) => (
-                            <div key={label} style={{ background:bg, border:`1.5px solid ${border}`, borderRadius:12, padding:"14px 16px", textAlign:"center" }}>
-                              <div style={{ fontSize:22, fontWeight:800, color, lineHeight:1 }}>{pct}</div>
-                              <div style={{ fontSize:13, fontWeight:700, color, marginTop:4 }}>{val}</div>
-                              <div style={{ fontSize:10, fontWeight:600, color, opacity:.7, marginTop:2, textTransform:"uppercase", letterSpacing:".06em" }}>{label}</div>
+                            <div key={label} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
+                              <div style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{pct}</div>
+                              <div style={{ fontSize: 13, fontWeight: 700, color, marginTop: 4 }}>{val}</div>
+                              <div style={{ fontSize: 10, fontWeight: 600, color, opacity: .7, marginTop: 2, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
                             </div>
                           ))}
                         </div>
@@ -1500,7 +1536,7 @@ function DashboardComplet() {
             )}
 
             <div className="db-section">État de la Machine</div>
-            <div className="db-grid2" style={{ marginBottom:20 }}>
+            <div className="db-grid2" style={{ marginBottom: 20 }}>
 
               {/* Doughnut */}
               <div className="db-card" {...anim("0.42s")}>
@@ -1513,51 +1549,63 @@ function DashboardComplet() {
                 </div>
                 {poussages.length > 0 ? (() => {
                   const nbMarche = poussages.filter(p => p.etatMachine === "En marche").length;
-                  const nbArret  = poussages.filter(p => p.etatMachine === "En arrêt").length;
+                  const nbArret = poussages.filter(p => p.etatMachine === "En arrêt").length;
                   const pctMarche = ((nbMarche / poussages.length) * 100).toFixed(1);
                   const doughnutEtatData = {
                     labels: ["En marche", "En arrêt"],
                     datasets: [{
                       data: [nbMarche, nbArret],
                       backgroundColor: ["#16a34a", "#f59e0b"],
-                      borderColor:     ["#15803d", "#d97706"],
+                      borderColor: ["#15803d", "#d97706"],
                       borderWidth: 2, hoverOffset: 12,
                     }],
                   };
                   const doughnutEtatOpts = {
                     responsive: true, cutout: "65%",
-                    animation: { duration:1200, easing:"easeOutBack" },
+                    animation: { duration: 1200, easing: "easeOutBack" },
                     plugins: {
-                      legend: { position:"bottom",
-                        labels:{ color:"#6b7280", font:{ family:"'Plus Jakarta Sans',sans-serif", size:12 },
-                          padding:16, usePointStyle:true, pointStyleWidth:8 } },
-                      tooltip: { backgroundColor:"#fff", borderColor:"#bbf7d0", borderWidth:1.5,
-                        titleColor:"#14532d", bodyColor:"#6b7280", padding:12, cornerRadius:10,
-                        callbacks:{ label:(c) => ` ${c.label} : ${c.parsed} op. (${((c.parsed/poussages.length)*100).toFixed(1)}%)` } },
+                      legend: {
+                        position: "bottom",
+                        labels: {
+                          color: "#6b7280", font: { family: "'Plus Jakarta Sans',sans-serif", size: 12 },
+                          padding: 16, usePointStyle: true, pointStyleWidth: 8
+                        }
+                      },
+                      tooltip: {
+                        backgroundColor: "#fff", borderColor: "#bbf7d0", borderWidth: 1.5,
+                        titleColor: "#14532d", bodyColor: "#6b7280", padding: 12, cornerRadius: 10,
+                        callbacks: { label: (c) => ` ${c.label} : ${c.parsed} op. (${((c.parsed / poussages.length) * 100).toFixed(1)}%)` }
+                      },
                     },
                   };
                   return (
                     <>
-                      <div style={{ position:"relative" }}>
-                        <div style={{ maxWidth:280, margin:"0 auto" }}>
+                      <div style={{ position: "relative" }}>
+                        <div style={{ maxWidth: 280, margin: "0 auto" }}>
                           <Doughnut data={doughnutEtatData} options={doughnutEtatOpts} />
                         </div>
-                        <div style={{ position:"absolute", top:"42%", left:"50%",
-                          transform:"translate(-50%,-50%)", textAlign:"center", pointerEvents:"none" }}>
-                          <div style={{ fontSize:24, fontWeight:800, color:"#15803d", lineHeight:1 }}>{pctMarche}%</div>
-                          <div style={{ fontSize:10, fontWeight:700, color:"#9ca3af",
-                            textTransform:"uppercase", letterSpacing:".08em" }}>en marche</div>
+                        <div style={{
+                          position: "absolute", top: "42%", left: "50%",
+                          transform: "translate(-50%,-50%)", textAlign: "center", pointerEvents: "none"
+                        }}>
+                          <div style={{ fontSize: 24, fontWeight: 800, color: "#15803d", lineHeight: 1 }}>{pctMarche}%</div>
+                          <div style={{
+                            fontSize: 10, fontWeight: 700, color: "#9ca3af",
+                            textTransform: "uppercase", letterSpacing: ".08em"
+                          }}>en marche</div>
                         </div>
                       </div>
-                      <div style={{ display:"flex", gap:12, marginTop:18 }}>
+                      <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
                         {[
-                          { label:"En marche", count:nbMarche, bg:"#dcfce7", color:"#15803d", border:"#bbf7d0" },
-                          { label:"En arrêt",  count:nbArret,  bg:"#fef3c7", color:"#92400e", border:"#fde68a" },
+                          { label: "En marche", count: nbMarche, bg: "#dcfce7", color: "#15803d", border: "#bbf7d0" },
+                          { label: "En arrêt", count: nbArret, bg: "#fef3c7", color: "#92400e", border: "#fde68a" },
                         ].map(({ label, count, bg, color, border }) => (
-                          <div key={label} style={{ background:bg, border:`1.5px solid ${border}`,
-                            borderRadius:12, padding:"10px 0", textAlign:"center", flex:1 }}>
-                            <div style={{ fontSize:26, fontWeight:800, color, lineHeight:1 }}>{count}</div>
-                            <div style={{ fontSize:11, fontWeight:600, color, marginTop:4, opacity:.8 }}>{label}</div>
+                          <div key={label} style={{
+                            background: bg, border: `1.5px solid ${border}`,
+                            borderRadius: 12, padding: "10px 0", textAlign: "center", flex: 1
+                          }}>
+                            <div style={{ fontSize: 26, fontWeight: 800, color, lineHeight: 1 }}>{count}</div>
+                            <div style={{ fontSize: 11, fontWeight: 600, color, marginTop: 4, opacity: .8 }}>{label}</div>
                           </div>
                         ))}
                       </div>
@@ -1578,7 +1626,7 @@ function DashboardComplet() {
                   const byDate = {};
                   poussages.forEach(p => {
                     const d = p.date || "N/A";
-                    if (!byDate[d]) byDate[d] = { marche:0, arret:0 };
+                    if (!byDate[d]) byDate[d] = { marche: 0, arret: 0 };
                     if (p.etatMachine === "En marche") byDate[d].marche++;
                     else byDate[d].arret++;
                   });
@@ -1586,35 +1634,53 @@ function DashboardComplet() {
                   const barEtatData = {
                     labels: dateLabels,
                     datasets: [
-                      { label:"En marche", data:dateLabels.map(d => byDate[d].marche),
-                        backgroundColor:"rgba(22,163,74,0.85)", borderColor:"#15803d", borderWidth:1.5,
-                        borderRadius:{ topLeft:6, topRight:6 }, borderSkipped:false,
-                        barPercentage:0.6, categoryPercentage:0.7 },
-                      { label:"En arrêt", data:dateLabels.map(d => byDate[d].arret),
-                        backgroundColor:"rgba(245,158,11,0.85)", borderColor:"#d97706", borderWidth:1.5,
-                        borderRadius:{ topLeft:6, topRight:6 }, borderSkipped:false,
-                        barPercentage:0.6, categoryPercentage:0.7 },
+                      {
+                        label: "En marche", data: dateLabels.map(d => byDate[d].marche),
+                        backgroundColor: "rgba(22,163,74,0.85)", borderColor: "#15803d", borderWidth: 1.5,
+                        borderRadius: { topLeft: 6, topRight: 6 }, borderSkipped: false,
+                        barPercentage: 0.6, categoryPercentage: 0.7
+                      },
+                      {
+                        label: "En arrêt", data: dateLabels.map(d => byDate[d].arret),
+                        backgroundColor: "rgba(245,158,11,0.85)", borderColor: "#d97706", borderWidth: 1.5,
+                        borderRadius: { topLeft: 6, topRight: 6 }, borderSkipped: false,
+                        barPercentage: 0.6, categoryPercentage: 0.7
+                      },
                     ],
                   };
                   const barEtatOpts = {
                     responsive: true,
-                    animation: { duration:900, easing:"easeOutQuart",
-                      delay(ctx) { return ctx.type==="data"&&ctx.mode==="default"?ctx.dataIndex*60:0; } },
+                    animation: {
+                      duration: 900, easing: "easeOutQuart",
+                      delay(ctx) { return ctx.type === "data" && ctx.mode === "default" ? ctx.dataIndex * 60 : 0; }
+                    },
                     plugins: {
-                      legend: { position:"bottom",
-                        labels:{ color:"#6b7280", font:{ family:"'Plus Jakarta Sans',sans-serif", size:12 },
-                          padding:14, usePointStyle:true, pointStyleWidth:8 } },
-                      tooltip: { backgroundColor:"#fff", borderColor:"#bbf7d0", borderWidth:1.5,
-                        titleColor:"#14532d", bodyColor:"#6b7280", padding:12, cornerRadius:10,
-                        callbacks:{ label:(c) => ` ${c.dataset.label} : ${c.parsed.y} opération${c.parsed.y>1?"s":""}` } },
+                      legend: {
+                        position: "bottom",
+                        labels: {
+                          color: "#6b7280", font: { family: "'Plus Jakarta Sans',sans-serif", size: 12 },
+                          padding: 14, usePointStyle: true, pointStyleWidth: 8
+                        }
+                      },
+                      tooltip: {
+                        backgroundColor: "#fff", borderColor: "#bbf7d0", borderWidth: 1.5,
+                        titleColor: "#14532d", bodyColor: "#6b7280", padding: 12, cornerRadius: 10,
+                        callbacks: { label: (c) => ` ${c.dataset.label} : ${c.parsed.y} opération${c.parsed.y > 1 ? "s" : ""}` }
+                      },
                     },
                     scales: {
-                      x: { grid:{ display:false }, border:{ display:false },
-                        ticks:{ color:"#9ca3af", font:{ family:"'Plus Jakarta Sans',sans-serif", size:11 } } },
-                      y: { grid:{ color:"rgba(22,163,74,0.07)" }, border:{ display:false },
-                        ticks:{ stepSize:1, callback:v=>Number.isInteger(v)?v:"",
-                          color:"#9ca3af", font:{ family:"'Plus Jakarta Sans',sans-serif", size:11 } },
-                        title:{ display:true, text:"Nb opérations", color:"#6b7280", font:{ size:10 } } },
+                      x: {
+                        grid: { display: false }, border: { display: false },
+                        ticks: { color: "#9ca3af", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 } }
+                      },
+                      y: {
+                        grid: { color: "rgba(22,163,74,0.07)" }, border: { display: false },
+                        ticks: {
+                          stepSize: 1, callback: v => Number.isInteger(v) ? v : "",
+                          color: "#9ca3af", font: { family: "'Plus Jakarta Sans',sans-serif", size: 11 }
+                        },
+                        title: { display: true, text: "Nb opérations", color: "#6b7280", font: { size: 10 } }
+                      },
                     },
                   };
                   return <Bar data={barEtatData} options={barEtatOpts} />;
@@ -1622,7 +1688,7 @@ function DashboardComplet() {
               </div>
 
             </div>
-          </>  )}
+          </>)}
       </div>
     </>
   );

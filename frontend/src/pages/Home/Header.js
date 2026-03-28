@@ -5,8 +5,6 @@ import { useAuth } from "../../components/AuthContext";
 import logo from "../../images/logo.png";
 import ocpLogo from "../../images/ocpLogo.png";
 
-<<<<<<< HEAD
-=======
 /**
  * Composant Header — barre de navigation principale de l'application.
  *
@@ -20,7 +18,6 @@ import ocpLogo from "../../images/ocpLogo.png";
  *   - theme       : thème actif ("light" | "dark")
  *   - toggleTheme : bascule entre les deux thèmes
  */
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
 const Header = ({ children }) => {
   const { user, logout, theme, toggleTheme } = useAuth();
   const navigate = useNavigate();
@@ -39,13 +36,8 @@ const Header = ({ children }) => {
 
   return (
     <header className="header">
-<<<<<<< HEAD
-      
-      {/* Logo */}
-=======
 
       {/* ── Logo principal (gauche) ── */}
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
       <div className="logo-container">
         <div className="logo-icon">
           <img src={logo} alt="Logo BGstripping" style={{ width: "50px", height: "auto" }} />
@@ -53,16 +45,12 @@ const Header = ({ children }) => {
         <span className="logo-text">BGstripping</span>
       </div>
 
-<<<<<<< HEAD
-      {/* Burger mobile */}
-=======
       
       {/*
         ── Bouton burger (mobile uniquement) ──
         N'apparaît que si des liens de navigation (children) sont fournis.
         Affiche une icône ☰ quand fermé et une icône ✕ quand ouvert.
       */}
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
       {children && (
         <button
           className="navbar-toggler"
@@ -98,10 +86,6 @@ const Header = ({ children }) => {
         </button>
       )}
 
-<<<<<<< HEAD
-      <div className={`navbar-collapse ${isOpen ? "show" : ""}`}>
-        
-=======
       {/*
         ── Menu de navigation (collapse sur mobile) ──
         La classe "show" est ajoutée dynamiquement pour afficher le menu
@@ -114,43 +98,11 @@ const Header = ({ children }) => {
           On clone l'élément pour lui passer la fonction closeMenu,
           permettant de fermer le menu au clic sur un lien (UX mobile).
         */}
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
         {children && React.cloneElement(children, { closeMenu })}
 
         {/* ── Actions utilisateur (droite du header) ── */}
         <div className="header-actions">
 
-<<<<<<< HEAD
-          {/* Toggle Theme */}
-          <button className="theme-toggle" onClick={toggleTheme}>
-            {theme === "dark" ? "☀️" : "🌙"}
-          </button>
-
-          {/* Se connecter */}
-          {!user && (
-            <Link to="/login">
-              <button className="connexion-btn">
-                Se connecter
-              </button>
-            </Link>
-          )}
-
-          {/* User info */}
-          {user && (
-            <div className="user-info" title={user.name}>
-              <div className="user-avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </div>
-              <span className="user-name">{user.name}</span>
-            </div>
-          )}
-
-          {/* Logout */}
-=======
           {/*
             ── Bouton bascule de thème ──
             CORRECTION : le SVG du mode "light" (soleil) était vide.
@@ -222,18 +174,12 @@ const Header = ({ children }) => {
             Affiché uniquement si un utilisateur est connecté.
             Appelle handleLogout qui vide la session et redirige vers /login.
           */}
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
           {user && (
             <button className="deconnexion-btn" onClick={handleLogout}>
               Déconnexion
             </button>
           )}
 
-<<<<<<< HEAD
-          <img src={ocpLogo} alt="OCP Logo" className="logo-ocp" />
-
-=======
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
         </div>
         
       </div>

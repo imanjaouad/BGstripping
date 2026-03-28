@@ -325,8 +325,6 @@
   .logo-text {
     font-size: 1.1rem;
   }
-<<<<<<< HEAD
-=======
   .nav-link {
     font-size: 1.1rem; /* Texte plus gros sur mobile */
   }
@@ -354,7 +352,7 @@
   .logo-text {
     font-size: 1.1rem;
   }
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
 }
 /* bouton se connecter */
 
@@ -375,8 +373,5 @@
   color:white;
   transform:translateY(-2px);
   box-shadow:0 4px 8px var(--shadow-color);
-<<<<<<< HEAD
-=======
 
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
 }

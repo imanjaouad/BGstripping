@@ -27,7 +27,8 @@ function App() {
 
       {/* PUBLIC */}
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
+     <Route path="/" element={<Login />} />
+<Route path="/login" element={<Login />} />
       <Route path="/securite" element={<Securite />} />
     
 

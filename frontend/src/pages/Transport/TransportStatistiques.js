@@ -14,7 +14,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import image from "../../images/ocpLogo.png";
 import TransportSidebar from "./TransportSidebar";
-
+import UseAuth from "../../components/UseAuth";
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend, Filler, ArcElement);
 
 // ─── CSS ─────────────────────────────────────────────────────────────────────
@@ -206,7 +206,7 @@ export default function TransportStatistiques() {
   const poussages = useSelector((s) => s.poussage?.list || []);
   const loading = useSelector((s) => s.transport?.loading);
   const saving = useSelector((s) => s.transport?.saving);
-
+ const { isAdmin } = UseAuth();
   const [period, setPeriod] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -697,7 +697,7 @@ export default function TransportStatistiques() {
                       <th>Panneau</th>
                       <th>Tranchée</th>
                       <th>Niveau</th>
-                      <th style={{ textAlign: "center" }}>Actions</th>
+                       {isAdmin && (<th style={{ textAlign: "center" }}>Actions</th>)}
                     </tr>
                   </thead>
                   <tbody>
@@ -720,6 +720,7 @@ export default function TransportStatistiques() {
                         <td style={{ color: "#15803d", fontWeight: 600 }}>{r.panneau || "—"}</td>
                         <td style={{ color: "#2563eb", fontWeight: 600 }}>{r.tranchee || "—"}</td>
                         <td style={{ color: "#d97706", fontWeight: 600 }}>{r.niveau || "—"}</td>
+                         {isAdmin && (
                         <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
                           <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
                             <button className="ts-btn-edit" onClick={() => openEdit(r)}>
@@ -730,11 +731,10 @@ export default function TransportStatistiques() {
                             </button>
                           </div>
                         </td>
-<<<<<<< HEAD
-=======
+                         )}
                         <td>{r.capacite_camion} t</td>
                         <td style={{ color: "#16a34a", fontWeight: 700 }}>{r.volume_decape.toLocaleString()} t</td>
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
                       </tr>
                     ))}
                   </tbody>
@@ -768,6 +768,7 @@ export default function TransportStatistiques() {
                   className="ts-modal-input" type="number" min="0"
                   value={editForm.nombre_voyages}
                   onChange={(e) => handleEditChange("nombre_voyages", Number(e.target.value))}
+                
                 />
               </div>
               <div>

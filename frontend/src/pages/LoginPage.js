@@ -4,23 +4,18 @@ import heroImage from "../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png";
 import logo from "../images/logo.png";
 
 const modeRoutes = {
-<<<<<<< HEAD
+    poussage: "/poussage",
+  casement: "/operations/casement",
+
   poussage: "/poussage",
   casement: "/operations/casement",
-=======
-<<<<<<< HEAD
-  poussage: "/poussage",
-  casement: "/operations/casement",
-=======
-<<<<<<< HEAD
+
   poussage: "/operations/poussage",
   encasement: "/operations/encasement",
-=======
+
   poussage: "/poussage",
   casement: "/operations/casement",
->>>>>>> main
->>>>>>> clean-IMANE
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
   transport: "/operations/transport",
 };
 
@@ -52,19 +47,8 @@ export default function LoginPage() {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-<<<<<<< HEAD
         body: JSON.stringify({ username: email, password, modeOpiration: mode }),
-=======
-<<<<<<< HEAD
-        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
-=======
-<<<<<<< HEAD
-        body: JSON.stringify({ email, password }),
-=======
-        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
->>>>>>> main
->>>>>>> clean-IMANE
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
       });
 
       const payload = await response.json();
@@ -137,19 +121,15 @@ export default function LoginPage() {
               <select value={mode} onChange={(event) => setMode(event.target.value)} required>
                 <option value="">Selectionner un mode</option>
                 <option value="poussage">Poussage</option>
-<<<<<<< HEAD
+
                 <option value="casement">Casement</option>
-=======
-<<<<<<< HEAD
+
                 <option value="casement">Casement</option>
-=======
-<<<<<<< HEAD
+
                 <option value="encasement">Encasement</option>
-=======
+
                 <option value="casement">Casement</option>
->>>>>>> main
->>>>>>> clean-IMANE
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
                 <option value="transport">Transport</option>
               </select>
             </label>
