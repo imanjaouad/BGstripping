@@ -9,6 +9,8 @@ import {
 } from "../../features/poussageSlice";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import image from "../../images/image3.webp";
 import UseAuth from "../../components/UseAuth";
 // ─── CSS ─────────────────────────────────────────────────────────────────────
@@ -115,6 +117,14 @@ const CSS = `
     font-family: inherit;
   }
   .hist-btn-excel:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,163,74,0.25); }
+
+  .hist-btn-pdf {
+    background: #b91c1c; color: #fff; border: none; border-radius: 10px;
+    padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; transition: all .18s;
+    font-family: inherit;
+  }
+  .hist-btn-pdf:hover { background: #991b1b; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(185,28,28,0.25); }
 
   .hist-btn-reset {
     padding: 8px 16px; border-radius: 9px;
@@ -439,7 +449,117 @@ function Historique() {
     );
   };
 
-  // ── Suppression ──
+  // ── Export PDF ──
+  const exportPDF = () => {
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+
+    // ── En-tête ──
+    doc.setFillColor(21, 128, 61);
+    doc.rect(0, 0, 297, 22, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Historique Poussage — Décapage ZD11", 14, 14);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Exporté le ${new Date().toLocaleDateString("fr-FR")}   •   ${filtered.length} opération${filtered.length !== 1 ? "s" : ""}`, 200, 14);
+
+    // ── KPIs sous le header ──
+    doc.setTextColor(20, 83, 45);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    const kpis = [
+      `📋 Opérations : ${kpiTotal}`,
+      `⛏️ Volume Total : ${kpiVol.toFixed(0)} t`,
+      `⏱️ Heures Marche : ${kpiTemps.toFixed(1)} h`,
+      `📈 Rendement Moy. : ${kpiRend} t/h`,
+      `✅ En Marche : ${kpiMarche}`,
+      `⛔ En Arrêt : ${kpiArret}`,
+    ];
+    kpis.forEach((kpi, i) => doc.text(kpi, 14 + i * 47, 30));
+
+    // ── Tableau ──
+    const head = [["Date","Panneau","Tranchée","Niveau","Équip.","Conducteur","Matr.","HTP","Vol (t)","H.M","H.A","OEE","TU","TD","Rend.","État","Nat. Arrêt"]];
+    const body = filtered.map(p => {
+      const ind = calcIndicateurs(p);
+      const ha  = Number(p.heures_arret || 0);
+      return [
+        p.date || "—",
+        p.panneau || "—",
+        p.tranchee || "—",
+        p.niveau || "—",
+        p.equipements?.join(", ") || "—",
+        p.conducteur || "—",
+        p.matricule || "—",
+        Number(p.htp) > 0 ? p.htp : "auto",
+        Number(p.volume_soté).toLocaleString(),
+        p.temps ? `${p.temps}h` : "—",
+        ha > 0 ? `${ha}h` : "—",
+        ind.oee,
+        ind.tu,
+        ind.td,
+        p.temps > 0 ? (p.volume_soté / p.temps).toFixed(2) : "—",
+        p.etatMachine || "—",
+        p.typeArret || "—",
+      ];
+    });
+
+    autoTable(doc, {
+      head,
+      body,
+      startY: 35,
+      styles: { fontSize: 7, cellPadding: 2, font: "helvetica", textColor: [55, 65, 81] },
+      headStyles: { fillColor: [21, 128, 61], textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+      alternateRowStyles: { fillColor: [240, 253, 244] },
+      columnStyles: {
+        0:  { cellWidth: 18 },
+        1:  { cellWidth: 14 },
+        2:  { cellWidth: 14 },
+        3:  { cellWidth: 12 },
+        4:  { cellWidth: 20 },
+        5:  { cellWidth: 22 },
+        6:  { cellWidth: 14 },
+        7:  { cellWidth: 10 },
+        8:  { cellWidth: 14 },
+        9:  { cellWidth: 10 },
+        10: { cellWidth: 10 },
+        11: { cellWidth: 12 },
+        12: { cellWidth: 12 },
+        13: { cellWidth: 12 },
+        14: { cellWidth: 14 },
+        15: { cellWidth: 16 },
+        16: { cellWidth: 20 },
+      },
+      didDrawCell: (data) => {
+        if (data.section === "body" && data.column.index === 15) {
+          const val = data.cell.raw;
+          if (val === "En marche") {
+            doc.setFillColor(220, 252, 231);
+            doc.setTextColor(21, 128, 61);
+          } else if (val === "En arrêt") {
+            doc.setFillColor(254, 243, 199);
+            doc.setTextColor(146, 64, 14);
+          }
+        }
+      },
+      margin: { left: 8, right: 8 },
+    });
+
+    // ── Pied de page ──
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(7);
+      doc.setTextColor(156, 163, 175);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Page ${i} / ${pageCount}`, 280, 205, { align: "right" });
+      doc.text("Historique Poussage — Décapage ZD11", 14, 205);
+    }
+
+    doc.save("historique_poussage.pdf");
+  };
+
+
   const openDelete = (p) => setDeleteTarget({ id: p.id, date: p.date, conducteur: p.conducteur });
   const closeDelete = () => { setDeleteTarget(null); setDeleting(false); };
   const confirmDelete = async () => {
@@ -516,6 +636,30 @@ function Historique() {
   const saveEdit = async () => {
     if (!editTarget) return;
     setSaving(true);
+
+    const updatedData = {
+      id:              editTarget.id,
+      date:            editForm.date,
+      panneau:         editForm.panneau,
+      tranchee:        editForm.tranchee,
+      niveau:          editForm.niveau,
+      "volume_soté":   parseFloat(editForm["volume_soté"]) || 0,
+      profendeur:      editForm.profendeur,
+      equipements:     editForm.equipements || [],
+      conducteur:      editForm.conducteur,
+      matricule:       editForm.matricule,
+      heureDebut:      editForm.heureDebut,
+      heureFin:        editForm.heureFin,
+      temps:           parseFloat(editForm.temps) || 0,
+      poste:           editForm.poste,
+      etatMachine:     editForm.etat_machine || "En marche",
+      typeArret:       editForm.typeArret,
+      heureDebutArret: editForm.heureDebutArret,
+      heureFinArret:   editForm.heureFinArret,
+      htp:             parseFloat(editForm.htp) || 0,
+      heures_arret:    parseFloat(editForm.heures_arret) || 0,
+    };
+
     try {
       // Données normalisées à envoyer au backend
       const dataToSend = {
@@ -566,7 +710,15 @@ function Historique() {
     } catch (err) {
       alert("Erreur enregistrement : " + (typeof err === "string" ? err : JSON.stringify(err)));
       setSaving(false);
+      return;
     }
+
+    // Toujours forcer la mise à jour du store local pour que le tableau
+    // reflète immédiatement les nouvelles valeurs (le backend peut renvoyer
+    // des noms de champs différents ex: operation_date vs date)
+    dispatch(forceUpdate(updatedData));
+
+    closeEdit();
   };
 
   // ── Preview OEE/TU/TD dans modal édition ──
@@ -673,13 +825,14 @@ function Historique() {
 
         {/* TABLEAU */}
         <div className="hist-card">
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <span className="hist-card-title" style={{ margin: 0 }}>📄 Liste des Opérations</span>
-            {isAdmin && (
-              <button className="hist-btn-excel" onClick={exportExcel}>
-                ⬇ Excel
-              </button>
-            )}
+
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+            <span className="hist-card-title" style={{ margin:0 }}>📄 Liste des Opérations</span>
+            <div style={{ display:"flex", gap:8 }}>
+              <button className="hist-btn-pdf" onClick={exportPDF}>⬇ PDF</button>
+              <button className="hist-btn-excel" onClick={exportExcel}>⬇ Excel</button>
+            </div>
+
           </div>
 
           <div className="hist-table-wrap">

@@ -48,9 +48,18 @@ class TransportJournalierController extends Controller
                 'nombre_voyages'  => $voyages,
                 'capacite_camion' => $capacite,
                 'volume_decape'   => $voyages * $capacite,
+<<<<<<< HEAD
+<<<<<<< HEAD
                 'panneau'         => $request->panneau ?? null,
                 'tranchee'        => $request->tranchee ?? null,
                 'niveau'          => $request->niveau ?? null,
+=======
+>>>>>>> clean-IMANE
+=======
+                'panneau'         => $request->panneau ?? null,
+                'tranchee'        => $request->tranchee ?? null,
+                'niveau'          => $request->niveau ?? null,
+>>>>>>> 5d417d875c26032342f1560f4c6ed8cd8f4760b7
             ]
         );
 
@@ -62,7 +71,15 @@ class TransportJournalierController extends Controller
      */
     public function update(Request $request, TransportJournalier $transportJournalier)
     {
+<<<<<<< HEAD
+<<<<<<< HEAD
         $data = $request->only(['nombre_voyages', 'capacite_camion', 'panneau', 'tranchee', 'niveau']);
+=======
+        $data = $request->only(['nombre_voyages', 'capacite_camion']);
+>>>>>>> clean-IMANE
+=======
+        $data = $request->only(['nombre_voyages', 'capacite_camion', 'panneau', 'tranchee', 'niveau']);
+>>>>>>> 5d417d875c26032342f1560f4c6ed8cd8f4760b7
 
         $voyages  = (int)   ($data['nombre_voyages']  ?? $transportJournalier->nombre_voyages);
         $capacite = (float) ($data['capacite_camion'] ?? $transportJournalier->capacite_camion);
@@ -71,9 +88,18 @@ class TransportJournalierController extends Controller
             'nombre_voyages'  => $voyages,
             'capacite_camion' => $capacite,
             'volume_decape'   => $voyages * $capacite,
+<<<<<<< HEAD
+<<<<<<< HEAD
             'panneau'         => $data['panneau']  ?? $transportJournalier->panneau,
             'tranchee'        => $data['tranchee'] ?? $transportJournalier->tranchee,
             'niveau'          => $data['niveau']   ?? $transportJournalier->niveau,
+=======
+>>>>>>> clean-IMANE
+=======
+            'panneau'         => $data['panneau']  ?? $transportJournalier->panneau,
+            'tranchee'        => $data['tranchee'] ?? $transportJournalier->tranchee,
+            'niveau'          => $data['niveau']   ?? $transportJournalier->niveau,
+>>>>>>> 5d417d875c26032342f1560f4c6ed8cd8f4760b7
         ]);
 
         return response()->json($transportJournalier);

@@ -4,18 +4,32 @@ import heroImage from "../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png";
 import logo from "../images/logo.png";
 
 const modeRoutes = {
+<<<<<<< HEAD
     poussage: "/poussage",
   casement: "/operations/casement",
+=======
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
 
   poussage: "/poussage",
   casement: "/operations/casement",
 
+<<<<<<< HEAD
+=======
+  poussage: "/poussage",
+  casement: "/operations/casement",
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
   poussage: "/operations/poussage",
   encasement: "/operations/encasement",
 
   poussage: "/poussage",
   casement: "/operations/casement",
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
   transport: "/operations/transport",
 };
 
@@ -47,8 +61,21 @@ export default function LoginPage() {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
+<<<<<<< HEAD
         body: JSON.stringify({ username: email, password, modeOpiration: mode }),
 
+=======
+
+        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
+
+        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
+
+        body: JSON.stringify({ email, password }),
+
+        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
+
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
       });
 
       const payload = await response.json();
@@ -130,6 +157,10 @@ export default function LoginPage() {
 
                 <option value="casement">Casement</option>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
                 <option value="transport">Transport</option>
               </select>
             </label>

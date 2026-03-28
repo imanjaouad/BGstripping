@@ -18,7 +18,6 @@ class TransportJournalier extends Model
         'nombre_voyages',
         'capacite_camion',
         'volume_decape',
-
         'panneau',
         'tranchee',
         'niveau',
@@ -29,6 +28,9 @@ class TransportJournalier extends Model
         'nombre_voyages' => 'integer',
         'capacite_camion' => 'decimal:2',
         'volume_decape' => 'decimal:2',
-
     ];
+
+   
+
+    
 }

@@ -731,9 +731,11 @@ export default function TransportStatistiques() {
                             </button>
                           </div>
                         </td>
+
                          )}
                         <td>{r.capacite_camion} t</td>
                         <td style={{ color: "#16a34a", fontWeight: 700 }}>{r.volume_decape.toLocaleString()} t</td>
+
 
                       </tr>
                     ))}

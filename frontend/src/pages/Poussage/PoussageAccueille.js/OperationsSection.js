@@ -1,64 +1,56 @@
 import { useState, useEffect, useRef } from "react";
 
+
 const operations = [
   {
     images: [
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/operation-poussage-Fgb9EYVkcbkcCXu7xP5CZJ.webp",
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
+      "https://s7d2.scene7.com/is/image/Caterpillar/C752902",
+      "https://tse1.mm.bing.net/th/id/OIP.Q5J7juIJ5615HyPTntllVQHaE8?pid=ImgDet&w=474&h=316&rs=1&o=7&rm=3"
     ],
-    title: "T1",
-    description: "Gestion des opérations d'extraction et de retrait des matériaux.",
+    title: "D11",
+    description: "Le Caterpillar D11 est un bulldozer de très grande puissance conçu spécialement pour les travaux miniers à ciel ouvert et les chantiers lourds. Il fait partie des plus gros bulldozers au monde et est largement utilisé dans les mines, notamment chez OCP pour le décapage par poussage.",
     fiche: {
-      Nom: "T1",
-      Référence: "ZD11-2023",
-      Puissance: "180 kW",
-      Rendement: "12 t/h",
-      Dimensions: "8m x 2.5m x 3m",
-      Poids: "15 t",
-      Matériaux: "Acier, Aluminium",
-      Vitesse: "4 m/s",
-      Consommation: "45 kWh",
-      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/operation-poussage-Fgb9EYVkcbkcCXu7xP5CZJ.webp",
+      Nom: "D11",
+      Modèle : "Cat C32 / C32B diesel",
+Puissance : "≈ 850 ch (634 kW)",
+Puissance_brute : "jusqu’à ≈ 936 ch",
+Cylindrée :" 32,1 litres",
+Régime_nominal : "≈ 1800 tr/min",
+     image: "https://tse1.mm.bing.net/th/id/OIP.Q5J7juIJ5615HyPTntllVQHaE8?pid=ImgDet&w=474&h=316&rs=1&o=7&rm=3"
     },
   },
   {
     images: [
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/storage-cumenage-ZzsNsRJNE7LE4jDf8GxtCw.webp",
-      "https://images.unsplash.com/photo-1553413077-190dd305871c?w=600&q=80",  ],
+      "https://image.made-in-china.com/2f0j00ONykZSBJWiqs/Used-Bulldozer-475-with-Good-Quality-Original-Dozer-for-Sale.jpg",
+     ],
   
-    title: "T2",
-    description: "Identification du produit et caractéristiques techniques.",
+     title: "Bulldozer KD 475",
+    description: "Le Komatsu D475 est un bulldozer de très grande capacité conçu pour les travaux miniers lourds, en particulier dans les exploitations à ciel ouvert comme celles de l’OCP. Il fait partie des plus grosses machines de terrassement au monde et se distingue par sa puissance et sa robustesse.travaux miniers à ciel ouvert et les chantiers lourds.",
     fiche: {
-      Nom: "T2",
-      Référence: "CM22-2022",
-      Puissance: "220 kW",
-      Rendement: "15 t/h",
-      Dimensions: "9m x 3m x 3.5m",
-      Poids: "18 t",
-      Matériaux: "Acier, Plastique",
-      Vitesse: "5 m/s",
-      Consommation: "55 kWh",
-      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/storage-cumenage-ZzsNsRJNE7LE4jDf8GxtCw.webp",
+      Nom: "Bulldozer KD 475",
+      Modèle : "Komatsu SAA12V140E-3",
+Puissance : "890 ch (664 kW)",
+Puissance_brute : "890 ch (≈ 664 kW)",
+Cylindrée :" ≈ 30,5 L",
+Régime_nominal : "2000 tr/min",
+      
+      image:"https://image.made-in-china.com/2f0j00ONykZSBJWiqs/Used-Bulldozer-475-with-Good-Quality-Original-Dozer-for-Sale.jpg",
     },
   },
   {
     images: [
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/transport-logistics-cFkpN6FkUL2xZuhtUWZVXY.webp",
-      "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=600&q=80",
+      "https://www.topmarkfunding.com/wp-content/uploads/2022/03/wheel-loaders-1024x577.jpg",
     ],
-    title: "T3",
-    description: "Suivi des chargements et gestion de la logistique.",
+    title: "Wheel Loader",
+    description: "La Wheel Loader (chargeuse sur pneus) est une machine de chantier et minière utilisée pour le chargement et le déplacement des matériaux comme la terre, le sable, les roches ou le phosphate. Elle se caractérise par sa grande mobilité grâce à ses roues (pneus), contrairement aux bulldozers qui utilisent des chenilles.",
     fiche: {
-      Nom: "T3",
-      Référence: "TR15-2021",
-      Puissance: "150 kW",
-      Rendement: "10 t/h",
-      Dimensions: "7m x 2m x 2.8m",
-      Poids: "12 t",
-      Matériaux: "Acier, Caoutchouc",
-      Vitesse: "3.5 m/s",
-      Consommation: "38 kWh",
-      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/transport-logistics-cFkpN6FkUL2xZuhtUWZVXY.webp",
+      Nom: "Wheel Loader",
+      Modèle : "Cat C32 ACERT",
+Puissance : "250 à 500 ch (≈ 185 – 370 kW)",
+Puissance_brute : "850 ch (≈ 634 kW)",
+Cylindrée :" 32,1 litres",
+Régime_nominal : "≈ 1800 – 2200 tr/min",
+      image:"https://www.topmarkfunding.com/wp-content/uploads/2022/03/wheel-loaders-1024x577.jpg",
     },
   },
 ];
@@ -160,14 +152,13 @@ export default function OperationsSection() {
               <h2 style={{color:"#064E3B",marginBottom:"0.7rem"}}>FICHE TECHNIQUE</h2>
               <img src={ficheData.image} alt={ficheData.Nom} style={{width:"100%",borderRadius:"12px",marginBottom:"0.7rem"}} />
               <p><strong>Nom:</strong> {ficheData.Nom}</p>
-              <p><strong>Référence:</strong> {ficheData.Référence}</p>
+             
               <p><strong>Puissance:</strong> {ficheData.Puissance}</p>
-              <p><strong>Rendement:</strong> {ficheData.Rendement}</p>
-              <p><strong>Dimensions:</strong> {ficheData.Dimensions}</p>
-              <p><strong>Poids:</strong> {ficheData.Poids}</p>
-              <p><strong>Matériaux:</strong> {ficheData.Matériaux}</p>
-              <p><strong>Vitesse:</strong> {ficheData.Vitesse}</p>
-              <p><strong>Consommation:</strong> {ficheData.Consommation}</p>
+              <p><strong>Modèle:</strong> {ficheData.Modèle}</p>
+              <p><strong>Puissance_brute:</strong> {ficheData.Puissance_brute}</p>
+              <p><strong>Cylindrée:</strong> {ficheData.Cylindrée}</p>
+              <p><strong>Régime_nominal:</strong> {ficheData.Régime_nominal}</p>
+             
               <button className="close-btn" onClick={closeFiche}>Fermer</button>
             </div>
           </div>

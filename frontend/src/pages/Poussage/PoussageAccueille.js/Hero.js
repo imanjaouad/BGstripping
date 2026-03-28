@@ -1,21 +1,497 @@
-import { Link } from "react-router-dom";
-import "./Home.css"
-//import IMGHero from "../../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png"
-export default function Hero() {
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+
+
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   AccueilleCasement — Page d'accueil du module Casement
+   AMÉLIORATIONS : Section INFO entièrement redessinée
+══════════════════════════════════════════════════════════════════════════ */
+
+
+
+ 
+ 
+  
+ 
+const CSS=`
+  @import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
+
+  .acc-csm * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .acc-csm {
+    font-family: 'Epilogue', sans-serif;
+    background: #ffffff;
+    color: #111827;
+    min-height: 100vh;
+  }
+
+  /* ════════════════════════════
+     SECTION 1 — HERO (inchangé)
+  ════════════════════════════ */
+
+  .acc-csm-hero { position: relative; height: 420px; overflow: hidden; }
+
+  .acc-csm-hero-img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    filter: brightness(0.55);
+  }
+
+  .acc-csm-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(20,83,45,0.75) 0%, rgba(0,0,0,0.3) 100%);
+  }
+
+  .acc-csm-hero-content {
+    position: absolute;
+    bottom: 48px; left: 48px; right: 48px;
+    max-width: 560px;
+  }
+
+  .acc-csm-hero h1 {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900; color: #fff;
+    line-height: 1.1; margin-bottom: 14px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  .acc-csm-hero h1 span { color: #86efac; }
+
+  .acc-csm-hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.65; max-width: 440px;
+  }
+
+  @keyframes acc-pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:0.5; transform:scale(1.5); }
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     SECTION 2 — INFO  ★ ENTIÈREMENT REDESSINÉE ★
+     Améliorations :
+       • Fond dégradé blanc → vert très pâle
+       • Cercles décoratifs de fond (::before / ::after)
+       • Badge eyebrow avec point pulsant
+       • Titre avec <em> souligné par un trait animé shimmer
+       • Définition dans un encadré à bordure gauche verte
+       • Cartes avec numéro filigrane (data-num via ::before)
+       • Trait vert qui s'étend au hover
+       • Bande accent top révélée au hover (::after scaleX)
+       • Icône avec rotation légère au hover
+  ══════════════════════════════════════════════════════════════ */
+
+  .acc-csm-info {
+    padding: 96px 48px;
+    background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Cercle décoratif haut-droite */
+  .acc-csm-info::before {
+    content: '';
+    position: absolute; top: -120px; right: -120px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(187,247,208,0.35) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Cercle décoratif bas-gauche */
+  .acc-csm-info::after {
+    content: '';
+    position: absolute; bottom: -80px; left: -80px;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(187,247,208,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Wrapper centré du titre + définition */
+  .acc-csm-info-head {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 64px;
+    position: relative; z-index: 1;
+  }
+
+  /* Badge eyebrow pill avec point animé */
+  .acc-csm-info-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: #16a34a;
+    margin-bottom: 20px;
+    padding: 6px 16px;
+    background: rgba(220,252,231,0.7);
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+  }
+
+  .acc-csm-info-eyebrow::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #16a34a;
+    animation: acc-pulse 2s ease infinite;
+  }
+
+  /* Titre H2 */
+  .acc-csm-info h2 {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 900; color: #111827;
+    line-height: 1.15; margin-bottom: 28px;
+  }
+
+  /* Mot-clé en vert avec soulignement shimmer animé */
+  .acc-csm-info h2 em {
+    font-style: normal;
+    color: #16a34a;
+    position: relative;
+  }
+
+  .acc-csm-info h2 em::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #16a34a, #86efac, #16a34a);
+    background-size: 200% 100%;
+    border-radius: 2px;
+    animation: acc-shimmer 3s linear infinite;
+  }
+
+  @keyframes acc-shimmer {
+    0%   { background-position: 0%; }
+    100% { background-position: 200%; }
+  }
+
+  /* Encadré de définition : bordure gauche verte */
+  .acc-csm-info-def {
+    background: #fff;
+    border: 1.5px solid #bbf7d0;
+    border-left: 4px solid #16a34a;
+    border-radius: 12px;
+    padding: 20px 24px;
+    text-align: left;
+    box-shadow: 0 4px 20px rgba(20,83,45,0.06);
+  }
+
+  .acc-csm-info-def p {
+    font-size: 14.5px; color: #4b5563;
+    line-height: 1.75; margin: 0;
+  }
+
+  /* Grille des 3 cartes avantage */
+  .acc-csm-cards-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+
+  @media (max-width: 720px) {
+    .acc-csm-cards-info        { grid-template-columns: 1fr; }
+    .acc-csm-modules-grid      { grid-template-columns: 1fr !important; }
+    .acc-csm-hero-content      { left: 24px; right: 24px;}
+    .acc-csm-info,
+    .acc-csm-modules           { padding: 56px 24px; }
+  }
+
+  /* Carte avantage */
+  .acc-csm-card-info {
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 36px 28px 32px;
+    text-align: left;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1),
+                box-shadow  0.3s cubic-bezier(0.16,1,0.3,1),
+                border-color 0.3s ease;
+  }
+
+  /* Numéro 01/02/03 en filigrane (lu depuis data-num) */
+  .acc-csm-card-info::before {
+    content: attr(data-num);
+    position: absolute; top: -10px; right: 16px;
+    font-family: 'Epilogue', sans-serif;
+    font-size: 96px; font-weight: 900;
+    color: rgba(220,252,231,0.6);
+    line-height: 1; pointer-events: none;
+    transition: color 0.3s ease;
+  }
+
+  /* Bande verte top révélée au hover */
+  .acc-csm-card-info::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #14532d, #16a34a, #86efac);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .acc-csm-card-info:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(20,83,45,0.13);
+    border-color: #86efac;
+  }
+
+  .acc-csm-card-info:hover::before { color: rgba(187,247,208,0.9); }
+  .acc-csm-card-info:hover::after  { transform: scaleX(1); }
+
+  /* Icône — conteneur carré arrondi avec fond dégradé vert
+     Taille augmentée (56px) pour mieux accueillir les SVG */
+  .acc-csm-card-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1.5px solid #86efac;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 14px rgba(22,163,74,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+    position: relative; z-index: 1;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  }
+
+  .acc-csm-card-info:hover .acc-csm-card-icon {
+    transform: scale(1.08) rotate(-3deg);
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    box-shadow: 0 8px 24px rgba(22,163,74,0.28);
+  }
+
+  /* Trait vert qui s'étend au hover */
+  .acc-csm-card-line {
+    width: 28px; height: 3px;
+    background: linear-gradient(90deg, #16a34a, #86efac);
+    border-radius: 2px; margin-bottom: 14px;
+    transition: width 0.3s ease;
+  }
+
+  .acc-csm-card-info:hover .acc-csm-card-line { width: 52px; }
+
+  .acc-csm-card-info h3 {
+    font-size: 15px; font-weight: 800; color: #14532d;
+    margin-bottom: 10px; position: relative; z-index: 1;
+  }
+
+  .acc-csm-card-info p {
+    font-size: 13.5px; color: #6b7280;
+    line-height: 1.65; margin: 0;
+    position: relative; z-index: 1;
+  }
+
+  /* ════════════════════════════
+     SECTION 3 — ÉQUIPEMENTS
+  ════════════════════════════ */
+
+  .acc-csm-modules { padding: 72px 48px; background: #f0fdf4; }
+
+  .acc-csm-modules-head { text-align: center; margin-bottom: 48px; }
+
+  .acc-csm-modules-head h2 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800; color: #14532d; margin-bottom: 8px;
+  }
+
+  .acc-csm-modules-head p {
+    font-size: 15px; color: #6b7280;
+    max-width: 440px; margin: 0 auto; line-height: 1.6;
+  }
+
+  .acc-csm-modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px; max-width: 1200px; margin: 0 auto;
+  }
+
+  .acc-csm-mod-card {
+    background: #fff; border-radius: 18px;
+    border: 1.5px solid #bbf7d0; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(20,83,45,0.07);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .acc-csm-mod-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(20,83,45,0.13);
+  }
+
+  .acc-csm-carousel { position: relative; height: 180px; overflow: hidden; background: #e5e7eb; }
+
+  .acc-csm-carousel-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.5s ease; }
+
+  .acc-csm-carousel-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(0,0,0,0.55); color: #fff;
+    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 999px; backdrop-filter: blur(4px);
+  }
+
+  .acc-csm-carousel-dots {
+    position: absolute; bottom: 10px; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 5px;
+  }
+
+  .acc-csm-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer; transition: all 0.2s ease;
+    border: none; padding: 0;
+  }
+
+  .acc-csm-dot.active { background: #fff; transform: scale(1.3); }
+
+  .acc-csm-mod-body { padding: 18px 20px 20px; }
+
+  .acc-csm-mod-top {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: 8px;
+  }
+
+  .acc-csm-mod-accent {
+    width: 32px; height: 3px;
+    background: linear-gradient(90deg, #16a34a, #86efac);
+    border-radius: 2px;
+  }
+
+  /* Badge état dynamique */
+  .acc-csm-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .acc-csm-badge::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .acc-csm-badge.marche {
+    background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
+  }
+  .acc-csm-badge.marche::before { background: #16a34a; animation: acc-pulse 2s ease infinite; }
+  .acc-csm-badge.arret {
+    background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;
+  }
+  .acc-csm-badge.arret::before { background: #ef4444; }
+  .acc-csm-badge.inconnu {
+    background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb;
+  }
+  .acc-csm-badge.inconnu::before { background: #9ca3af; }
+
+  .acc-csm-mod-body h3 { font-size: 15px; font-weight: 700; color: #14532d; margin-bottom: 5px; }
+  .acc-csm-mod-body > p { font-size: 13px; color: #6b7280; line-height: 1.6; margin-bottom: 14px; }
+
+  /* Tableau specs techniques */
+  .acc-csm-specs {
+    display: flex; flex-direction: column; gap: 5px;
+    border-top: 1px solid #f0fdf4; padding-top: 12px; margin-top: 4px;
+  }
+  .acc-csm-spec-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11.5px;
+  }
+  .acc-csm-spec-key {
+    color: #9ca3af; font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .acc-csm-spec-val {
+    color: #14532d; font-weight: 700; font-size: 12px;
+  }
+
+  /* ════════════════════════════
+     SECTION 4 — CTA (inchangé)
+  ════════════════════════════ */
+
+  .acc-csm-cta {
+    background: linear-gradient(135deg, #14532d 0%, #16a34a 60%, #10b981 100%);
+    padding: 64px 48px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+
+  .acc-csm-cta::before {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    animation: acc-sweep 5s ease-in-out infinite;
+  }
+
+  @keyframes acc-sweep {
+    0%   { left: -100%; }
+    50%  { left: 150%;  }
+    100% { left: 150%;  }
+  }
+
+  .acc-csm-cta h2 {
+    font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; color: #fff;
+    margin-bottom: 10px; position: relative; z-index: 1;
+  }
+
+  .acc-csm-cta p {
+    font-size: 15px; color: rgba(255,255,255,0.8);
+    margin-bottom: 28px; position: relative; z-index: 1;
+  }
+
+  .acc-csm-cta-btn {
+    position: relative; z-index: 1;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 36px; background: #fff; color: #14532d;
+    font-family: 'Epilogue', sans-serif; font-size: 14px; font-weight: 700;
+    border: none; border-radius: 12px; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: all 0.25s ease;
+  }
+
+  .acc-csm-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    background: #f0fdf4;
+  }
+`;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SOUS-COMPOSANT — Carrousel
+══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SOUS-COMPOSANT — Carrousel
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMPOSANT PRINCIPAL
+══════════════════════════════════════════════════════════════════════════ */
+
+function Accueill() {
+ 
   return (
-    <section className="hero-section position-relative overflow-hidden">
-      
-      <div className="hero-overlay"></div>
-      <div className="container position-relative h-100 d-flex align-items-center">
-        <div className="hero-content text-white">
-          <h1 className="display-4 fw-bold mb-4">
-            Gestion Intelligente du Décapage de Phosphate
-          </h1>
-          <p className="lead mb-4">
-            Optimisez vos opérations d'extraction, de stockage et de transport avec notre plateforme de gestion intégrée.
+    <div className="acc-csm">
+      <style>{CSS}</style>
+
+      {/* ════════ SECTION 1 — HERO ════════ */}
+      <section className="acc-csm-hero">
+       
+       
+        <div className="acc-csm-hero-overlay" />
+        <div className="acc-csm-hero-content">
+          <h1>Gestion<br />du <span>Décapage</span><br />par Poussage</h1>
+          <p>
+            Améliorez la performance de vos opérations de décapage grâce à une
+            collecte rigoureuse des données terrain, permettant un suivi précis
+            des rendements et une analyse statistique en temps réel.
           </p>
-          
         </div>
-      </div>
-    </section> 
-  );}
+      </section>
+
+      {/* ════════ SECTION 2 — INFO ★ REDESSINÉE ★ ════════ */}
+     
+
+    </div>
+  );
+}
+
+export default Accueill;
