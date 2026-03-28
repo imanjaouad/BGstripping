@@ -47,15 +47,9 @@ h2 {
   transition: 0.3s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
-.add-btn{
-  color:white;
-  background-color: #1a6ae2;
-}
-.add-btn:hover{
-  background-color: darkblue;
-}
+
 .btn-back:hover {
-  background: #1b325e;
+  background: #016537;
   color: white;
   transform: translateX(-4px);
 }
@@ -167,7 +161,7 @@ h2 {
 }
 
 .users-form button:hover {
-  background: #1b5e20;
+  background: #0f2e92;
 }
 
 /* TABLE */
