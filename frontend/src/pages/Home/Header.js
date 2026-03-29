@@ -19,6 +19,7 @@ import ocpLogo from "../../images/ocpLogo.png";
  *   - toggleTheme : bascule entre les deux thèmes
  */
 const Header = ({ children }) => {
+  
   const { user, logout, theme, toggleTheme } = useAuth();
   const navigate = useNavigate();
 
@@ -152,15 +153,7 @@ const Header = ({ children }) => {
             )}
           </button>
 
-          {/*
-            ── Bouton "Se connecter" ──
-            Affiché uniquement si aucun utilisateur n'est connecté.
-          */}
-          {!user && (
-            <Link to="/login">
-              <button className="connexion-btn">Se connecter</button>
-            </Link>
-          )}
+         
 
           {/*
             ── Informations de l'utilisateur connecté ──

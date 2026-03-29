@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::table('poussages', function (Blueprint $table) {
 
             $table->number('HTP')->nullable();
+            $table->decimal('observation', 8, 2)->nullable();
         });
 
-       $table->decimal('observation', 8, 2)->nullable();
+      
         
 
     }
