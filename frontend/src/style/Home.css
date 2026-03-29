@@ -1,4 +1,3 @@
-
 /* ============================================
 - HOME PAGE STYLES 
    ============================================ */
@@ -27,6 +26,8 @@
   --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Premium Green Overlay Effect - More visible green on the left */
+  --premium-green-overlay: linear-gradient(90deg, rgba(10, 50, 20, 0.85) 0%, rgba(22, 163, 74, 0.4) 35%, rgba(0, 0, 0, 0) 100%);
 }
 
 * {
@@ -48,7 +49,12 @@ body {
   overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
   color: var(--dark-gray);
@@ -90,9 +96,6 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   overflow: hidden;
   position: relative;
-  background-size: cover;        /* ← ajouter */
-  background-position: center;   /* ← ajouter */
-  background-repeat: no-repeat;  /* ← ajouter */
 }
 
 .hero-image {
@@ -117,7 +120,8 @@ h1, h2, h3, h4, h5, h6 {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-color: #1a3a2a; /* fallback si l'image ne charge pas */
+  background-color: #1a3a2a;
+  /* fallback si l'image ne charge pas */
 }
 
 /* .hero-image supprimé — on utilise background-image sur la section */
@@ -125,11 +129,7 @@ h1, h2, h3, h4, h5, h6 {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.55) 0%,
-    rgba(10, 40, 20, 0.4) 100%
-  );
+  background: var(--premium-green-overlay);
   z-index: 1;
 }
 
@@ -190,38 +190,85 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ---------- Keyframes ---------- */
 @keyframes hero-zoom {
-  from { transform: scale(1.08); }
-  to   { transform: scale(1); }
+  from {
+    transform: scale(1.08);
+  }
+
+  to {
+    transform: scale(1);
+  }
 }
 
 @keyframes hero-overlay-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes hero-title-in {
-  0%   { opacity: 0; transform: translateY(40px) skewY(1.5deg); filter: blur(4px); }
-  100% { opacity: 1; transform: translateY(0) skewY(0deg);      filter: blur(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(40px) skewY(1.5deg);
+    filter: blur(4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) skewY(0deg);
+    filter: blur(0);
+  }
 }
 
 @keyframes hero-text-in {
-  0%   { opacity: 0; transform: translateX(-20px); }
-  100% { opacity: 1; transform: translateX(0); }
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes hero-btn-in {
-  0%   { opacity: 0; transform: translateY(16px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0)   scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes hero-line-grow {
-  from { width: 0; opacity: 0; }
-  to   { width: 60px; opacity: 1; }
+  from {
+    width: 0;
+    opacity: 0;
+  }
+
+  to {
+    width: 60px;
+    opacity: 1;
+  }
 }
 
 @keyframes hero-scroll-bounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(6px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(6px);
+  }
 }
 
 /* ---------- Image — Ken Burns doux ---------- */
@@ -280,8 +327,8 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.22, 0.68, 0, 1.4),
-              box-shadow 0.3s ease,
-              background-color 0.3s ease;
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
 }
 
 /* Shine effect sur les boutons */
@@ -293,12 +340,10 @@ h1, h2, h3, h4, h5, h6 {
   left: -75%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.25),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.25),
+      transparent);
   transform: skewX(-20deg);
   transition: left 0.5s ease;
   pointer-events: none;
@@ -318,40 +363,42 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
 }
+
 /* ============================================
    DefinitionSection 
    ============================================ */
 
 /* ---------- CSS Variables ---------- */
 :root {
-  --def-bg:           #ffffff;
-  --def-bg-glow:      #dcfce7;
-  --def-card-bg:      #ffffff;
-  --def-card-border:  #e5e7eb;
-  --def-title:        #111827;
-  --def-muted:        #6b7280;
-  --def-icon-bg:      #dcfce7;
-  --def-shadow:       rgba(22, 163, 74, 0.10);
+  --def-bg: #ffffff;
+  --def-bg-glow: #dcfce7;
+  --def-card-bg: #ffffff;
+  --def-card-border: #e5e7eb;
+  --def-title: #111827;
+  --def-muted: #6b7280;
+  --def-icon-bg: #dcfce7;
+  --def-shadow: rgba(22, 163, 74, 0.10);
   --def-shadow-hover: rgba(22, 163, 74, 0.18);
-  --green:            #16a34a;
-  --green-dark:       #166534;
+  --green: #16a34a;
+  --green-dark: #166534;
 }
 
 /* Remplace @media (prefers-color-scheme: dark) { :root { ... } } */
 
 [data-theme="dark"] {
-  --def-bg:           #0f172a;
-  --def-bg-glow:      rgba(22, 163, 74, 0.08);
-  --def-card-bg:      #1e293b;
-  --def-card-border:  #334155;
-  --def-title:        #f1f5f9;
-  --def-muted:        #94a3b8;
-  --def-icon-bg:      rgba(22, 163, 74, 0.15);
-  --def-shadow:       rgba(0, 0, 0, 0.3);
+  --def-bg: #0f172a;
+  --def-bg-glow: rgba(22, 163, 74, 0.08);
+  --def-card-bg: #1e293b;
+  --def-card-border: #334155;
+  --def-title: #f1f5f9;
+  --def-muted: #94a3b8;
+  --def-icon-bg: rgba(22, 163, 74, 0.15);
+  --def-shadow: rgba(0, 0, 0, 0.3);
   --def-shadow-hover: rgba(22, 163, 74, 0.20);
-  --green:            #22c55e;
-  --green-dark:       #4ade80;
+  --green: #22c55e;
+  --green-dark: #4ade80;
 }
+
 /* ---------- Section ---------- */
 .definition-section {
   padding: 80px 24px;
@@ -538,9 +585,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 640px) {
-  .definition-section { padding: 60px 16px; }
-  .definition-card { max-width: 100%; }
+  .definition-section {
+    padding: 60px 16px;
+  }
+
+  .definition-card {
+    max-width: 100%;
+  }
 }
+
 /* ============================================
    OPERATIONS SECTION
    ============================================ */
@@ -552,6 +605,7 @@ h1, h2, h3, h4, h5, h6 {
   --text-dark: #111827;
   --text-muted: #6b7280;
 }
+
 /* ============================================
    DARK MODE — OPERATIONS SECTION
    ============================================ */
@@ -608,6 +662,7 @@ h1, h2, h3, h4, h5, h6 {
 [data-theme="dark"] .ops-dot.active {
   background: #22c55e;
 }
+
 /* ---------- Section ---------- */
 .ops-section {
   padding: 80px 24px;
@@ -748,14 +803,15 @@ h1, h2, h3, h4, h5, h6 {
 .ops-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 50%, rgba(22, 163, 74, 0.8) 100%);
-  opacity: 0.4;
-  transition: opacity 0.4s ease;
+  background: var(--premium-green-overlay);
+  opacity: 0.6;
+  /* Un peu plus opaque sur les petites cartes pour le contraste du texte */
+  transition: all 0.4s ease;
   pointer-events: none;
 }
 
 .ops-card:hover .ops-card-overlay {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 /* Image counter */
@@ -855,6 +911,7 @@ h1, h2, h3, h4, h5, h6 {
 .ops-card:hover .ops-cta-arrow {
   transform: translateX(6px);
 }
+
 /* ============================================
    CTA SECTION
    ============================================ */
@@ -863,8 +920,10 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center; /* Pour s'assurer que le texte est centré */
+  text-align: center;
+  /* Pour s'assurer que le texte est centré */
 }
+
 .cta-section {
   background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
   padding: 4rem 0;
@@ -1073,9 +1132,11 @@ h1, h2, h3, h4, h5, h6 {
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -1327,7 +1388,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1rem;
   }
 
- 
+
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
@@ -1494,17 +1555,196 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   z-index: 1020;
 }
- .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -0.75rem; /* Compensation du padding des colonnes */
-            margin-left: -0.75rem;
-        }
 
-        .col {
-            flex-basis: 0;
-            flex-grow: 1;
-            max-width: 100%;
-            padding-right: 0.75rem;
-            padding-left: 0.75rem;
-        }
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.75rem;
+  /* Compensation du padding des colonnes */
+  margin-left: -0.75rem;
+}
+
+.col {
+  flex-basis: 0;
+  flex-grow: 1;
+  max-width: 100%;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+}
+
+/* ============================================
+   HERO CAROUSEL — SLIDE EFFECT
+   ============================================ */
+
+/* Wrapper qui clip le débordement de la piste */
+.hero-track-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Piste : 3 slides côte à côte → largeur = N×100% de la section */
+.hero-track {
+  display: flex;
+  width: 300%;
+  /* 3 slides × 100% */
+  height: 100%;
+  transition: transform 0.75s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+/* Chaque slide = 33.33% de la piste = 100% de la section */
+.hero-slide-item {
+  width: 33.3333%;
+  height: 100%;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Texte animé */
+@keyframes heroTextIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Dots ── */
+.hero-dots {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.hero-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.35s ease;
+}
+
+.hero-dot.active {
+  width: 28px;
+  border-radius: 5px;
+  background: #16a34a;
+  box-shadow: 0 0 10px rgba(22, 163, 74, 0.6);
+}
+
+/* ── Flèches ── */
+.hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.hero-arrow:hover {
+  background: rgba(22, 163, 74, 0.75);
+  border-color: #16a34a;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.hero-arrow-left {
+  left: 20px;
+}
+
+.hero-arrow-right {
+  right: 20px;
+}
+
+
+/* ── Dots (indicateurs) ── */
+.hero-dots {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.hero-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.35s ease;
+}
+
+.hero-dot.active {
+  width: 28px;
+  border-radius: 5px;
+  background: #16a34a;
+  box-shadow: 0 0 10px rgba(22, 163, 74, 0.6);
+}
+
+/* ── Flèches Navigation ── */
+.hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.hero-arrow:hover {
+  background: rgba(22, 163, 74, 0.75);
+  border-color: #16a34a;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.hero-arrow-left {
+  left: 20px;
+}
+
+.hero-arrow-right {
+  right: 20px;
+}
