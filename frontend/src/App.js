@@ -1,22 +1,43 @@
-import { Route, Routes } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
+// Pages publiques
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
+import Securite from "./pages/Home/Securite";
+
+// Dashboards (modules)
 import Poussage from "./pages/Poussage/poussage";
 import Casement from "./pages/Casement/casement";
 import TransportDashboard from "./pages/Transport/TransportDashboard";
 import TransportStatistiques from "./pages/Transport/TransportStatistiques";
+
+// Admin
 import UserManagement from "./pages/UsersManagement/UserManagement";
-import Securite from "./pages/Home/Securite";
+
+// Protection des routes
 import PrivateRoute from "./components/PrivateRoute";
+
+// Styles globaux
 import "./style/PoussageForm.css";
 import "./style/ReportsSection.css";
 
 function App() {
   return (
     <Routes>
+
+      {/* ================= PUBLIC ROUTES ================= */}
+
+      {/* Page d'accueil */}
       <Route path="/" element={<Home />} />
+
+      {/* Page de connexion */}
       <Route path="/login" element={<Login />} />
+
+      {/* Page sécurité */}
+      <Route path="/securite" element={<Securite />} />
+
+
+      {/* ================= PROTECTED ROUTES ================= */}
 
       {/* Poussage — wildcard /* required for nested <Routes> in poussage.js */}
       <Route path="/poussage/*" element={<PrivateRoute allowedMode="poussage"><Poussage /></PrivateRoute>} />
@@ -41,8 +62,6 @@ function App() {
         } 
       />
 
-      {/* Sécurité */}
-      <Route path="/securite" element={<Securite />} />
     </Routes>
   );
 }

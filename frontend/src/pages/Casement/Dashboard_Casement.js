@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import image from "../../images/image3.webp";
-
+import UseAuth from "../../components/UseAuth";
 /* ═══════════════════════════════════════════════════════════════════════════
    ACCUEIL CASEMENT  — Page d'accueil du module
    Style identique au reste du module (Plus Jakarta Sans, palette verte)
@@ -219,7 +219,7 @@ const CSS = `
 function DashboardCasement() {
   const navigate = useNavigate();
   const casements = useSelector((s) => s.casement?.list || []);
-
+const { isAdmin } = UseAuth();
   const totalVolume = casements.reduce(
     (a, c) => a + Number(c.volume_saute || 0),
     0,
@@ -299,6 +299,7 @@ function DashboardCasement() {
               </p>
               {/* ── Definition de casement ──────────────────────────────────────────────────────── */}
               <div></div>
+               {isAdmin && (
               <div className="acc-hero-actions">
                 <button className="acc-btn-primary" onClick={() => navigate(`${BASE}/gestion`)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -309,6 +310,7 @@ function DashboardCasement() {
                   Voir les statistiques
                 </button>
               </div>
+               )}
             </div>
             <img src={image} alt="Logo Mine" className="acc-hero-img" />
           </div>

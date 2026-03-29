@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 import { Chart, registerables } from "chart.js";
 import { FaMoneyBillWave, FaCalculator, FaChartBar, FaCalendarAlt, FaFilter, FaTrash } from "react-icons/fa";
 import "../../components/animations.css";
-
+import UseAuth from "../../components/UseAuth";
 Chart.register(...registerables);
 
 const MONTHS_NAMES = [
-  "Janvier","Février","Mars","Avril","Mai","Juin",
-  "Juillet","Août","Septembre","Octobre","Novembre","Décembre"
+  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
 ];
 
 function fmt(n) {
@@ -69,9 +69,9 @@ function Cout() {
   const poussages = useSelector((state) =>
     state.poussage?.poussages ?? state.poussage?.list ?? []
   );
-
-  const [meterCost,     setMeterCost]     = useState("");
-  const [annualCost,    setAnnualCost]    = useState("");
+  const { isAdmin } = UseAuth();
+  const [meterCost, setMeterCost] = useState("");
+  const [annualCost, setAnnualCost] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
 
   // ✅ FIX 2 — localStorage : persistance de l'historique
@@ -89,7 +89,7 @@ function Cout() {
     localStorage.setItem("cout-history", JSON.stringify(history));
   }, [history]);
 
-  const chartRef      = useRef(null);
+  const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
   // ── Mois disponibles depuis Redux ──
@@ -109,13 +109,13 @@ function Cout() {
 
     // ✅ FIX 4 — Formule corrigée : (meterCost * annualCost) / 100
     // représente le % du budget annuel consommé par ce mois
-    const cost     = (Number(meterCost) * Number(annualCost)) / 100;
+    const cost = (Number(meterCost) * Number(annualCost)) / 100;
     const newEntry = {
-      month:       selectedMonth,
+      month: selectedMonth,
       cost,
-      meterCost:   Number(meterCost),
-      annualCost:  Number(annualCost),
-      createdAt:   new Date().toLocaleDateString("fr-MA"),
+      meterCost: Number(meterCost),
+      annualCost: Number(annualCost),
+      createdAt: new Date().toLocaleDateString("fr-MA"),
     };
     setHistory((prev) => [...prev, newEntry]);
     resetForm();
@@ -169,12 +169,12 @@ function Cout() {
             backgroundColor: percents.map((p) => {
               const c = getColor(p);
               return c === "#16A34A" ? "rgba(22,163,74,0.75)"
-                   : c === "#F59E0B" ? "rgba(245,158,11,0.75)"
-                   : "rgba(239,68,68,0.75)";
+                : c === "#F59E0B" ? "rgba(245,158,11,0.75)"
+                  : "rgba(239,68,68,0.75)";
             }),
-            borderColor:   percents.map((p) => getColor(p)),
-            borderWidth:   2,
-            borderRadius:  8,
+            borderColor: percents.map((p) => getColor(p)),
+            borderWidth: 2,
+            borderRadius: 8,
             borderSkipped: false,
           },
         ],
@@ -185,7 +185,7 @@ function Cout() {
         plugins: {
           legend: {
             labels: {
-              font:  { family: "'Rajdhani', sans-serif", size: 13 },
+              font: { family: "'Rajdhani', sans-serif", size: 13 },
               color: "#374151",
             },
           },
@@ -207,15 +207,15 @@ function Cout() {
           x: {
             grid: { display: false },
             ticks: {
-              font:  { family: "'Rajdhani', sans-serif", size: 12 },
+              font: { family: "'Rajdhani', sans-serif", size: 12 },
               color: "#6B7280",
             },
           },
           y: {
-            grid:  { color: "rgba(22,163,74,0.07)" },
+            grid: { color: "rgba(22,163,74,0.07)" },
             ticks: {
               callback: (v) => v + "%",
-              font:  { family: "'Rajdhani', sans-serif", size: 11 },
+              font: { family: "'Rajdhani', sans-serif", size: 11 },
               color: "#6B7280",
             },
             beginAtZero: true,
@@ -334,7 +334,8 @@ function Cout() {
                 style={{ ...inputStyle, paddingRight: 75 }}
                 className="form-control"
                 onFocus={e => { e.target.style.borderColor = "#16A34A"; e.target.style.boxShadow = "0 0 0 4px rgba(22,163,74,0.08)"; }}
-                onBlur={e  => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+                onBlur={e => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+              disabled={!isAdmin}
               />
               <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: ".82rem", fontWeight: 600, color: "#9CA3AF" }}>
                 MAD/m²
@@ -353,7 +354,8 @@ function Cout() {
                 style={{ ...inputStyle, paddingRight: 56 }}
                 className="form-control"
                 onFocus={e => { e.target.style.borderColor = "#16A34A"; e.target.style.boxShadow = "0 0 0 4px rgba(22,163,74,0.08)"; }}
-                onBlur={e  => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+                onBlur={e => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+              disabled={!isAdmin}
               />
               <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: ".82rem", fontWeight: 600, color: "#9CA3AF" }}>
                 MAD
@@ -373,7 +375,8 @@ function Cout() {
               className="form-select"
               style={{ ...inputStyle }}
               onFocus={e => { e.target.style.borderColor = "#16A34A"; e.target.style.boxShadow = "0 0 0 4px rgba(22,163,74,0.08)"; }}
-              onBlur={e  => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+              onBlur={e => { e.target.style.borderColor = "#E5E7EB"; e.target.style.boxShadow = "none"; }}
+            disabled={!isAdmin}
             >
               <option value="">Sélectionner un mois</option>
               {availableMonths.map((m, i) => (
@@ -385,56 +388,58 @@ function Cout() {
         </div>
 
         {/* Buttons */}
-        <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
-          <button
-            className="btn-submit"
-            onClick={calculateBudget}
-            disabled={!meterCost || !annualCost || !selectedMonth}
-            style={{ opacity: (!meterCost || !annualCost || !selectedMonth) ? 0.5 : 1 }}
-          >
-            <FaCalculator style={{ marginRight: 6 }} /> Calculer
-          </button>
-
-          <button
-            onClick={resetForm}
-            style={{
-              background: "linear-gradient(135deg,#6B7280,#9CA3AF)",
-              color: "white", border: "none", borderRadius: 50,
-              padding: "13px 28px", fontFamily: "'Rajdhani', sans-serif",
-              fontSize: "1rem", fontWeight: 700, letterSpacing: "1px",
-              cursor: "pointer", transition: "all .3s",
-              boxShadow: "0 4px 14px rgba(107,114,128,0.3)",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
-          >
-            Réinitialiser Formulaire
-          </button>
-
-          {/* ✅ FIX 9 — Bouton vider tout l'historique */}
-          {history.length > 0 && (
+        {isAdmin && (
+          <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
             <button
-              onClick={clearHistory}
+              className="btn-submit"
+              onClick={calculateBudget}
+              disabled={!meterCost || !annualCost || !selectedMonth}
+              style={{ opacity: (!meterCost || !annualCost || !selectedMonth) ? 0.5 : 1 }}
+            >
+              <FaCalculator style={{ marginRight: 6 }} /> Calculer
+            </button>
+
+            <button
+              onClick={resetForm}
               style={{
-                background: "linear-gradient(135deg,#991B1B,#EF4444)",
+                background: "linear-gradient(135deg,#6B7280,#9CA3AF)",
                 color: "white", border: "none", borderRadius: 50,
                 padding: "13px 28px", fontFamily: "'Rajdhani', sans-serif",
                 fontSize: "1rem", fontWeight: 700, letterSpacing: "1px",
                 cursor: "pointer", transition: "all .3s",
-                boxShadow: "0 4px 14px rgba(239,68,68,0.3)",
-                display: "flex", alignItems: "center", gap: 6,
+                boxShadow: "0 4px 14px rgba(107,114,128,0.3)",
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              <FaTrash /> Vider l'historique
+              Réinitialiser Formulaire
             </button>
-          )}
-        </div>
+
+            {/* ✅ FIX 9 — Bouton vider tout l'historique */}
+            {history.length > 0 && (
+              <button
+                onClick={clearHistory}
+                style={{
+                  background: "linear-gradient(135deg,#991B1B,#EF4444)",
+                  color: "white", border: "none", borderRadius: 50,
+                  padding: "13px 28px", fontFamily: "'Rajdhani', sans-serif",
+                  fontSize: "1rem", fontWeight: 700, letterSpacing: "1px",
+                  cursor: "pointer", transition: "all .3s",
+                  boxShadow: "0 4px 14px rgba(239,68,68,0.3)",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
+              >
+                <FaTrash /> Vider l'historique
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── KPI Row ── */}
-      {history.length > 0 && (
+      {isAdmin && history.length > 0 && (
         <div style={{ display: "flex", gap: 20, marginBottom: 28, flexWrap: "wrap" }}>
           <KpiCard
             label="Entrées Calculées"
@@ -551,14 +556,14 @@ function Cout() {
                   <th>Coût Calculé (MAD)</th>
                   <th>% Budget</th>
                   <th>Progression</th>
-                  <th>Action</th>
+                  {isAdmin && <th>Action</th>}
                 </tr>
               </thead>
               <tbody>
                 {history.map((h, i) => {
-                  const pct   = totalCost > 0 ? ((h.cost / totalCost) * 100) : 0;
+                  const pct = totalCost > 0 ? ((h.cost / totalCost) * 100) : 0;
                   const color = getColor(pct);
-                  const barW  = Math.min(pct * 1.5, 100);
+                  const barW = Math.min(pct * 1.5, 100);
                   return (
                     <tr key={i} style={{ animation: `fadeSlideRight .4s ${i * 0.05}s ease both` }}>
                       <td style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, color: "#9CA3AF" }}>
@@ -596,15 +601,17 @@ function Cout() {
                           </span>
                         </div>
                       </td>
-                      <td>
-                        <button
-                          className="btn-del"
-                          onClick={() => removeEntry(i)}
-                          title="Supprimer"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
+                      {isAdmin && (
+                        <td>
+                          <button
+                            className="btn-del"
+                            onClick={() => removeEntry(i)}
+                            title="Supprimer"
+                          >
+                            <FaTrash />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

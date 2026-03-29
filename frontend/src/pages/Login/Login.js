@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FaEye, FaEyeSlash, FaUser, FaLock } from "react-icons/fa";
 import "../../style/Login.css";
-
-import Navbar from "../Home/navBare";
-import Header from "../Home/Header";
-import Footer from "../Home/Footer";
-
-import { FaUser, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import logo from "../../images/logo.png";
 
 export default function Login() {
@@ -15,28 +10,27 @@ export default function Login() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(""); // ✅ error state
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    remember: false
+    remember: false,
   });
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg(""); // ✅ reset error
+    setErrorMsg("");
 
     try {
       const res = await axios.post("http://127.0.0.1:8000/api/login", {
         username: formData.username,
-        password: formData.password
+        password: formData.password,
       });
 
       const user = res.data.user;
 
-      // ✅ stockage
       sessionStorage.setItem("token", res.data.token);
       sessionStorage.setItem("user", JSON.stringify(user));
 
@@ -44,10 +38,9 @@ export default function Login() {
         localStorage.setItem("token", res.data.token);
       }
 
-      // ✅ redirection
       setTimeout(() => {
         if (user.role === "admin") {
-          navigate("/admin/users");
+          navigate("/");
         } else {
           switch (user.mode_operation) {
             case "poussage":
@@ -64,40 +57,64 @@ export default function Login() {
           }
         }
       }, 300);
-
     } catch (error) {
-      // ✅ message UX propre
-      setErrorMsg("Nom d'utilisateur ou mot de passe incorrect");
+      setErrorMsg("Identifiant ou mot de passe incorrect.");
       setLoading(false);
     }
   };
 
+  const features = [
+    { icon: "⛏", label: "Poussage & suivi des opérations" },
+    { icon: "🏗", label: "Casement structuré et optimisé" },
+    { icon: "🚛", label: "Transport et logistique intégrés" },
+    { icon: "👥", label: "Gestion avancée des utilisateurs" },
+    { icon: "🔒", label: "Sécurité et contrôle d'accès renforcés" },
+    { icon: "📄", label: "Rapports détaillés et exportables" },
+    { icon: "📊", label: "Statistiques en temps réel" },
+  ];
+
   return (
-    <div className="page-wrapper">
-      <Navbar />
-      <Header />
+    <div className="ocp-page">
+      <div className="ocp-card">
 
-      <main className="login-container">
-        <div className="login-card">
+        {/* LEFT */}
+        <div className="ocp-left">
+          <div className="ocp-app-title">BG Stripping</div>
+          <div className="ocp-divider" />
 
-          {/* LOGO */}
-          <div className="logo-top">
-            <img src={logo} alt="logo" />
+          <p className="ocp-desc">
+            Notre application <strong>BG Stripping</strong> offre une gestion
+            complète des opérations industrielles :
+          </p>
+
+          <ul className="ocp-features">
+            {features.map((f, i) => (
+              <li key={i} className="ocp-feature-item">
+                <span className="ocp-feature-dot" />
+                {f.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* RIGHT */}
+        <div className="ocp-right">
+
+          <div className="ocp-logo-wrap">
+            <img src={logo} alt="Logo" className="ocp-logo-img" />
           </div>
 
-          <h2>Se Connecter</h2>
-
-         
+          <h2 className="ocp-form-title">Connexion</h2>
+          <p className="ocp-form-sub">Accédez à votre espace de travail</p>
 
           <form onSubmit={handleLogin}>
 
             {/* USERNAME */}
-            <div className="form-group">
-              <label htmlFor="username">Nom d'utilisateur:</label>
-              <div className="input-box">
-                <FaUser className="icon" />
+            <div className="ocp-field">
+              <label>Nom d'utilisateur</label>
+              <div className="ocp-input-wrap">
+                <FaUser className="ocp-fi" />
                 <input
-                  id="username"
                   type="text"
                   placeholder="Nom d'utilisateur"
                   value={formData.username}
@@ -111,14 +128,14 @@ export default function Login() {
             </div>
 
             {/* PASSWORD */}
-            <div className="form-group">
-              <label htmlFor="password">Mot de passe:</label>
-              <div className="input-box">
-                <FaLock className="icon" />
+            <div className="ocp-field">
+              <label>Mot de passe</label>
+              <div className="ocp-input-wrap">
+                <FaLock className="ocp-fi" />
+
                 <input
-                  id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Mot de passe"
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
@@ -126,8 +143,9 @@ export default function Login() {
                   required
                   disabled={loading}
                 />
+
                 <span
-                  className="toggle-pass"
+                  className="ocp-toggle-pass"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -135,9 +153,9 @@ export default function Login() {
               </div>
             </div>
 
-            {/* OPTIONS */}
-            <div className="options">
-              <label>
+            {/* REMEMBER */}
+            <div className="ocp-options">
+              <label className="ocp-check-label">
                 <input
                   type="checkbox"
                   checked={formData.remember}
@@ -153,19 +171,17 @@ export default function Login() {
             {/* BUTTON */}
             <button
               type="submit"
-              className={`login-btn ${loading ? "loading" : ""}`}
+              className={`ocp-btn${loading ? " loading" : ""}`}
               disabled={loading}
             >
-              {loading ? <span className="spinner"></span> : "Se Connecter"}
+              {loading ? <span className="ocp-spinner" /> : "Se connecter"}
             </button>
-            {/* ✅ ERROR au dessous*/}
-{errorMsg && <div className="error-msg">{errorMsg}</div>}
 
+            {errorMsg && <div className="ocp-error">{errorMsg}</div>}
           </form>
         </div>
-      </main>
 
-      <Footer />
+      </div>
     </div>
   );
 }

@@ -7,11 +7,7 @@ import {
   FaSearch,
   FaEye,
   FaEyeSlash,
-  FaHome,
-  FaUsers,
-  FaIndustry,
-  FaBoxes,
-  FaTruck
+ 
 } from "react-icons/fa";
 
 const UserManagement = () => {
@@ -38,12 +34,7 @@ const UserManagement = () => {
 
   const isAdmin = currentUser?.role === "admin";
 
-  // ================= LOGOUT =================
-  const handleLogout = () => {
-    sessionStorage.clear();
-    localStorage.clear();
-    navigate("/login");
-  };
+ 
 
   // ================= PROTECTION =================
   useEffect(() => {
@@ -165,56 +156,7 @@ const UserManagement = () => {
   return (
     <div className="dashboard-layout">
 
-      {/* SIDEBAR */}
-      <div className="sidebar">
-
-        <div className="logo-section">
-          <img src={require("../../images/logo.png")} alt="logo" />
-          <h3>BG stripping</h3>
-        </div>
-
-        {/* ✅ MENU مصحح */}
-        <div className="menu">
-
-          <button onClick={() => navigate("/admin/users")}>
-            <FaUsers /> Utilisateurs
-          </button>
-
-          {isAdmin && (
-            <>
-              <button onClick={() => navigate("/operations/poussage")}>
-                <FaIndustry /> Poussage
-              </button>
-
-              <button onClick={() => navigate("/operations/casement")}>
-                <FaBoxes /> Casement
-              </button>
-
-              <button onClick={() => navigate("/operations/transport")}>
-                <FaTruck /> Transport
-              </button>
-            </>
-          )}
-
-          {!isAdmin && currentUser?.mode_operation && (
-            <button onClick={() => navigate(`/operations/${currentUser.mode_operation}`)}>
-              <FaIndustry /> Mon Dashboard
-            </button>
-          )}
-
-          {/* 🔁 Retour */}
-          <button onClick={() => navigate("/")}>
-            <FaHome /> Retour à l'accueil
-          </button>
-
-        </div>
-
-        {/* LOGOUT */}
-        <button onClick={handleLogout} className="logout">
-          Déconnexion
-        </button>
-
-      </div>
+     
 
       {/* MAIN */}
       <div className="main-content">
@@ -225,11 +167,17 @@ const UserManagement = () => {
           </div>
         )}
 
-        {currentUser && isAdmin && (
-          <div className="welcome-badge">
-            Bienvenue, <strong>{currentUser.username}</strong>
-          </div>
-        )}
+       
+        {/* Bouton Retour */}
+<div className="back-btn-container">
+  <button className="btn-back" onClick={() => navigate("/")}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Retour à l'accueil
+  </button>
+</div>
 
         <h2>Gestion des Utilisateurs</h2>
 
@@ -299,7 +247,7 @@ const UserManagement = () => {
               <option value="superviseur">Superviseur</option>
             </select>
 
-            <button type="submit">
+            <button type="submit" className="add-btn">
               {editingId ? "Modifier" : "Ajouter"}
             </button>
           </form>

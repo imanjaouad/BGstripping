@@ -1,257 +1,383 @@
+/* ─────────────────────────────────────────
+   OCP LOGIN  —  BG Stripping  |  Split Card
+───────────────────────────────────────── */
 
-.login-container {
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+/* PAGE */
+.ocp-page {
   min-height: 100vh;
-  background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
-              url('../images/slide2.jpg') center/cover no-repeat;
+  background:
+    linear-gradient(rgba(0,0,0,0.52), rgba(0,0,0,0.52)),
+    url('../images/slide2.jpg') center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
- 
+  padding: 24px 16px;
+  
 }
 
-/* CARD - PRO LOOK */
-.login-card {
-  width: 460px;
-  padding: 28px;
-  margin-top: 55px;
+/* CARD */
+.ocp-card {
+  width: 100%;
+  max-width: 860px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   border-radius: 20px;
-  background: rgba(255,255,255,0.95);
-  border-top: 4px solid #43a047;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-  text-align: center;
-  animation: fadeIn 0.6s ease;
-  transition: all 0.3s ease;
-
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+  animation: ocpFadeIn 0.55s ease both;
+    backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.85);
 }
 
-/* LOGO */
-.logo-top img {
-  width: 95px;
-  padding: 10px;
-  background: #f1f8f4;
+/* ── PANNEAU GAUCHE ── */
+.ocp-left {
+  background: #1a4a1a;
+  background-image:
+    radial-gradient(ellipse at 20% 18%, rgba(67,160,71,.38) 0%, transparent 58%),
+    radial-gradient(ellipse at 78% 82%, rgba(27,94,32,.55) 0%, transparent 55%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 44px 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ocp-left::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 260px; height: 260px;
   border-radius: 50%;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-  margin-bottom: 12px;
-  transition: 0.3s;
+  border: 1.5px solid rgba(255,255,255,.07);
+  pointer-events: none;
+}
+.ocp-left::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: -60px;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.05);
+  pointer-events: none;
 }
 
-.logo-top img:hover {
-  transform: scale(1.05);
-}
-
-/* TITLE */
-.login-card h2 {
-  color: #1b1b1b;
-  font-weight: 700;
+.ocp-app-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  color: #fff;
   margin-bottom: 4px;
 }
 
-.subtitle {
-  color: #777;
-  font-size: 0.85rem;
+
+.ocp-divider {
+  width: 38px;
+  height: 2px;
+  background: rgba(255,255,255,.28);
+  border-radius: 2px;
+  margin: 16px 0;
+}
+
+.ocp-desc {
+  font-size: 12.5px;
+  color: rgba(255,255,255,.65);
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.ocp-desc strong {
+  color: #a5d6a7;
+  font-weight: 600;
+}
+
+/* FEATURES LIST */
+.ocp-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.ocp-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: rgba(255,255,255,.82);
+  line-height: 1.4;
+}
+
+.ocp-feature-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #43a047;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(67,160,71,.6);
+}
+
+/* ── PANNEAU DROIT ── */
+.ocp-right {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 40px 40px;
+}
+
+/* LOGO IMAGE */
+.ocp-logo-wrap {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #f1f8f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  overflow: hidden;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+.ocp-logo-wrap:hover { transform: scale(1.05); }
+
+.ocp-logo-img {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+}
+
+.ocp-form-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: #1b1b1b;
+  margin-bottom: 3px;
+  text-align: center;
+}
+
+.ocp-form-sub {
+  font-size: 12.5px;
+  color: #888;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.ocp-right form {
+  width: 100%;
+}
+
+/* FIELD */
+.ocp-field {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 14px;
 }
 
-/* FORM */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-}
-
-.form-group label {
+.ocp-field label {
+  font-size: 12px;
   font-weight: 600;
-  font-size: 0.8rem;
-  color: #222;
+  color: #555;
   margin-bottom: 5px;
-  text-align: left;
 }
 
-/* INPUT BOX */
-.input-box {
+.ocp-input-wrap {
   position: relative;
 }
 
-.input-box input {
+.ocp-fi {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: #43a047;
+  pointer-events: none;
+}
+
+.ocp-input-wrap input {
   width: 100%;
-  padding: 12px 42px 12px 40px;
-  border-radius: 12px;
-  border: 1px solid #e5e5e5;
+  padding: 10px 40px 10px 38px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
   background: #f9f9f9;
-  transition: all 0.25s ease;
-  font-size: 0.95rem;
+  font-size: 13.5px;
+  color: #222;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  font-family: inherit;
 }
 
-
-/* ICONS */
-.icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #43a047;
-  font-size: 16px;
+.ocp-input-wrap input:focus {
+  border-color: #43a047;
+  box-shadow: 0 0 0 3px rgba(67,160,71,.12);
+  background: #fff;
 }
 
-/* PASSWORD TOGGLE */
-.toggle-pass {
+.ocp-input-wrap input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ocp-toggle-pass {
   position: absolute;
-  right: 14px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #9e9e9e;
-  font-size: 18px;
-  transition: 0.3s;
-}
-
-.toggle-pass:hover {
-  color: #43a047;
-  transform: translateY(-50%) scale(1.1);
-}
-
-/* OPTIONS */
-.options {
+  color: #aaa;
+  font-size: 15px;
   display: flex;
   align-items: center;
-  margin-top: 5px;
-  margin-bottom: 12px;
+  transition: color .2s;
 }
+.ocp-toggle-pass:hover { color: #43a047; }
 
-.options label {
+.ocp-options {
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
+  margin-bottom: 18px;
+}
+
+.ocp-check-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
   color: #2e7d32;
+  cursor: pointer;
+  user-select: none;
 }
 
-/* CHECKBOX */
-.options input[type="checkbox"] {
+.ocp-check-label input[type="checkbox"] {
   appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
   border: 2px solid #43a047;
   background: #fff;
   position: relative;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: background .2s, transform .15s;
+  flex-shrink: 0;
 }
-
-.options input[type="checkbox"]:hover {
-  transform: scale(1.1);
-}
-
-.options input[type="checkbox"]:checked {
+.ocp-check-label input[type="checkbox"]:hover { transform: scale(1.1); }
+.ocp-check-label input[type="checkbox"]:checked {
   background: linear-gradient(135deg, #1b5e20, #43a047);
-  border: none;
+  border-color: transparent;
 }
-
-.options input[type="checkbox"]:checked::after {
-  content: "";
+.ocp-check-label input[type="checkbox"]:checked::after {
+  content: '';
   position: absolute;
-  left: 5px;
-  top: 2px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
   transform: rotate(45deg);
 }
 
-/* BUTTON -  PRO STYLE */
-.login-btn {
+.ocp-btn {
   width: 100%;
-  padding: 13px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
-  font-weight: bold;
-  font-size: 1rem;
-  color: white;
   background: linear-gradient(135deg, #2e7d32, #43a047);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .5px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: opacity .2s, transform .15s, box-shadow .2s;
 }
-
-.login-btn:hover {
-  background: linear-gradient(135deg, #1b5e20, #2e7d32);
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+.ocp-btn:hover {
+  opacity: .92;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(46,125,50,.3);
 }
-
-.login-btn:active {
-  transform: scale(0.97);
-}
-
-/* LOADING BUTTON */
-.login-btn.loading {
+.ocp-btn:active { transform: scale(.98); }
+.ocp-btn.loading {
   pointer-events: none;
-  opacity: 0.8;
+  opacity: .75;
 }
 
-/* SPINNER */
-.spinner {
+.ocp-spinner {
   display: inline-block;
   width: 18px;
   height: 18px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top-color: white;
+  border: 3px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: ocpSpin 0.75s linear infinite;
+  vertical-align: middle;
 }
 
-/* ERROR MESSAGE  */
-.error-msg {
+.ocp-error {
   background: #ffebee;
   color: #c62828;
-  padding: 8px;
+  border-left: 3px solid #e53935;
+  padding: 9px 12px;
   border-radius: 8px;
-  font-size: 0.8rem;
-  margin-bottom: 10px;
-  animation: shake 0.3s;
+  font-size: 12px;
+  margin-top: 12px;
+  animation: ocpShake 0.3s ease;
+}
+.ocp-input-wrap {
+  position: relative;
 }
 
+.ocp-fi {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #43a047;
+  font-size: 14px;
+}
+
+.ocp-input-wrap input {
+  width: 100%;
+  padding: 10px 40px 10px 38px; 
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  background: #f9f9f9;
+  font-size: 13.5px;
+}
+
+.ocp-input-wrap input:focus {
+  border-color: #43a047;
+  box-shadow: 0 0 0 3px rgba(67,160,71,.12);
+  background: #fff;
+}
 /* ANIMATIONS */
-@keyframes spin {
+@keyframes ocpFadeIn {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ocpSpin {
   to { transform: rotate(360deg); }
 }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ❗ Animation error */
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
+@keyframes ocpShake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-5px); }
+  50%  { transform: translateX(5px); }
+  75%  { transform: translateX(-4px); }
   100% { transform: translateX(0); }
 }
 
 /* RESPONSIVE */
-@media(max-width: 500px){
-  .login-card {
-    width: 95%;
-    padding: 22px;
-  }
-}
-
-.error-msg {
- 
-  color: #c62828;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  margin-bottom: 12px;
-  animation: shake 0.3s;
+@media (max-width: 620px) {
+  .ocp-card { grid-template-columns: 1fr; }
+  .ocp-left { padding: 30px 24px; align-items: center; }
+  .ocp-right { padding: 28px 24px; }
 }

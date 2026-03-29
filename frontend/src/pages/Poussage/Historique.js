@@ -12,7 +12,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import image from "../../images/image3.webp";
-
+import UseAuth from "../../components/UseAuth";
 // ─── CSS ─────────────────────────────────────────────────────────────────────
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -320,7 +320,7 @@ const CSS = `
 function calcPlage(debut, fin) {
   if (!debut || !fin) return 0;
   const d = (debut || "").substring(0, 5);
-  const f = (fin   || "").substring(0, 5);
+  const f = (fin || "").substring(0, 5);
   const [dh, dm] = d.split(":").map(Number);
   const [fh, fm] = f.split(":").map(Number);
   let mins = (fh * 60 + fm) - (dh * 60 + dm);
@@ -358,43 +358,42 @@ function calcIndicateurs(p) {
 
 // ─── Composant principal ──────────────────────────────────────────────────────
 function Historique() {
-  const dispatch  = useDispatch();
+  const dispatch = useDispatch();
   const { list: poussages, loading } = useSelector((s) => s.poussage);
-
   useEffect(() => { dispatch(fetchPoussages()); }, [dispatch]);
-
+  const { isAdmin } = UseAuth();
   // ── Filtres ──
-  const [filterPanneau,   setFilterPanneau]   = useState("");
-  const [filterTranchee,  setFilterTranchee]  = useState("");
-  const [filterEtat,      setFilterEtat]      = useState("");
+  const [filterPanneau, setFilterPanneau] = useState("");
+  const [filterTranchee, setFilterTranchee] = useState("");
+  const [filterEtat, setFilterEtat] = useState("");
   const [filterDateDebut, setFilterDateDebut] = useState("");
-  const [filterDateFin,   setFilterDateFin]   = useState("");
+  const [filterDateFin, setFilterDateFin] = useState("");
 
   // ── Modal suppression ──
   const [deleteTarget, setDeleteTarget] = useState(null); // { id, date, conducteur }
-  const [deleting,     setDeleting]     = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // ── Modal édition ──
-  const [editTarget,   setEditTarget]   = useState(null); // objet poussage complet
-  const [editForm,     setEditForm]     = useState({});
-  const [saving,       setSaving]       = useState(false);
+  const [editTarget, setEditTarget] = useState(null); // objet poussage complet
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
 
-  const EQUIP_OPTS = ["T1","T2","T3","T4","T5","T6","T7"];
+  const EQUIP_OPTS = ["T1", "T2", "T3", "T4", "T5", "T6", "T7"];
 
   // ── Valeurs uniques pour dropdowns ──
-  const uniquePanneaux  = useMemo(() => [...new Set(poussages.map(p => p.panneau).filter(Boolean))],  [poussages]);
+  const uniquePanneaux = useMemo(() => [...new Set(poussages.map(p => p.panneau).filter(Boolean))], [poussages]);
   const uniqueTranchees = useMemo(() => [...new Set(poussages.map(p => p.tranchee).filter(Boolean))], [poussages]);
 
   // ── Données filtrées ──
   const filtered = useMemo(() => {
     return poussages.filter(p => {
-      if (filterPanneau  && p.panneau    !== filterPanneau)  return false;
-      if (filterTranchee && p.tranchee   !== filterTranchee) return false;
-      if (filterEtat     && p.etatMachine !== filterEtat)    return false;
+      if (filterPanneau && p.panneau !== filterPanneau) return false;
+      if (filterTranchee && p.tranchee !== filterTranchee) return false;
+      if (filterEtat && p.etatMachine !== filterEtat) return false;
       if (filterDateDebut || filterDateFin) {
         const d = new Date(p.date);
         if (filterDateDebut && new Date(filterDateDebut) > d) return false;
-        if (filterDateFin   && new Date(filterDateFin)   < d) return false;
+        if (filterDateFin && new Date(filterDateFin) < d) return false;
       }
       return true;
     });
@@ -408,12 +407,12 @@ function Historique() {
   };
 
   // ── KPIs globaux ──
-  const kpiTotal  = filtered.length;
-  const kpiVol    = filtered.reduce((a, p) => a + Number(p.volume_soté || 0), 0);
-  const kpiTemps  = filtered.reduce((a, p) => a + Number(p.temps || 0), 0);
-  const kpiRend   = kpiTemps > 0 ? (kpiVol / kpiTemps).toFixed(2) : 0;
+  const kpiTotal = filtered.length;
+  const kpiVol = filtered.reduce((a, p) => a + Number(p.volume_soté || 0), 0);
+  const kpiTemps = filtered.reduce((a, p) => a + Number(p.temps || 0), 0);
+  const kpiRend = kpiTemps > 0 ? (kpiVol / kpiTemps).toFixed(2) : 0;
   const kpiMarche = filtered.filter(p => p.etatMachine === "En marche").length;
-  const kpiArret  = filtered.filter(p => p.etatMachine === "En arrêt").length;
+  const kpiArret = filtered.filter(p => p.etatMachine === "En arrêt").length;
 
   // ── Export Excel ──
   const exportExcel = () => {
@@ -579,25 +578,25 @@ function Historique() {
   const openEdit = (p) => {
     setEditTarget(p);
     setEditForm({
-      date:           p.date || "",
-      panneau:        p.panneau || "",
-      tranchee:       p.tranchee || "",
-      niveau:         p.niveau || "",
-      volume_soté:    p.volume_soté || "",
-      profendeur:     p.profendeur || "",
-      equipements:    p.equipements || [],
-      conducteur:     p.conducteur || "",
-      matricule:      p.matricule || "",
-      heureDebut:     (p.heureDebut || "").substring(0, 5),
-      heureFin:       (p.heureFin   || "").substring(0, 5),
-      temps:          p.temps || "",
-      poste:          p.poste || "",
-      etat_machine:   p.etatMachine || "En marche",
-      typeArret:      p.typeArret || "",
-      heureDebutArret:(p.heureDebutArret || "").substring(0, 5),
-      heureFinArret:  (p.heureFinArret   || "").substring(0, 5),
-      heures_arret:   p.heures_arret || 0,
-      htp:            p.htp || "",
+      date: p.date || "",
+      panneau: p.panneau || "",
+      tranchee: p.tranchee || "",
+      niveau: p.niveau || "",
+      volume_soté: p.volume_soté || "",
+      profendeur: p.profendeur || "",
+      equipements: p.equipements || [],
+      conducteur: p.conducteur || "",
+      matricule: p.matricule || "",
+      heureDebut: (p.heureDebut || "").substring(0, 5),
+      heureFin: (p.heureFin || "").substring(0, 5),
+      temps: p.temps || "",
+      poste: p.poste || "",
+      etat_machine: p.etatMachine || "En marche",
+      typeArret: p.typeArret || "",
+      heureDebutArret: (p.heureDebutArret || "").substring(0, 5),
+      heureFinArret: (p.heureFinArret || "").substring(0, 5),
+      heures_arret: p.heures_arret || 0,
+      htp: p.htp || "",
     });
   };
   const closeEdit = () => { setEditTarget(null); setSaving(false); };
@@ -609,13 +608,13 @@ function Historique() {
     // Auto-calcul temps
     if (name === "heureDebut" || name === "heureFin") {
       const debut = name === "heureDebut" ? value : editForm.heureDebut;
-      const fin   = name === "heureFin"   ? value : editForm.heureFin;
+      const fin = name === "heureFin" ? value : editForm.heureFin;
       updated.temps = calcPlage(debut, fin) || editForm.temps;
     }
     // Auto-calcul heures arrêt
     if (name === "heureDebutArret" || name === "heureFinArret") {
       const d = name === "heureDebutArret" ? value : editForm.heureDebutArret;
-      const f = name === "heureFinArret"   ? value : editForm.heureFinArret;
+      const f = name === "heureFinArret" ? value : editForm.heureFinArret;
       updated.heures_arret = calcPlage(d, f) || 0;
     }
     // Reset arrêt si machine en marche
@@ -662,10 +661,54 @@ function Historique() {
     };
 
     try {
-      // Appel API backend
-      await dispatch(updatePoussageAsync({ id: editTarget.id, data: updatedData })).unwrap();
-    } catch (apiErr) {
-      alert("Erreur enregistrement : " + (typeof apiErr === "string" ? apiErr : JSON.stringify(apiErr)));
+      // Données normalisées à envoyer au backend
+      const dataToSend = {
+        ...editForm,
+        htp: parseFloat(editForm.htp) || 0,
+        heures_arret: parseFloat(editForm.heures_arret) || 0,
+        temps: parseFloat(editForm.temps) || 0,
+        volume_soté: parseFloat(editForm["volume_soté"]) || 0,
+      };
+
+      // On tente l'appel API
+      let responsePayload;
+      try {
+        responsePayload = await dispatch(updatePoussageAsync({ id: editTarget.id, data: dataToSend })).unwrap();
+      } catch (apiErr) {
+        throw apiErr;
+      }
+
+      // Si le backend ne renvoie pas tous les champs frontend, on force la mise à jour
+      // du store avec les données du formulaire (mise à jour optimiste garantie)
+      if (!responsePayload || responsePayload.operation_date === undefined && responsePayload.date === undefined) {
+        // Mise à jour directe dans le store avec les champs frontend
+        dispatch(forceUpdate({
+          id: editTarget.id,
+          date: editForm.date,
+          panneau: editForm.panneau,
+          tranchee: editForm.tranchee,
+          niveau: editForm.niveau,
+          "volume_soté": parseFloat(editForm["volume_soté"]) || 0,
+          profendeur: editForm.profendeur,
+          equipements: editForm.equipements || [],
+          conducteur: editForm.conducteur,
+          matricule: editForm.matricule,
+          heureDebut: editForm.heureDebut,
+          heureFin: editForm.heureFin,
+          temps: parseFloat(editForm.temps) || 0,
+          poste: editForm.poste,
+          etatMachine: editForm.etat_machine || "En marche",
+          typeArret: editForm.typeArret,
+          heureDebutArret: editForm.heureDebutArret,
+          heureFinArret: editForm.heureFinArret,
+          htp: parseFloat(editForm.htp) || 0,
+          heures_arret: parseFloat(editForm.heures_arret) || 0,
+        }));
+      }
+
+      closeEdit();
+    } catch (err) {
+      alert("Erreur enregistrement : " + (typeof err === "string" ? err : JSON.stringify(err)));
       setSaving(false);
       return;
     }
@@ -679,29 +722,29 @@ function Historique() {
   };
 
   // ── Preview OEE/TU/TD dans modal édition ──
- const previewHtp = parseFloat(editForm.htp) || 0;
-const previewArret = parseFloat(editForm.heures_arret) || 0;
+  const previewHtp = parseFloat(editForm.htp) || 0;
+  const previewArret = parseFloat(editForm.heures_arret) || 0;
 
-const previewBase = previewHtp > 0
-  ? previewHtp
-  : calcPlage(editForm.heureDebut, editForm.heureFin);
+  const previewBase = previewHtp > 0
+    ? previewHtp
+    : calcPlage(editForm.heureDebut, editForm.heureFin);
 
-// OEE
-const previewOEE = previewBase > 0
-  ? ((previewBase / 24) * 100).toFixed(1)
-  : "0.0";
+  // OEE
+  const previewOEE = previewBase > 0
+    ? ((previewBase / 24) * 100).toFixed(1)
+    : "0.0";
 
-// TU
-const previewTU = previewBase > 0
-  ? ((previewOEE / 24) * 100).toFixed(1)
-  : "0.0";
+  // TU
+  const previewTU = previewBase > 0
+    ? ((previewOEE / 24) * 100).toFixed(1)
+    : "0.0";
 
-// TD
-const tempsFonctionnement = previewBase - previewArret;
+  // TD
+  const tempsFonctionnement = previewBase - previewArret;
 
-const previewTD = previewBase > 0
-  ? ((tempsFonctionnement / 24) * 100).toFixed(1)
-  : "0.0";
+  const previewTD = previewBase > 0
+    ? ((tempsFonctionnement / 24) * 100).toFixed(1)
+    : "0.0";
   // ─────────────────────────────────────────────────────────────────────────────
   return (
     <>
@@ -720,12 +763,12 @@ const previewTD = previewBase > 0
         {/* KPIs */}
         <div className="hist-kpi-row">
           {[
-            { icon:"📋", label:"Opérations",     value: kpiTotal,              unit:"" },
-            { icon:"⛏️",  label:"Volume Total",    value: kpiVol.toFixed(0),     unit:"t" },
-            { icon:"⏱️",  label:"Heures Marche",   value: kpiTemps.toFixed(1),   unit:"h" },
-            { icon:"📈",  label:"Rendement Moy.",  value: kpiRend,               unit:"t/h" },
-            { icon:"✅",  label:"En Marche",       value: kpiMarche,             unit:"op" },
-            { icon:"⛔",  label:"En Arrêt",        value: kpiArret,              unit:"op" },
+            { icon: "📋", label: "Opérations", value: kpiTotal, unit: "" },
+            { icon: "⛏️", label: "Volume Total", value: kpiVol.toFixed(0), unit: "t" },
+            { icon: "⏱️", label: "Heures Marche", value: kpiTemps.toFixed(1), unit: "h" },
+            { icon: "📈", label: "Rendement Moy.", value: kpiRend, unit: "t/h" },
+            { icon: "✅", label: "En Marche", value: kpiMarche, unit: "op" },
+            { icon: "⛔", label: "En Arrêt", value: kpiArret, unit: "op" },
           ].map(({ icon, label, value, unit }) => (
             <div className="hist-kpi" key={label}>
               <div className="hist-kpi-icon">{icon}</div>
@@ -739,8 +782,8 @@ const previewTD = previewBase > 0
 
         {/* FILTRES */}
         <div className="hist-card">
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
-            <span className="hist-card-title" style={{ margin:0 }}>🔍 Filtres</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <span className="hist-card-title" style={{ margin: 0 }}>🔍 Filtres</span>
             {hasFilters && <button className="hist-btn-reset" onClick={resetFilters}>✕ Réinitialiser</button>}
           </div>
           <div className="hist-filter-grid">
@@ -782,12 +825,14 @@ const previewTD = previewBase > 0
 
         {/* TABLEAU */}
         <div className="hist-card">
+
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
             <span className="hist-card-title" style={{ margin:0 }}>📄 Liste des Opérations</span>
             <div style={{ display:"flex", gap:8 }}>
               <button className="hist-btn-pdf" onClick={exportPDF}>⬇ PDF</button>
               <button className="hist-btn-excel" onClick={exportExcel}>⬇ Excel</button>
             </div>
+
           </div>
 
           <div className="hist-table-wrap">
@@ -817,20 +862,20 @@ const previewTD = previewBase > 0
               <tbody>
                 {filtered.length > 0 ? filtered.map((p, i) => {
                   const ind = calcIndicateurs(p);
-                  const ha  = Number(p.heures_arret || 0);
+                  const ha = Number(p.heures_arret || 0);
                   return (
                     <tr key={p.id || i} style={{ animationDelay: `${i * 0.03}s` }}>
                       <td>{p.date}</td>
                       <td>{p.panneau || "—"}</td>
                       <td>{p.tranchee || "—"}</td>
                       <td>{p.niveau || "—"}</td>
-                      <td style={{ maxWidth:120, overflow:"hidden", textOverflow:"ellipsis" }}>
+                      <td style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis" }}>
                         {p.equipements?.join(", ") || "—"}
                       </td>
                       <td>{p.conducteur || "—"}</td>
-                      <td>{p.matricule  || "—"}</td>
-                      <td style={{ fontWeight:600, color:"#15803d" }}>
-                        {Number(p.htp) > 0 ? p.htp : <span style={{ color:"#9ca3af", fontSize:11 }}>auto</span>}
+                      <td>{p.matricule || "—"}</td>
+                      <td style={{ fontWeight: 600, color: "#15803d" }}>
+                        {Number(p.htp) > 0 ? p.htp : <span style={{ color: "#9ca3af", fontSize: 11 }}>auto</span>}
                       </td>
                       <td><strong>{Number(p.volume_soté).toLocaleString()}</strong></td>
                       <td>{p.temps ? `${p.temps} h` : "—"}</td>
@@ -846,16 +891,20 @@ const previewTD = previewBase > 0
                           {p.etatMachine}
                         </span>
                       </td>
-                      <td style={{ color:"#9ca3af", fontSize:12 }}>{p.typeArret || "—"}</td>
+                      <td style={{ color: "#9ca3af", fontSize: 12 }}>{p.typeArret || "—"}</td>
                       <td>
-                        <div style={{ display:"flex", gap:6 }}>
-                          <button className="hist-btn-edit" onClick={() => openEdit(p)}>
-                            ✏️ Modifier
-                          </button>
-                          <button className="hist-btn-del" onClick={() => openDelete(p)}>
-                            🗑️ Supprimer
-                          </button>
-                        </div>
+                        {isAdmin ? (
+                          <div style={{ display: "flex", gap: 6 }}>
+                            <button className="hist-btn-edit" onClick={() => openEdit(p)}>
+                              ✏️ Modifier
+                            </button>
+                            <button className="hist-btn-del" onClick={() => openDelete(p)}>
+                              🗑️ Supprimer
+                            </button>
+                          </div>
+                        ) : (
+                          <span style={{ color: "#9ca3af", fontSize: 12 }}>Lecture seule</span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -872,7 +921,7 @@ const previewTD = previewBase > 0
         </div>
 
         {/* ══ MODAL SUPPRESSION ══ */}
-        {deleteTarget && (
+        {isAdmin && editTarget && (
           <div className="hist-modal-overlay" onClick={closeDelete}>
             <div className="hist-modal" onClick={e => e.stopPropagation()}>
               <div className="hist-modal-icon">🗑️</div>
@@ -893,7 +942,7 @@ const previewTD = previewBase > 0
         )}
 
         {/* ══ MODAL ÉDITION ══ */}
-        {editTarget && (
+        {isAdmin && editTarget && (
           <div className="hist-edit-overlay" onClick={closeEdit}>
             <div className="hist-edit-modal" onClick={e => e.stopPropagation()}>
               <div className="hist-edit-title">
@@ -904,18 +953,18 @@ const previewTD = previewBase > 0
 
                 {/* Champs principaux */}
                 {[
-                  { label:"Date",            name:"date",        type:"date"   },
-                  { label:"Panneau",         name:"panneau",     type:"text",   ph:"Ex: P1"    },
-                  { label:"Tranchée",        name:"tranchee",    type:"text",   ph:"Ex: TR12"  },
-                  { label:"Niveau",          name:"niveau",      type:"text",   ph:"Ex: N1"    },
-                  { label:"HTP (h)",         name:"htp",         type:"number", ph:"Heures théoriques", step:"0.1", min:"0", max:"24" },
-                  { label:"Profondeur (m)",  name:"profendeur",  type:"number", ph:"0.00",     step:"0.01" },
-                  { label:"Volume Souté (t)",name:"volume_soté", type:"number", ph:"0.00",     step:"0.01" },
-                  { label:"Conducteur",      name:"conducteur",  type:"text",   ph:"Nom"       },
-                  { label:"Matricule",       name:"matricule",   type:"text",   ph:"Matricule" },
-                  { label:"Poste",           name:"poste",       type:"text",   ph:"Ex: Matin" },
-                  { label:"Heure Début",     name:"heureDebut",  type:"time"   },
-                  { label:"Heure Fin",       name:"heureFin",    type:"time"   },
+                  { label: "Date", name: "date", type: "date" },
+                  { label: "Panneau", name: "panneau", type: "text", ph: "Ex: P1" },
+                  { label: "Tranchée", name: "tranchee", type: "text", ph: "Ex: TR12" },
+                  { label: "Niveau", name: "niveau", type: "text", ph: "Ex: N1" },
+                  { label: "HTP (h)", name: "htp", type: "number", ph: "Heures théoriques", step: "0.1", min: "0", max: "24" },
+                  { label: "Profondeur (m)", name: "profendeur", type: "number", ph: "0.00", step: "0.01" },
+                  { label: "Volume Souté (t)", name: "volume_soté", type: "number", ph: "0.00", step: "0.01" },
+                  { label: "Conducteur", name: "conducteur", type: "text", ph: "Nom" },
+                  { label: "Matricule", name: "matricule", type: "text", ph: "Matricule" },
+                  { label: "Poste", name: "poste", type: "text", ph: "Ex: Matin" },
+                  { label: "Heure Début", name: "heureDebut", type: "time" },
+                  { label: "Heure Fin", name: "heureFin", type: "time" },
                 ].map(({ label, name, type, ph, step, min, max }) => (
                   <div key={name}>
                     <label className="hist-edit-label">{label}</label>
@@ -938,12 +987,12 @@ const previewTD = previewBase > 0
                   <label className="hist-edit-label">Heures Marche (auto)</label>
                   <input
                     type="number" className="hist-edit-input" readOnly
-                    value={editForm.temps || 0} style={{ background:"#f0fdf4", color:"#15803d", fontWeight:700 }}
+                    value={editForm.temps || 0} style={{ background: "#f0fdf4", color: "#15803d", fontWeight: 700 }}
                   />
                 </div>
 
                 {/* État machine */}
-                <div style={{ gridColumn:"span 2" }}>
+                <div style={{ gridColumn: "span 2" }}>
                   <label className="hist-edit-label">État Machine</label>
                   <select
                     className={`hist-edit-select ${editForm.etat_machine === "En arrêt" ? "hist-edit-select-danger" : ""}`}
@@ -962,25 +1011,25 @@ const previewTD = previewBase > 0
                     <div className="hist-edit-arret-title">⚠️ Détails de l'arrêt</div>
                     <div className="hist-edit-arret-grid">
                       <div>
-                        <label className="hist-edit-label" style={{ color:"#92400e" }}>Nature d'arrêt</label>
+                        <label className="hist-edit-label" style={{ color: "#92400e" }}>Nature d'arrêt</label>
                         <input type="text" className="hist-edit-input" name="typeArret"
                           value={editForm.typeArret} onChange={handleEditChange} placeholder="Cause..." />
                       </div>
                       <div>
-                        <label className="hist-edit-label" style={{ color:"#92400e" }}>Heure Début Arrêt</label>
+                        <label className="hist-edit-label" style={{ color: "#92400e" }}>Heure Début Arrêt</label>
                         <input type="time" className="hist-edit-input" name="heureDebutArret"
                           value={editForm.heureDebutArret} onChange={handleEditChange} />
                       </div>
                       <div>
-                        <label className="hist-edit-label" style={{ color:"#92400e" }}>Heure Fin Arrêt</label>
+                        <label className="hist-edit-label" style={{ color: "#92400e" }}>Heure Fin Arrêt</label>
                         <input type="time" className="hist-edit-input" name="heureFinArret"
                           value={editForm.heureFinArret} onChange={handleEditChange} />
                       </div>
                       <div>
-                        <label className="hist-edit-label" style={{ color:"#92400e" }}>Heures Arrêt (auto)</label>
+                        <label className="hist-edit-label" style={{ color: "#92400e" }}>Heures Arrêt (auto)</label>
                         <input type="number" className="hist-edit-input" readOnly
                           value={editForm.heures_arret || 0}
-                          style={{ background:"#fef3c7", color:"#92400e", fontWeight:700 }} />
+                          style={{ background: "#fef3c7", color: "#92400e", fontWeight: 700 }} />
                       </div>
                     </div>
                   </div>
@@ -1001,22 +1050,30 @@ const previewTD = previewBase > 0
                 </div>
 
                 {/* Preview OEE/TU/TD */}
-                <div style={{ gridColumn:"1 / -1" }}>
-                  <div style={{ background:"linear-gradient(135deg,#f0fdf4,#dcfce7)", border:"1.5px solid #bbf7d0",
-                    borderRadius:12, padding:"14px 18px", display:"flex", gap:24, flexWrap:"wrap" }}>
-                    <span style={{ fontSize:11, fontWeight:700, color:"#9ca3af", textTransform:"uppercase",
-                      letterSpacing:".08em", alignSelf:"center" }}>Aperçu :</span>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <div style={{
+                    background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", border: "1.5px solid #bbf7d0",
+                    borderRadius: 12, padding: "14px 18px", display: "flex", gap: 24, flexWrap: "wrap"
+                  }}>
+                    <span style={{
+                      fontSize: 11, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase",
+                      letterSpacing: ".08em", alignSelf: "center"
+                    }}>Aperçu :</span>
                     {[
-                      { label:"OEE", val:previewOEE+"%", color:"#2563eb", bg:"#eff6ff" },
-                      { label:"TU",  val:previewTU+"%",  color:"#15803d", bg:"#dcfce7" },
-                      { label:"TD",  val:previewTD+"%",  color:"#92400e", bg:"#fef3c7" },
-                      { label:"H. Marche", val:(editForm.temps||0)+"h", color:"#15803d", bg:"#f0fdf4" },
+                      { label: "OEE", val: previewOEE + "%", color: "#2563eb", bg: "#eff6ff" },
+                      { label: "TU", val: previewTU + "%", color: "#15803d", bg: "#dcfce7" },
+                      { label: "TD", val: previewTD + "%", color: "#92400e", bg: "#fef3c7" },
+                      { label: "H. Marche", val: (editForm.temps || 0) + "h", color: "#15803d", bg: "#f0fdf4" },
                     ].map(({ label, val, color, bg }) => (
-                      <div key={label} style={{ textAlign:"center" }}>
-                        <div style={{ fontSize:10, fontWeight:700, color:"#9ca3af", textTransform:"uppercase",
-                          letterSpacing:".08em", marginBottom:4 }}>{label}</div>
-                        <div style={{ background:bg, color, padding:"4px 14px", borderRadius:20,
-                          fontSize:15, fontWeight:800 }}>{val}</div>
+                      <div key={label} style={{ textAlign: "center" }}>
+                        <div style={{
+                          fontSize: 10, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase",
+                          letterSpacing: ".08em", marginBottom: 4
+                        }}>{label}</div>
+                        <div style={{
+                          background: bg, color, padding: "4px 14px", borderRadius: 20,
+                          fontSize: 15, fontWeight: 800
+                        }}>{val}</div>
                       </div>
                     ))}
                   </div>

@@ -26,7 +26,7 @@ import transwinLogo from "../../images/transwinLogo.jpg";
 import { FaArrowLeft, FaCalendarAlt, FaBolt, FaCalendarCheck, FaHardHat, FaFileExcel, FaFilePdf, FaTruck, FaTruckLoading, FaTruckMonster, FaInbox, FaWarehouse, FaShuttleVan, FaMapMarkerAlt, FaLayerGroup, FaRulerVertical } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import TransportSidebar from "./TransportSidebar";
-
+import UseAuth from "../../components/UseAuth";
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement, PointElement,
   Title, Tooltip, Legend, Filler, ArcElement
@@ -202,6 +202,7 @@ const PALETTE = {
 function AnimCount({ target, duration = 1100 }) {
   const [val, setVal] = useState(0);
   const raf = React.useRef(null);
+   
   React.useEffect(() => {
     const t0 = performance.now();
     const run = (now) => {
@@ -217,7 +218,7 @@ function AnimCount({ target, duration = 1100 }) {
 
 // ─── Company Section Component ────────────────────────────────────────────────
 // ─── Company Section Component ────────────────────────────────────────────────
-function CompanySection({ name, icon, color, filteredPoussages, selectedDate, transportData, dispatch, isLimited = false, onVolumeDecapeChange }) {
+function CompanySection({ name, icon, color, filteredPoussages, selectedDate, transportData, dispatch, isLimited = false, onVolumeDecapeChange,isAdmin }) {
   const entrepriseKey = name.toLowerCase();
   const [activeTab, setActiveTab] = useState("petits");
 
@@ -517,6 +518,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
       })()}
 
       {/* ── Saisie Manuelle : Panneau / Tranchée / Niveau ── */}
+      
       <div style={{
         background: "#fff", border: "1.5px solid #bbf7d0", borderRadius: 12,
         padding: "14px 16px", marginBottom: 14,
@@ -532,7 +534,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             value={panneauInput}
             style={errPanneau ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
             onChange={(e) => handlePanneauChange(e.target.value)}
-            disabled={isLimited}
+           disabled={isLimited || !isAdmin}
           />
           {errPanneau && (
             <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠ {errPanneau}</div>
@@ -548,7 +550,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             value={trancheeInput}
             style={errTranchee ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
             onChange={(e) => handleTrancheeChange(e.target.value)}
-            disabled={isLimited}
+           disabled={isLimited || !isAdmin}
           />
           {errTranchee && (
             <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠ {errTranchee}</div>
@@ -564,12 +566,13 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
             value={niveauInput}
             style={errNiveau ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
             onChange={(e) => handleNiveauChange(e.target.value)}
-            disabled={isLimited}
+            disabled={isLimited || !isAdmin}
           />
           {errNiveau && (
             <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4 }}>⚠ {errNiveau}</div>
           )}
         </div>
+        
       </div>
 
       {/* Tabs */}
@@ -598,6 +601,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
                     style={errVoyagesPetits ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
                     onChange={(e) => handleVoyagesPetits(Number(e.target.value))}
                     placeholder="0"
+                     disabled={!isAdmin}
                   />
                   {errVoyagesPetits && (
                     <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
@@ -620,6 +624,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
                     style={errCapacitePetits ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
                     onChange={(e) => handleCapacitePetits(Number(e.target.value))}
                     placeholder="20"
+                     disabled={!isAdmin}
                   />
                   {errCapacitePetits && (
                     <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
@@ -659,6 +664,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
                     style={errVoyagesGrands ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
                     onChange={(e) => handleVoyagesGrands(Number(e.target.value))}
                     placeholder="0"
+                     disabled={!isAdmin}
                   />
                   {errVoyagesGrands && (
                     <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
@@ -681,6 +687,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
                     style={errCapaciteGrands ? { borderColor: "#ef4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.12)" } : {}}
                     onChange={(e) => handleCapaciteGrands(Number(e.target.value))}
                     placeholder="50"
+                     disabled={!isAdmin}
                   />
                   {errCapaciteGrands && (
                     <div style={{ color: "#dc2626", fontSize: 10, fontWeight: 600, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
@@ -737,7 +744,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
       </div>
 
       {/* Bouton Enregistrer */}
-      {!isLimited && (
+      { isAdmin && !isLimited && (
         <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 14 }}>
           <button
             onClick={handleManualSave}
@@ -774,7 +781,7 @@ function CompanySection({ name, icon, color, filteredPoussages, selectedDate, tr
 export default function TransportDashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+const { isAdmin } = UseAuth();
   // ── Role check ──────────────────────────────────────────────
   const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
   const currentUser = userStr ? JSON.parse(userStr) : null;
@@ -811,10 +818,17 @@ export default function TransportDashboard() {
 
   // ─── Volume Sauté par Jour (last 7 days) ──────────────────────────────────
   const last7Days = [];
+  // Use selectedDate as the reference point, or today if not set
+  const baseDate = selectedDate ? new Date(selectedDate) : new Date();
+  
   for (let i = 6; i >= 0; i--) {
-    const d = new Date();
+    const d = new Date(baseDate);
     d.setDate(d.getDate() - i);
-    last7Days.push(d.toISOString().split("T")[0]);
+    // Format securely to YYYY-MM-DD avoiding UTC timezone shifts
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    last7Days.push(`${y}-${m}-${dd}`);
   }
 
   const volumeParJour = last7Days.map((day) => {
@@ -1031,6 +1045,7 @@ export default function TransportDashboard() {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
+                  disabled={!isAdmin}
                 />
               </div>
               <img
@@ -1114,6 +1129,7 @@ export default function TransportDashboard() {
               dispatch={dispatch}
               isLimited={isLimited}
               onVolumeDecapeChange={setVolumeDecapeProcaneq}
+              isAdmin={isAdmin}
             />
           </div>
 
@@ -1129,6 +1145,7 @@ export default function TransportDashboard() {
               dispatch={dispatch}
               isLimited={isLimited}
               onVolumeDecapeChange={setVolumeDecapeTranswine}
+              isAdmin={isAdmin}
             />
           </div>
 

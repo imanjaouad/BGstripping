@@ -158,7 +158,7 @@ function TransportSidebar() {
           <div className="tr-logo-ring">
             <img src={image} alt="Logo Mine" />
           </div>
-          <div className="tr-brand-title">ZD11</div>
+          <div className="tr-brand-title"></div>
           <div className="tr-brand-sub">Transport</div>
         </div>
 
