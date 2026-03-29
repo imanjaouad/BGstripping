@@ -1,30 +1,35 @@
+// Import React + hooks
 import React, { useEffect, useState } from "react";
+// Navigation entre pages
 import { useNavigate } from "react-router-dom";
+// API personnalisée (axios config)
 import api from "../services/Api";
+// CSS
 import "../../style/UserManagement.css";
-
+//ICONES
 import {
   FaSearch,
   FaEye,
   FaEyeSlash,
-  FaHome,
-  FaUsers,
-  FaIndustry,
-  FaBoxes,
-  FaTruck
+ 
 } from "react-icons/fa";
 
 const UserManagement = () => {
+   // Hook navigation
   const navigate = useNavigate();
-
+ // ================= STATES =================
+ // Utilisateur connecté
   const [currentUser, setCurrentUser] = useState(null);
+  // Utilisateur connecté
   const [showPassword, setShowPassword] = useState(false);
+   // Liste des utilisateurs
   const [users, setUsers] = useState([]);
-
+  // Recherche + filtres
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("");
   const [filterMode, setFilterMode] = useState("");
 
+  // Formulaire (ajout / modification)
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -32,22 +37,22 @@ const UserManagement = () => {
     mode_operation: "poussage"
   });
 
+  // ID en cours de modification
   const [editingId, setEditingId] = useState(null);
 
+  // Alert message
   const [alert, setAlert] = useState({ message: "", type: "" });
 
+  // Vérifie si admin
   const isAdmin = currentUser?.role === "admin";
 
-  // ================= LOGOUT =================
-  const handleLogout = () => {
-    sessionStorage.clear();
-    localStorage.clear();
-    navigate("/login");
-  };
+ 
 
   // ================= PROTECTION =================
+   // Vérifie si utilisateur connecté et admin
   useEffect(() => {
     const user = JSON.parse(sessionStorage.getItem("user"));
+     // Vérifie si utilisateur connecté et admin
     if (!user || user.role !== "admin") {
       navigate("/login");
     }
@@ -56,7 +61,7 @@ const UserManagement = () => {
   // ================= FETCH USER =================
   const fetchCurrentUser = async () => {
     try {
-      const res = await api.get("/me");
+      const res = await api.get("/me");// récupère user connecté
       setCurrentUser(res.data);
     } catch (err) {
       console.log(err);
@@ -68,9 +73,9 @@ const UserManagement = () => {
     try {
       const res = await api.get("/users", {
         params: {
-          search,
-          role: filterRole,
-          mode: filterMode
+          search,//recherche
+          role: filterRole,// filtre rôle
+          mode: filterMode // filtre mode
         }
       });
       setUsers(res.data);
@@ -78,18 +83,19 @@ const UserManagement = () => {
       console.log(err);
     }
   };
-
+// Charger données au début
   useEffect(() => {
     fetchCurrentUser();
     fetchUsers();
   }, []);
-
+// Recharger utilisateurs quand filtre change
   useEffect(() => {
     fetchUsers();
   }, [search, filterRole, filterMode]);
 
   // ================= ALERT AUTO HIDE =================
   useEffect(() => {
+     // Supprime alert après 3s
     if (alert.message) {
       const timer = setTimeout(() => {
         setAlert({ message: "", type: "" });
@@ -103,25 +109,31 @@ const UserManagement = () => {
     e.preventDefault();
 
     try {
+
+      // Si mode modification
       if (editingId) {
+        // UPDATE user
         await api.put(`/users/${editingId}`, form);
         setAlert({ message: "✅ Utilisateur modifié avec succès", type: "success" });
         setEditingId(null);
       } else {
+
+        // CREATE user
         await api.post("/users", form);
         setAlert({ message: "✅ Utilisateur ajouté avec succès", type: "success" });
       }
-
+        // Reset form
       setForm({
         username: "",
         password: "",
         role: "superviseur",
         mode_operation: "poussage"
       });
-
+       // Refresh list
       fetchUsers();
 
     } catch (error) {
+        // Affiche erreur API
       setAlert({
         message: error.response?.data?.message || "❌ Une erreur s'est produite",
         type: "error"
@@ -131,30 +143,34 @@ const UserManagement = () => {
 
   // ================= EDIT =================
   const handleEdit = (user) => {
+     // Remplir form avec données user
     setForm({
       username: user.username,
-      password: "",
+      password: "",// on ne récupère pas password
       role: user.role,
       mode_operation: user.mode_operation
     });
+     // Activer mode modification
     setEditingId(user.id);
   };
 
   // ================= DELETE =================
   const handleDelete = async (id) => {
+
+    // Empêcher suppression de soi-même
     if (currentUser?.id === id) {
       setAlert({ message: "❌ Vous ne pouvez pas supprimer votre propre compte !", type: "error" });
       return;
     }
-
+   // Compter admins
     const adminCount = users.filter(u => u.role === "admin").length;
     const userToDelete = users.find(u => u.id === id);
-
+ // Empêcher suppression du dernier admin
     if (userToDelete.role === "admin" && adminCount === 1) {
       setAlert({ message: "❌ Impossible de supprimer le dernier admin !", type: "error" });
       return;
     }
-
+// Confirmation
     if (window.confirm("Confirmer suppression ?")) {
       await api.delete(`/users/${id}`);
       setAlert({ message: "🗑️ Utilisateur supprimé avec succès", type: "success" });
@@ -165,56 +181,7 @@ const UserManagement = () => {
   return (
     <div className="dashboard-layout">
 
-      {/* SIDEBAR */}
-      <div className="sidebar">
-
-        <div className="logo-section">
-          <img src={require("../../images/logo.png")} alt="logo" />
-          <h3>BG stripping</h3>
-        </div>
-
-        {/* ✅ MENU مصحح */}
-        <div className="menu">
-
-          <button onClick={() => navigate("/admin/users")}>
-            <FaUsers /> Utilisateurs
-          </button>
-
-          {isAdmin && (
-            <>
-              <button onClick={() => navigate("/operations/poussage")}>
-                <FaIndustry /> Poussage
-              </button>
-
-              <button onClick={() => navigate("/operations/casement")}>
-                <FaBoxes /> Casement
-              </button>
-
-              <button onClick={() => navigate("/operations/transport")}>
-                <FaTruck /> Transport
-              </button>
-            </>
-          )}
-
-          {!isAdmin && currentUser?.mode_operation && (
-            <button onClick={() => navigate(`/operations/${currentUser.mode_operation}`)}>
-              <FaIndustry /> Mon Dashboard
-            </button>
-          )}
-
-          {/* 🔁 Retour */}
-          <button onClick={() => navigate("/")}>
-            <FaHome /> Retour à l'accueil
-          </button>
-
-        </div>
-
-        {/* LOGOUT */}
-        <button onClick={handleLogout} className="logout">
-          Déconnexion
-        </button>
-
-      </div>
+     
 
       {/* MAIN */}
       <div className="main-content">
@@ -225,11 +192,17 @@ const UserManagement = () => {
           </div>
         )}
 
-        {currentUser && isAdmin && (
-          <div className="welcome-badge">
-            Bienvenue, <strong>{currentUser.username}</strong>
-          </div>
-        )}
+       
+        {/* Bouton Retour */}
+<div className="back-btn-container">
+  <button className="btn-back" onClick={() => navigate("/")}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Retour à l'accueil
+  </button>
+</div>
 
         <h2>Gestion des Utilisateurs</h2>
 
@@ -299,7 +272,7 @@ const UserManagement = () => {
               <option value="superviseur">Superviseur</option>
             </select>
 
-            <button type="submit">
+            <button type="submit" className="add-btn">
               {editingId ? "Modifier" : "Ajouter"}
             </button>
           </form>

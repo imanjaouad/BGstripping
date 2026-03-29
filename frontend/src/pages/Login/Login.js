@@ -1,64 +1,91 @@
+// Import des hooks React
 import { useState } from "react";
+
+// Permet de naviguer entre les pages (React Router)
 import { useNavigate } from "react-router-dom";
+
+// Axios pour envoyer des requêtes HTTP vers ton backend (Laravel)
 import axios from "axios";
+
+// Import des icônes
+import { FaEye, FaEyeSlash, FaUser, FaLock } from "react-icons/fa";
+
+// Import du style CSS
 import "../../style/Login.css";
 
-import Navbar from "../Home/navBare";
-import Header from "../Home/Header";
-import Footer from "../Home/Footer";
-
-import { FaUser, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
+// Import du logo
 import logo from "../../images/logo.png";
 
+// Import du contexte d'authentification
+import { useAuth } from "../../components/AuthContext";
+
 export default function Login() {
+
+  // Hook pour redirection vers d'autres pages
   const navigate = useNavigate();
 
+  // État pour afficher ou cacher le mot de passe
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(""); // ✅ error state
 
+  // État pour afficher loading (spinner)
+  const [loading, setLoading] = useState(false);
+
+  // État pour afficher message d'erreur
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // État du formulaire (username, password, remember)
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    remember: false
+    remember: false,
   });
 
+  // Fonction login depuis AuthContext (stocke user + token)
+  const { login } = useAuth();
+
+  // Fonction appelée quand on clique sur "Se connecter"
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg(""); // ✅ reset error
+
+    e.preventDefault(); // Empêche le rechargement de la page
+    setLoading(true);   // Active le loading
+    setErrorMsg("");    // Réinitialise l'erreur
 
     try {
+      // Envoi des données vers Laravel API
       const res = await axios.post("http://127.0.0.1:8000/api/login", {
         username: formData.username,
-        password: formData.password
+        password: formData.password,
       });
 
+      // Récupération de l'utilisateur depuis la réponse
       const user = res.data.user;
 
-      // ✅ stockage
-      sessionStorage.setItem("token", res.data.token);
-      sessionStorage.setItem("user", JSON.stringify(user));
+      // Stocker user + token (dans localStorage ou context)
+      login(user, res.data.token);
 
-      if (formData.remember) {
-        localStorage.setItem("token", res.data.token);
-      }
-
-      // ✅ redirection
+      // Petite pause pour UX (animation)
       setTimeout(() => {
+
+        // Si admin → dashboard principal
         if (user.role === "admin") {
-          navigate("/admin/users");
+          navigate("/");
         } else {
+
+          // Sinon redirection selon type d'opération
           switch (user.mode_operation) {
+
             case "poussage":
               navigate("/operations/poussage/dashboard");
               break;
+
             case "casement":
               navigate("/operations/casement/dashboard");
               break;
+
             case "transport":
               navigate("/operations/transport");
               break;
+
             default:
               navigate("/");
           }
@@ -66,38 +93,79 @@ export default function Login() {
       }, 300);
 
     } catch (error) {
-      // ✅ message UX propre
-      setErrorMsg("Nom d'utilisateur ou mot de passe incorrect");
+
+      // Si erreur (login incorrect)
+      setErrorMsg("Identifiant ou mot de passe incorrect.");
+
+      // Désactiver loading
       setLoading(false);
     }
   };
 
+  // Liste des fonctionnalités affichées à gauche
+  const features = [
+    { icon: "⛏", label: "Poussage & suivi des opérations" },
+    { icon: "🏗", label: "Casement structuré et optimisé" },
+    { icon: "🚛", label: "Transport et logistique intégrés" },
+    { icon: "👥", label: "Gestion avancée des utilisateurs" },
+    { icon: "🔒", label: "Sécurité et contrôle d'accès renforcés" },
+    { icon: "📄", label: "Rapports détaillés et exportables" },
+    { icon: "📊", label: "Statistiques en temps réel" },
+  ];
+
   return (
-    <div className="page-wrapper">
-      <Navbar />
-      <Header />
+    <div className="ocp-page">
 
-      <main className="login-container">
-        <div className="login-card">
+      <div className="ocp-card">
 
-          {/* LOGO */}
-          <div className="logo-top">
-            <img src={logo} alt="logo" />
+        {/* PARTIE GAUCHE (Présentation) */}
+        <div className="ocp-left">
+
+          {/* Titre de l'application */}
+          <div className="ocp-app-title">BG Stripping</div>
+
+          <div className="ocp-divider" />
+
+          {/* Description */}
+          <p className="ocp-desc">
+            Notre application <strong>BG Stripping</strong> offre une gestion
+            complète des opérations industrielles :
+          </p>
+
+          {/* Liste des fonctionnalités */}
+          <ul className="ocp-features">
+            {features.map((f, i) => (
+              <li key={i} className="ocp-feature-item">
+                <span className="ocp-feature-dot" />
+                {f.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* PARTIE DROITE (Formulaire login) */}
+        <div className="ocp-right">
+
+          {/* Logo */}
+          <div className="ocp-logo-wrap">
+            <img src={logo} alt="Logo" className="ocp-logo-img" />
           </div>
 
-          <h2>Se Connecter</h2>
+          {/* Titre */}
+          <h2 className="ocp-form-title">Connexion</h2>
+          <p className="ocp-form-sub">Accédez à votre espace de travail</p>
 
-         
-
+          {/* FORMULAIRE */}
           <form onSubmit={handleLogin}>
 
-            {/* USERNAME */}
-            <div className="form-group">
-              <label htmlFor="username">Nom d'utilisateur:</label>
-              <div className="input-box">
-                <FaUser className="icon" />
+            {/* INPUT USERNAME */}
+            <div className="ocp-field">
+              <label>Nom d'utilisateur</label>
+
+              <div className="ocp-input-wrap">
+                <FaUser className="ocp-fi" />
+
                 <input
-                  id="username"
                   type="text"
                   placeholder="Nom d'utilisateur"
                   value={formData.username}
@@ -110,15 +178,16 @@ export default function Login() {
               </div>
             </div>
 
-            {/* PASSWORD */}
-            <div className="form-group">
-              <label htmlFor="password">Mot de passe:</label>
-              <div className="input-box">
-                <FaLock className="icon" />
+            {/* INPUT PASSWORD */}
+            <div className="ocp-field">
+              <label>Mot de passe</label>
+
+              <div className="ocp-input-wrap">
+                <FaLock className="ocp-fi" />
+
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mot de passe"
+                  type={showPassword ? "text" : "password"} // afficher ou cacher
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
@@ -126,8 +195,10 @@ export default function Login() {
                   required
                   disabled={loading}
                 />
+
+                {/* Bouton afficher/cacher password */}
                 <span
-                  className="toggle-pass"
+                  className="ocp-toggle-pass"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -135,9 +206,9 @@ export default function Login() {
               </div>
             </div>
 
-            {/* OPTIONS */}
-            <div className="options">
-              <label>
+            {/* CHECKBOX REMEMBER */}
+            <div className="ocp-options">
+              <label className="ocp-check-label">
                 <input
                   type="checkbox"
                   checked={formData.remember}
@@ -150,22 +221,22 @@ export default function Login() {
               </label>
             </div>
 
-            {/* BUTTON */}
+            {/* BOUTON LOGIN */}
             <button
               type="submit"
-              className={`login-btn ${loading ? "loading" : ""}`}
+              className={`ocp-btn${loading ? " loading" : ""}`}
               disabled={loading}
             >
-              {loading ? <span className="spinner"></span> : "Se Connecter"}
+              {/* Spinner si loading */}
+              {loading ? <span className="ocp-spinner" /> : "Se connecter"}
             </button>
-            {/* ✅ ERROR au dessous*/}
-{errorMsg && <div className="error-msg">{errorMsg}</div>}
 
+            {/* MESSAGE D'ERREUR */}
+            {errorMsg && <div className="ocp-error">{errorMsg}</div>}
           </form>
         </div>
-      </main>
 
-      <Footer />
+      </div>
     </div>
   );
 }
