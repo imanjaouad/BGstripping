@@ -316,7 +316,7 @@ const TD = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
               value={formData.profondeur} onChange={handleChange} placeholder="0.00" />
           </div>
           <div>
-            <label className="db-form-label">Volume Souté (t)</label>
+            <label className="db-form-label">Volume Sauté (t)</label>
             <input type="number" step="0.01" className="db-form-input" name="volume_sote"
               value={formData.volume_sote} onChange={handleChange} placeholder="0.00" />
           </div>

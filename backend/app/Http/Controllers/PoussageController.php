@@ -21,7 +21,11 @@ class PoussageController extends Controller
             'data' => $poussages,
         ]);
     }
-
+public function getPoussageData()
+{
+    $data = DB::table('poussages')->latest()->get();
+    return response()->json($data);
+}
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([

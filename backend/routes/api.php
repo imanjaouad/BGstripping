@@ -24,7 +24,7 @@ Route::middleware(['auth:sanctum','role:admin,superadmin'])->group(function () {
     Route::delete('/users/{id}',[UserController::class,'destroy']);
 
 });
-
+Route::get('/poussages', [YourController::class, 'getPoussageData']);
 // Routes pour la gestion de la sécurité (documents et images)
 Route::prefix('securite')->group(function () {
    Route::get('/securite/{id}/download', [SecuriteController::class, 'download']);     // Lister les fichiers
