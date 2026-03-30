@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { addCasement, updateCasement, deleteCasement, fetchCasements } from "../../features/casementSlice";
 import image from "../../images/image3.webp";
-import UseAuth from "../../components/UseAuth";
+
 /* ═══════════════════════════════════════════════════════════════════════════
    CASEMENT  — DASHBOARD FORM
    CHANGES:
@@ -811,8 +811,7 @@ function RendementRing({ value, max = 200 }) {
 /* ══════════════════════════════════════════════════════════════════════════
    CONFIRM DIALOG
 ══════════════════════════════════════════════════════════════════════════ */
-function ConfirmDialog({ open, label, onConfirm, onCancel, isAdmin  }) {
-
+function ConfirmDialog({ open, label, onConfirm, onCancel }) {
   if (!open) return null;
   return (
     <div className="lcsm-dlg-overlay" onClick={onCancel}>
@@ -829,14 +828,11 @@ function ConfirmDialog({ open, label, onConfirm, onCancel, isAdmin  }) {
           Voulez-vous vraiment supprimer l'opération <strong>«&nbsp;{label}&nbsp;»</strong> ?<br/>
           Cette action est irréversible.
         </div>
-         {isAdmin && (
         <div className="lcsm-dlg-btns">
           <button className="lcsm-dlg-cancel" onClick={onCancel}>Annuler</button>
           <button className="lcsm-dlg-confirm" onClick={onConfirm}>Supprimer</button>
         </div>
-         )}
       </div>
-         
     </div>
   );
 }
@@ -898,7 +894,7 @@ function LcsmToast({ toasts, onClose }) {
 function Gestion() {
   const dispatch  = useDispatch();
   const casements = useSelector((s) => s.casement?.list || []);
-const { isAdmin } = UseAuth();
+
   // ── Lecture de l'état de navigation (données pré-remplies depuis Statistique_Casement) ──
   const location = useLocation();
   const navigate = useNavigate();
@@ -1134,7 +1130,6 @@ const { isAdmin } = UseAuth();
         label={confirmDlg.label}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDlg({ open: false, id: null, index: null, label: "" })}
-       isAdmin={isAdmin}
       />
       <div className="lcsm-bg" /><div className="lcsm-dots" />
       <div className="lcsm-leaf lcsm-leaf-1" /><div className="lcsm-leaf lcsm-leaf-2" />
@@ -1169,7 +1164,6 @@ const { isAdmin } = UseAuth();
                       onClick={() => toggleEquip(eq)}
                     >
                       {eq}
-                       {isAdmin && (
                       <button
                         type="button"
                         className="lcsm-chip-delete"
@@ -1178,14 +1172,11 @@ const { isAdmin } = UseAuth();
                       >
                         ×
                       </button>
-                       )}
                     </div>
                   ))}
-                   {isAdmin && (
                   <button type="button" className="lcsm-chip-add" onClick={addEquip}>
                     Ajouter équipement
                   </button>
-                   )}
                 </div>
               </div>
 
@@ -1194,26 +1185,25 @@ const { isAdmin } = UseAuth();
 
               <Field label="Date">
                 <input type="date" className="lcsm-input" name="date"
-                  value={form.date} onChange={handleChange} required
-                   disabled={!isAdmin} />
+                  value={form.date} onChange={handleChange} required />
               </Field>
 
               <Field label="Panneau">
                 <input type="text" className="lcsm-input" name="panneau"
-                  placeholder="ex : P-12" value={form.panneau} onChange={handleChange}  disabled={!isAdmin} />
+                  placeholder="ex : P-12" value={form.panneau} onChange={handleChange} />
               </Field>
 
               <Field label="Tranchée">
                 <input type="text" className="lcsm-input" name="tranchee"
-                  placeholder="ex : T-03" value={form.tranchee} onChange={handleChange}  disabled={!isAdmin} />
+                  placeholder="ex : T-03" value={form.tranchee} onChange={handleChange} />
               </Field>
                <Field label="Niveau">
                 <input type="text" className="lcsm-input" name="niveau"
-                  placeholder="ex : N-1" value={form.niveau} onChange={handleChange}  disabled={!isAdmin} />
+                  placeholder="ex : N-1" value={form.niveau} onChange={handleChange} />
               </Field>   
               <Field label="Profondeur">
                 <input type="text" className="lcsm-input" name="profondeur"
-                  placeholder="ex : −45 m" value={form.profondeur} onChange={handleChange}   disabled={!isAdmin}/>
+                  placeholder="ex : −45 m" value={form.profondeur} onChange={handleChange} />
               </Field>
 
               {/* ── 02 · PRODUCTION ── */}
@@ -1221,7 +1211,7 @@ const { isAdmin } = UseAuth();
 
               <Field label="Volume Sauté">
                 <input type="number" className="lcsm-input" name="volume_saute"
-                  placeholder="m²" value={form.volume_saute} onChange={handleChange}  disabled={!isAdmin} />
+                  placeholder="m²" value={form.volume_saute} onChange={handleChange} />
               </Field>
 
               {/* ── 03 · TEMPS ── */}
@@ -1229,17 +1219,17 @@ const { isAdmin } = UseAuth();
 
               <Field label="Début du Compteur">
                 <input type="time" className="lcsm-input" name="heureDebutCompteur"
-                  value={form.heureDebutCompteur} onChange={handleChange}  disabled={!isAdmin}/>
+                  value={form.heureDebutCompteur} onChange={handleChange} />
               </Field>
 
               <Field label="Fin du Compteur">
                 <input type="time" className="lcsm-input" name="heureFinCompteur"
-                  value={form.heureFinCompteur} onChange={handleChange}  disabled={!isAdmin} />
+                  value={form.heureFinCompteur} onChange={handleChange} />
               </Field>
 
               <Field label="hHeur de marche" auto>
                 <input type="number" className="lcsm-input" name="temps"
-                  value={form.temps} readOnly placeholder="calculé auto"  disabled={!isAdmin} />
+                  value={form.temps} readOnly placeholder="calculé auto" />
               </Field>
 
               <Field label="HTP — Heures Travail Pur">
@@ -1248,7 +1238,6 @@ const { isAdmin } = UseAuth();
                   onChange={handleChange}
                   placeholder={TB > 0 ? `auto : ${Math.max(0, TB - TA).toFixed(2)} h` : "ex : 6.5"}
                   min="0" max="24" step="0.01"
-                   disabled={!isAdmin}
                 />
               </Field>
 
@@ -1257,12 +1246,12 @@ const { isAdmin } = UseAuth();
 
               <Field label="Conducteur">
                 <input type="text" className="lcsm-input" name="conducteur"
-                  placeholder="Nom complet" value={form.conducteur} onChange={handleChange}   disabled={!isAdmin}/>
+                  placeholder="Nom complet" value={form.conducteur} onChange={handleChange} />
               </Field>
 
               <Field label="Matricule">
                 <input type="text" className="lcsm-input" name="matricule"
-                  placeholder="MAT-XXXX" value={form.matricule} onChange={handleChange}  disabled={!isAdmin} />
+                  placeholder="MAT-XXXX" value={form.matricule} onChange={handleChange} />
               </Field>
 
               <Field label="Poste">
@@ -1272,7 +1261,6 @@ const { isAdmin } = UseAuth();
                   <option value="1er">1er </option>
                   <option value="2eme">2ème </option>
                   <option value="3eme">3ème </option>
-                   disabled={!isAdmin}
                 </select>
               </Field>
 
@@ -1284,7 +1272,7 @@ const { isAdmin } = UseAuth();
               <Field label="État Machine">
                 <select
                   className={`lcsm-select${isArret ? " lcsm-select-danger" : ""}`}
-                  name="etatMachine" value={form.etatMachine} onChange={handleChange}  disabled={!isAdmin}
+                  name="etatMachine" value={form.etatMachine} onChange={handleChange}
                 >
                   <option value="marche">En marche</option>
                   <option value="arret">En arrêt</option>
@@ -1300,15 +1288,15 @@ const { isAdmin } = UseAuth();
                     <Field label="Nature d'arrêt">
                       <input type="text" className="lcsm-input" name="typeArret"
                         placeholder="Panne / Maintenance…"
-                        value={form.typeArret} onChange={handleChange}  disabled={!isAdmin} />
+                        value={form.typeArret} onChange={handleChange} />
                     </Field>
                     <Field label="Heure Début Arrêt">
                       <input type="time" className="lcsm-input" name="heureDebutArret"
-                        value={form.heureDebutArret} onChange={handleChange}  disabled={!isAdmin} />
+                        value={form.heureDebutArret} onChange={handleChange} />
                     </Field>
                     <Field label="Heure Fin Arrêt">
                       <input type="time" className="lcsm-input" name="heureFinArret"
-                        value={form.heureFinArret} onChange={handleChange}  disabled={!isAdmin} />
+                        value={form.heureFinArret} onChange={handleChange} />
                     </Field>
                   </div>
                 </div>
@@ -1441,7 +1429,7 @@ const { isAdmin } = UseAuth();
                 </div>
               </div>
 
-              {/* ── ACTIONS ── */} {isAdmin && (
+              {/* ── ACTIONS ── */}
               <div className="lcsm-action-row">
                 <button type="submit" className="lcsm-btn-submit" disabled={submitting}>
                   {editIndex !== null ? (
@@ -1458,7 +1446,7 @@ const { isAdmin } = UseAuth();
                   </button>
                 )}
               </div>
-              )}
+
             </div>
           </form>
         </div>
@@ -1534,7 +1522,7 @@ const { isAdmin } = UseAuth();
                     <th>HTP (h)</th>
                     <th>OEE</th>
                     <th>État</th>
-                   {isAdmin && <th>Action</th>}
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1579,9 +1567,7 @@ const { isAdmin } = UseAuth();
                             : <span className="lcsm-badge-arret">Arrêt</span>
                           }
                         </td>
-                         {isAdmin && (
                         <td>
-                          
                           <div className="lcsm-tbl-actions">
                             <button
                               type="button"
@@ -1610,9 +1596,7 @@ const { isAdmin } = UseAuth();
                               Supprimer
                             </button>
                           </div>
-                          
                         </td>
-                         )}
                       </tr>
                     );
                   })}

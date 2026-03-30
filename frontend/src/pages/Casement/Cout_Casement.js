@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Chart, registerables } from "chart.js";
 import "../../components/animations.css";
-import UseAuth from "../../components/UseAuth";
+
 // ── SVG icons ────────────────────────────────────────────────────────────────
 const IcoMoney    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
 const IcoCalc     = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>;
@@ -96,7 +96,7 @@ function CoutCasement() {
   const casements = useSelector((state) =>
     state.casement?.list ?? []
   );
-const { isAdmin } = UseAuth();
+
   const [coupCost,      setCoupCost]      = useState("");   // coût par coup 
   const [annualCost,    setAnnualCost]    = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -383,7 +383,6 @@ const { isAdmin } = UseAuth();
                 className="form-control"
                 onFocus={e=>{e.target.style.borderColor="#16A34A";e.target.style.boxShadow="0 0 0 4px rgba(22,163,74,0.08)";}}
                 onBlur={e=>{e.target.style.borderColor="#E5E7EB";e.target.style.boxShadow="none";}}
-                disabled={!isAdmin}
               />
               <span style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",fontSize:".82rem",fontWeight:600,color:"#9CA3AF"}}>
                 MAD
@@ -402,7 +401,6 @@ const { isAdmin } = UseAuth();
                 className="form-control"
                 onFocus={e=>{e.target.style.borderColor="#16A34A";e.target.style.boxShadow="0 0 0 4px rgba(22,163,74,0.08)";}}
                 onBlur={e=>{e.target.style.borderColor="#E5E7EB";e.target.style.boxShadow="none";}}
-                disabled={!isAdmin}
               />
               <span style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",fontSize:".82rem",fontWeight:600,color:"#9CA3AF"}}>
                 MAD
@@ -419,7 +417,6 @@ const { isAdmin } = UseAuth();
               className="form-select" style={inputStyle}
               onFocus={e=>{e.target.style.borderColor="#16A34A";e.target.style.boxShadow="0 0 0 4px rgba(22,163,74,0.08)";}}
               onBlur={e=>{e.target.style.borderColor="#E5E7EB";e.target.style.boxShadow="none";}}
-              disabled={!isAdmin}
             >
               <option value="">Sélectionner un mois</option>
               {availableMonths.map((m,i)=><option key={i} value={m}>{m}</option>)}
@@ -428,7 +425,6 @@ const { isAdmin } = UseAuth();
         </div>
 
         {/* Boutons */}
-        {isAdmin && (
         <div style={{display:"flex",gap:12,marginTop:20,flexWrap:"wrap"}}>
           <button onClick={calculateBudget}
             disabled={!coupCost||!annualCost||!selectedMonth}
@@ -472,11 +468,10 @@ const { isAdmin } = UseAuth();
             </button>
           )}
         </div>
-         )}
       </div>
 
       {/* ── KPI Row ─────────────────────────────────────────────────────── */}
-     {isAdmin && history.length > 0 && (
+      {history.length>0&&(
         <div style={{display:"flex",gap:20,marginBottom:28,flexWrap:"wrap"}}>
 
           <KpiCard label="Coût Total Cumulé" value={fmt(totalCost)} unit=" MAD" icon={<IcoMoney/>} delay=".1s"/>
@@ -600,8 +595,7 @@ const { isAdmin } = UseAuth();
                   <th>Coût/Coup (MAD)</th>
                   <th>Coût (MAD)</th><th>Budget Annuel (MAD)</th>
                   <th>Coût Total (MAD)</th><th>% Budget</th>
-                  <th>Progression</th>
-                  {isAdmin && <th>Action</th>}
+                  <th>Progression</th><th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -627,11 +621,9 @@ const { isAdmin } = UseAuth();
                           <span style={{fontFamily:DASH_FONT,fontWeight:700,fontSize:".85rem",color,minWidth:38,textAlign:"right"}}>{pct.toFixed(1)}%</span>
                         </div>
                       </td>
-                       {isAdmin && (
                       <td>
                         <button className="cout-del-btn" onClick={()=>removeEntry(i)} title="Supprimer"><IcoTrash/></button>
                       </td>
-                       )}
                     </tr>
                   );
                 })}

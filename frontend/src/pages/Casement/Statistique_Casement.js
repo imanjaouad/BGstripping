@@ -17,8 +17,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import image from "../../images/image3.webp";
 import RapportCasement from "./Rapport_Casement";
-import "../../style/Casement.css";
-import UseAuth from "../../components/UseAuth";
+import "../../style/Casement.css"
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend, Filler, ArcElement
@@ -462,7 +461,7 @@ function StatistiqueCasement() {
   const casements = useSelector((s) => s.casement?.list || []);
   const location  = useLocation();
   const navigate  = useNavigate();
-const { isAdmin } = UseAuth();
+
   // Navigation — saisie et historique gérés sur d'autres pages
   const activeTab = location.pathname.endsWith("couts") ? "couts" : "overview";
 
@@ -970,73 +969,71 @@ const { isAdmin } = UseAuth();
         <div className="db-form-grid">
           <div><label className="db-form-label">Date</label>
             <input className="db-form-input" type="date" name="date"
-              value={formData.date} onChange={handleChange} required
-               disabled={!isAdmin}/></div>
+              value={formData.date} onChange={handleChange} required/></div>
           <div><label className="db-form-label">Panneau</label>
             <input className="db-form-input" type="text" name="panneau"
-              value={formData.panneau} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.panneau} onChange={handleChange}/></div>
           <div><label className="db-form-label">Tranchée</label>
             <input className="db-form-input" type="text" name="tranchee"
-              value={formData.tranchee} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.tranchee} onChange={handleChange}/></div>
           <div><label className="db-form-label">Niveau</label>
             <input className="db-form-input" type="text" name="niveau"
-              value={formData.niveau} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.niveau} onChange={handleChange}/></div>
           <div><label className="db-form-label">Volume Sauté (t)</label>
             <input className="db-form-input" type="number" name="volume_saute"
-              value={formData.volume_saute} onChange={handleChange} required  disabled={!isAdmin}/></div>
+              value={formData.volume_saute} onChange={handleChange} required/></div>
           <div><label className="db-form-label">Granulométrie (mm)</label>
             <input className="db-form-input" type="number" name="granulometrie"
-              value={formData.granulometrie} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.granulometrie} onChange={handleChange}/></div>
           <div><label className="db-form-label">Type de Roche</label>
             <select className="db-form-select" name="type_roche"
               value={formData.type_roche} onChange={handleChange}>
               <option value="">— Sélectionner —</option>
               <option>Phosphate</option><option>Silex</option>
-              <option>Calcaire</option><option>Argile</option><option>Mixte</option>  disabled={!isAdmin}
+              <option>Calcaire</option><option>Argile</option><option>Mixte</option>
             </select></div>
           <div><label className="db-form-label">Nombre de Coups </label>
             <input className="db-form-input" type="number" name="nombreCoups"
-              placeholder="coups " value={formData.nombreCoups} onChange={handleChange}  disabled={!isAdmin}/></div>
+              placeholder="coups " value={formData.nombreCoups} onChange={handleChange}/></div>
           <div><label className="db-form-label">Heure de Début</label>
             <input className="db-form-input" type="time" name="heureDebut"
-              value={formData.heureDebut} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.heureDebut} onChange={handleChange}/></div>
           <div><label className="db-form-label">Heure de Fin</label>
             <input className="db-form-input" type="time" name="heureFin"
-              value={formData.heureFin} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.heureFin} onChange={handleChange}/></div>
           <div><label className="db-form-label">
               Heures de Marche <span className="db-auto-badge">AUTO</span>
             </label>
             <input className="db-form-input" type="number" name="temps"
               value={formData.temps} onChange={handleChange}
               placeholder="Calculé automatiquement"
-              readOnly={!!(formData.heureDebut&&formData.heureFin)} required  disabled={!isAdmin}/></div>
+              readOnly={!!(formData.heureDebut&&formData.heureFin)} required/></div>
           <div><label className="db-form-label">Conducteur</label>
             <input className="db-form-input" type="text" name="conducteur"
-              value={formData.conducteur} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.conducteur} onChange={handleChange}/></div>
           <div><label className="db-form-label">Matricule</label>
             <input className="db-form-input" type="text" name="matricule"
-              value={formData.matricule} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.matricule} onChange={handleChange}/></div>
           <div><label className="db-form-label">Poste</label>
             <input className="db-form-input" type="text" name="poste"
               placeholder="Matin / Après-midi / Nuit"
-              value={formData.poste} onChange={handleChange}  disabled={!isAdmin}/></div>
+              value={formData.poste} onChange={handleChange}/></div>
           <div><label className="db-form-label">État Machine</label>
             <select className="db-form-select" name="etatMachine"
               value={formData.etatMachine} onChange={handleChange}>
               <option>En marche</option>
               <option>En arrêt</option>
-               disabled={!isAdmin}
             </select></div>
           {formData.etatMachine==="En arrêt"&&(<>
             <div><label className="db-form-label">Nature d'arrêt</label>
               <input className="db-form-input" type="text" name="typeArret"
-                value={formData.typeArret} onChange={handleChange}  disabled={!isAdmin}/></div>
+                value={formData.typeArret} onChange={handleChange}/></div>
             <div><label className="db-form-label">Heure Début Arrêt</label>
               <input className="db-form-input" type="time" name="heureDebutArret"
-                value={formData.heureDebutArret} onChange={handleChange}  disabled={!isAdmin}/></div>
+                value={formData.heureDebutArret} onChange={handleChange}/></div>
             <div><label className="db-form-label">Heure Fin Arrêt</label>
               <input className="db-form-input" type="time" name="heureFinArret"
-                value={formData.heureFinArret} onChange={handleChange}  disabled={!isAdmin}/></div>
+                value={formData.heureFinArret} onChange={handleChange}/></div>
           </>)}
         </div>
 
@@ -1051,7 +1048,7 @@ const { isAdmin } = UseAuth();
                 {eq}
               </div>
             ))}
-            {isAdmin && ( <button type="button" className="db-equip-add" onClick={addEquip}>＋ Ajouter</button>)}
+            <button type="button" className="db-equip-add" onClick={addEquip}>＋ Ajouter</button>
           </div>
         </div>
 
