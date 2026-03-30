@@ -18,7 +18,7 @@ export default function Footer() {
           <div>
             <h5>Navigation</h5>
             <ul>
-              <li><Link to="/">Accueil</Link></li>
+              <li><a href="#accueille">Accueil</a></li>
               <li><a href="#definition">Définition</a></li>
               <li><a href="#operations">Opérations</a></li>
               <li><Link to="/securite">Sécurité</Link></li>

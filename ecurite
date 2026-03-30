@@ -1,0 +1,86 @@
+[33mcommit 26ca0cda2d99f1a90067ec4434966f4b0917884e[m
+Author: imane <imanjaouad480@gmail.com>
+Date:   Thu Mar 26 08:18:51 2026 +0000
+
+    Ignore .rar files
+
+[33mcommit 05177e593e6619305ccab7a7510ee56cfc5cfcbf[m
+Author: imane <imanjaouad480@gmail.com>
+Date:   Thu Mar 26 07:44:29 2026 +0000
+
+    Merge clean branch
+
+[33mcommit 31231ee98a8d61bc16da221d1ce21287bf8f99a4[m
+Merge: 0cab9a6 f281ced
+Author: imane <imanjaouad480@gmail.com>
+Date:   Thu Mar 26 07:19:54 2026 +0000
+
+    Merge clean branch
+
+[33mcommit 0cab9a60717c7e132a15aa434c282dae85a100df[m
+Merge: 047edd3 a886071
+Author: imane <imanjaouad480@gmail.com>
+Date:   Thu Mar 26 06:54:51 2026 +0000
+
+    Resolve merge conflicts
+
+[33mcommit 047edd37412dd17100110cd83968c71d548d375a[m
+Author: imane <imanjaouad480@gmail.com>
+Date:   Thu Mar 26 06:47:56 2026 +0000
+
+    modification dans la page d'accueille
+
+[33mcommit 8e448e387dc247ef7be2e9b03109741d75e874a2[m
+Author: Zohair Merchoud <merchoudzohair@gmail.com>
+Date:   Wed Mar 25 23:38:30 2026 +0100
+
+    update transport
+
+[33mcommit a8860719d57f552aa32c50aae71186574f2661ba[m
+Author: Zohair Merchoud <merchoudzohair@gmail.com>
+Date:   Wed Mar 25 23:38:30 2026 +0100
+
+    update transport
+
+[33mcommit f281cedfc8915bcd153f56e1027a83de272d5916[m
+Author: imane <imanjaouad480@gmail.com>
+Date:   Wed Mar 25 10:22:01 2026 +0000
+
+    Clean project without large files
+
+[33mcommit 6b16683447a26cf824914497eee8712037d3e168[m
+Author: imane <imanjaouad480@gmail.com>
+Date:   Wed Mar 25 09:19:40 2026 +0000
+
+    ajout de page de securite
+
+[33mcommit a465a9df267e4af8726b280c5108e7f555ab361b[m
+Author: imane <imanjaouad480@gmail.com>
+Date:   Wed Mar 25 09:06:01 2026 +0000
+
+    Ignore large files
+
+[33mcommit 2372d083adf6a582041866892cb0b93017a112bb[m
+Merge: d60185f e966a98
+Author: imane <imanjaouad480@gmail.com>
+Date:   Wed Mar 25 08:58:25 2026 +0000
+
+    Merge latest changes from main
+
+[33mcommit d60185f44bf5331a51c171b22d6fb94296e6fc9c[m
+Author: imane <imanjaouad480@gmail.com>
+Date:   Wed Mar 25 08:58:10 2026 +0000
+
+    ajout de page de securite
+
+[33mcommit a305da42e31ccebbe612f29a4f0a7254fdfbd988[m
+Author: Saida <saidaaitzine532@gmail.com>
+Date:   Wed Mar 25 09:52:50 2026 +0100
+
+    'changes'
+
+[33mcommit e966a987e7cd3dc682dbb3b463eed0db6f81c88b[m
+Author: Saida <saidaaitzine532@gmail.com>
+Date:   Wed Mar 25 09:52:50 2026 +0100
+
+    'changes'

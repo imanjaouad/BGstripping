@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -62,6 +62,20 @@ return [
                 (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        
+        'tir_sautage' => [
+    'driver' => 'mysql',
+    'host' => env('DB_TIR_HOST', '127.0.0.1'),
+    'port' => env('DB_TIR_PORT', '3306'),
+    'database' => env('DB_TIR_DATABASE', 'tir_sautage'),
+    'username' => env('DB_TIR_USERNAME', 'root'),
+    'password' => env('DB_TIR_PASSWORD', ''),
+    'charset' => 'utf8mb4',
+    'collation' => 'utf8mb4_unicode_ci',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'strict' => true,
+],
 
         'mariadb' => [
             'driver' => 'mariadb',

@@ -4,15 +4,20 @@ import "../../style/Home.css";
 import image1 from "../../images/700.jpg";
 import image2 from "../../images/7001.jpeg"
 import image3 from "../../images/ph.jpg"
+import image4 from "../../images/poussage.png";
+import image5 from "../../images/poussage2.png";
+import image6 from "../../images/transport.png";
+import image7 from "../../images/transport2.jpg";
+import image8 from "../../images/transport3.png";
+
+
 
 const operations = [
   {
     href: "/operations/poussage",
     images: [
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/operation-poussage-Fgb9EYVkcbkcCXu7xP5CZJ.webp",
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
-      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+      image4, image5
+      
     ],
     title: "Poussage",
     description: "Gestion des opérations d'extraction et de retrait des matériaux.",
@@ -29,10 +34,7 @@ const operations = [
   {
     href: "/operations/transport",
     images: [
-      "https://d2xsxph8kpxj0f.cloudfront.net/310519663205468249/85zuLatPDUpDsHYShiK7dK/transport-logistics-cFkpN6FkUL2xZuhtUWZVXY.webp",
-      "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=600&q=80",
-      "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&q=80",
-      "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=600&q=80",
+    image6,image7, image8
     ],
     title: "Transport",
     description: "Suivi des chargements et gestion de la logistique de transport.",

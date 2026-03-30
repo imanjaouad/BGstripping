@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
     // Au lieu de User::factory()->create([...])
    User::create([
     'username'      => 'admin',
- 'password'=>Hash::make('admin'),
+    'password'=>Hash::make('admin'),
         'role'          => 'admin',
     ]);
     }
