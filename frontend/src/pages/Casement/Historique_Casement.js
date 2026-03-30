@@ -6,7 +6,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
+import UseAuth from "../../components/UseAuth";
 /* ══════════════════════════════════════════════════════════════════════════
    HistoriqueCasement
    ──────────────────────────────────────────────────────────────────────────
@@ -301,7 +301,7 @@ function HistoriqueCasement() {
   const storeError = useSelector((state) => state.casement?.error    ?? null);
   const dispatch   = useDispatch();
   const navigate   = useNavigate();
-
+ const { isAdmin } = UseAuth();
   /* ① Charger depuis la BDD au montage — données survivent au refresh */
   useEffect(() => {
     dispatch(fetchCasements());
@@ -555,6 +555,7 @@ return (
         <strong>{confirmDlg.label}</strong>
         <br/>Cette action supprimera définitivement l'enregistrement de la base de données.
       </div>
+       {isAdmin && (
       <div className="modal-btns">
         <button
           className="modal-cancel"
@@ -571,6 +572,7 @@ return (
           {confirmDlg.deleting ? "Suppression…" : "Supprimer"}
         </button>
       </div>
+       )}
     </div>
   </div>
 )}
@@ -755,7 +757,7 @@ return (
             <th>Tu</th>
             <th>TD</th>
             <th>État Machine</th>
-            <th>Actions</th>
+            {isAdmin && <th>Action</th>}
           </tr>
         </thead>
 
@@ -795,6 +797,7 @@ return (
                   </span>
                 </td>
                 <td>
+                   {isAdmin && (
                   <div className="actions-cell">
                     <button className="btn-edit" onClick={() => handleEdit(c)}>
                       ✏️ Modifier
@@ -803,6 +806,7 @@ return (
                       🗑️ Supprimer
                     </button>
                   </div>
+                   )}
                 </td>
               </tr>
               );

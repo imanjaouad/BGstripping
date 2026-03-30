@@ -29,4 +29,8 @@ class TransportJournalier extends Model
         'capacite_camion' => 'decimal:2',
         'volume_decape' => 'decimal:2',
     ];
+
+   
+
+    
 }

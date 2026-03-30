@@ -1,0 +1,57 @@
+[33m63aeb1f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: commit: update transport
+[33m8e448e3[m HEAD@{1}: reset: moving to HEAD
+[33m8e448e3[m HEAD@{2}: commit: update transport
+[33ma305da4[m HEAD@{3}: pull: Fast-forward
+[33m7bab6af[m HEAD@{4}: pull: Fast-forward
+[33m566129e[m HEAD@{5}: reset: moving to HEAD
+[33m566129e[m HEAD@{6}: commit: update htp
+[33m819d0f5[m HEAD@{7}: commit: update pousage (+htp)
+[33m4d153fd[m HEAD@{8}: commit: update transport
+[33m3e95f98[m HEAD@{9}: pull: Fast-forward
+[33mc89739c[m HEAD@{10}: reset: moving to HEAD
+[33mc89739c[m HEAD@{11}: pull: Fast-forward
+[33ma8e5b70[m HEAD@{12}: commit: Suppression de la gestion des utilisateurs
+[33m546bff6[m HEAD@{13}: checkout: moving from main to main
+[33m546bff6[m HEAD@{14}: checkout: moving from main to main
+[33m546bff6[m HEAD@{15}: commit (merge): fix version merge
+[33m0cd8dfb[m HEAD@{16}: commit: ajout de la gestion des utilisateurs
+[33m957632b[m HEAD@{17}: commit: ajout du backend complet
+[33m367f315[m HEAD@{18}: commit (merge): merge: integrate remote changes
+[33m0bd2788[m HEAD@{19}: commit: ajout backend de casement
+[33mee65b2a[m HEAD@{20}: commit: ajout du backend de poussage
+[33m7f69799[m HEAD@{21}: commit: ajout des modification dans casement
+[33m9953c76[m HEAD@{22}: commit: l'ajout de page casement
+[33mfdd4ba1[m HEAD@{23}: commit: modification de App.js
+[33m2efef4a[m HEAD@{24}: pull: Merge made by the 'ort' strategy.
+[33m2dd8e68[m HEAD@{25}: commit: structuration de page poussage
+[33m93e39c9[m HEAD@{26}: commit: mise à jour du projet : suppression et ajout de fichiers
+[33md8b1da9[m HEAD@{27}: checkout: moving from main to main
+[33md8b1da9[m HEAD@{28}: checkout: moving from main to main
+[33md8b1da9[m HEAD@{29}: rebase (finish): returning to refs/heads/main
+[33md8b1da9[m HEAD@{30}: commit: ajout de page poussage
+[33m4b5f417[m HEAD@{31}: pull origin main --rebase (start): checkout 4b5f4178c96797e2e86fb7f514031322708293f4
+[33m4313016[m HEAD@{32}: commit: ajout de page poussage
+[33m7142923[m HEAD@{33}: pull origin main --rebase (finish): returning to refs/heads/main
+[33m7142923[m HEAD@{34}: pull origin main --rebase (pick): modification de app.js et index.js
+[33m71e1588[m HEAD@{35}: pull origin main --rebase (start): checkout 71e1588f6a196355aee2e0e801bfa4026c7be0ce
+[33m98ae63b[m HEAD@{36}: checkout: moving from IMANE to main
+[33m8355333[m[33m ([m[1;32mIMANE[m[33m)[m HEAD@{37}: pull origin IMANE --rebase: Fast-forward
+[33m18280d0[m HEAD@{38}: checkout: moving from main to IMANE
+[33m98ae63b[m HEAD@{39}: commit: modification de app.js et index.js
+[33m53258bc[m HEAD@{40}: commit (merge): Merge remote changes into main
+[33m18280d0[m HEAD@{41}: merge IMANE: Fast-forward
+[33mb3f917c[m HEAD@{42}: checkout: moving from IMANE to main
+[33m18280d0[m HEAD@{43}: commit: ajout des images
+[33m6121139[m HEAD@{44}: commit: ajout de page d'accueille
+[33mb3f917c[m HEAD@{45}: checkout: moving from main to IMANE
+[33mb3f917c[m HEAD@{46}: commit: move react app into frontend folder
+[33mc98c0f6[m HEAD@{47}: commit: move react app into frontend folder
+[33m74864c0[m HEAD@{48}: pull origin main: Fast-forward
+[33mac3ffe2[m HEAD@{49}: commit: Fix: restructure - remove nested folders
+[33mc5fcbf2[m HEAD@{50}: commit: Clean: remove src, public and root config files
+[33m6be1f88[m HEAD@{51}: commit (merge): Merge: resolve conflicts
+[33mbba18fb[m HEAD@{52}: commit: cleanup: remove root react files
+[33m6af07c3[m HEAD@{53}: commit: Move files and folders to frontend
+[33m70f38d9[m HEAD@{54}: commit: Ajout du dossier backend
+[33mf0259a3[m HEAD@{55}: Branch: renamed refs/heads/master to refs/heads/main
+[33mf0259a3[m HEAD@{57}: commit (initial): initial commit

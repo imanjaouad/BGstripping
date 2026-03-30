@@ -352,25 +352,6 @@
   .logo-text {
     font-size: 1.1rem;
   }
-}
-/* bouton se connecter */
-
-.connexion-btn{
-  background: transparent;
-  border:2px solid var(--primary-green);
-  color:var(--primary-green);
-  padding:0.55rem 1.4rem;
-  border-radius:8px;
-  font-size:0.9rem;
-  font-weight:600;
-  cursor:pointer;
-  transition:all .3s ease;
-}
-
-.connexion-btn:hover{
-  background:var(--primary-green);
-  color:white;
-  transform:translateY(-2px);
-  box-shadow:0 4px 8px var(--shadow-color);
 
 }
+

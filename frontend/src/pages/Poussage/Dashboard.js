@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchPoussages, addPoussageAsync, updatePoussageAsync } from "../../features/poussageSlice";
 import image from "../../images/image3.webp";
 import "../../style/PoussageForm.css";
-
+import UseAuth from "../../components/UseAuth";
 function Dashboard() {
   const dispatch = useDispatch();
   const { loading } = useSelector((s) => s.poussage);
-
+  const { isAdmin } = UseAuth();
   useEffect(() => {
     dispatch(fetchPoussages());
   }, [dispatch]);
@@ -33,7 +33,6 @@ function Dashboard() {
     heureDebut: "",
     heureFin: "",
     temps: "",
-   
     poste: "",
     etat_machine: "En marche",
     type_arret: "",
@@ -66,6 +65,7 @@ function Dashboard() {
 
   // FIX 3 : accolade fermante mal placée — le bloc if(etat_machine) était sorti de la fonction
   const handleChange = (e) => {
+    if (!isAdmin) return;
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
 
@@ -93,6 +93,7 @@ function Dashboard() {
   };
 
   const handleEquipementChange = (equipement) => {
+    if (!isAdmin) return;
     const list = formData.equipements;
     setFormData({
       ...formData,
@@ -103,6 +104,7 @@ function Dashboard() {
   };
 
   const addEquipement = () => {
+    if (!isAdmin) return;
     const newEquip = prompt("Entrer le nom du nouvel équipement");
     if (newEquip && !equipementOptions.includes(newEquip)) {
       setEquipementOptions([...equipementOptions, newEquip]);
@@ -112,6 +114,7 @@ function Dashboard() {
   const resetForm = () => setFormData(emptyForm);
 
   const handleSubmit = async (e) => {
+    if (!isAdmin) return;
     e.preventDefault();
     try {
       if (editIndex !== null && editId) {
@@ -280,77 +283,92 @@ const TD = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
 
       {/* FORM */}
       <div className="form-card">
+       
         <form onSubmit={handleSubmit} className="db-form-grid">
 
           {/* ROW 1 — Localisation */}
           <div>
             <label className="db-form-label">Date</label>
             <input type="date" className="db-form-input" name="date"
-              value={formData.date} onChange={handleChange} required />
+              value={formData.date} onChange={handleChange} required
+               disabled={!isAdmin} />
           </div>
           <div>
             <label className="db-form-label">Panneau</label>
             <input type="text" className="db-form-input" name="panneau"
-              value={formData.panneau} onChange={handleChange} placeholder="Ex: P1" />
+              value={formData.panneau} onChange={handleChange} placeholder="Ex: P1"
+               disabled={!isAdmin}
+               />
           </div>
           <div>
             <label className="db-form-label">Tranchée</label>
             <input type="text" className="db-form-input" name="tranchee"
-              value={formData.tranchee} onChange={handleChange} placeholder="Ex: TR12" />
+              value={formData.tranchee} onChange={handleChange} placeholder="Ex: TR12"
+               disabled={!isAdmin} />
           </div>
           <div>
             <label className="db-form-label">Niveau</label>
             <input type="text" className="db-form-input" name="niveau"
-              value={formData.niveau} onChange={handleChange} placeholder="Ex: N1" />
+              value={formData.niveau} onChange={handleChange} placeholder="Ex: N1"
+               disabled={!isAdmin} />
           </div>
           <div>
             <label className="db-form-label">HTP</label>
             <input type="number" step="1" min="0" max="8" className="db-form-input" name="htp"
-              value={formData.htp} onChange={handleChange} placeholder="Saisir le htp" />
+              value={formData.htp} onChange={handleChange} placeholder="Saisir le htp"
+               disabled={!isAdmin} />
           </div>
 
           {/* ROW 2 — Mesures */}
           <div>
             <label className="db-form-label">Profondeur (m)</label>
             <input type="number" step="0.01" className="db-form-input" name="profondeur"
-              value={formData.profondeur} onChange={handleChange} placeholder="0.00" />
+              value={formData.profondeur} onChange={handleChange} placeholder="0.00"
+               disabled={!isAdmin} />
           </div>
           <div>
-            <label className="db-form-label">Volume Souté (t)</label>
+            <label className="db-form-label">Volume Sauté (t)</label>
             <input type="number" step="0.01" className="db-form-input" name="volume_sote"
-              value={formData.volume_sote} onChange={handleChange} placeholder="0.00" />
+              value={formData.volume_sote} onChange={handleChange} placeholder="0.00" 
+               disabled={!isAdmin}/>
           </div>
           <div>
             <label className="db-form-label">Heure Début</label>
             <input type="time" className="db-form-input" name="heureDebut"
-              value={formData.heureDebut} onChange={handleChange} />
+              value={formData.heureDebut} onChange={handleChange} 
+               disabled={!isAdmin}/>
           </div>
           <div>
             <label className="db-form-label">Heure Fin</label>
             <input type="time" className="db-form-input" name="heureFin"
-              value={formData.heureFin} onChange={handleChange} />
+              value={formData.heureFin} onChange={handleChange}
+               disabled={!isAdmin} />
           </div>
 
           {/* ROW 3 — Personnel & Machine */}
           <div>
             <label className="db-form-label">Conducteur</label>
             <input type="text" className="db-form-input" name="conducteur"
-              value={formData.conducteur} onChange={handleChange} placeholder="Nom" />
+              value={formData.conducteur} onChange={handleChange} placeholder="Nom"
+               disabled={!isAdmin} />
           </div>
           <div>
             <label className="db-form-label">Matricule</label>
             <input type="text" className="db-form-input" name="matricule"
-              value={formData.matricule} onChange={handleChange} placeholder="Matricule conducteur" />
+              value={formData.matricule} onChange={handleChange} placeholder="Matricule conducteur" 
+               disabled={!isAdmin}/>
           </div>
           <div>
             <label className="db-form-label">Machine</label>
             <input type="number" className="db-form-input" name="machine_id"
-              value={formData.machine_id} onChange={handleChange} placeholder="ID machine" />
+              value={formData.machine_id} onChange={handleChange} placeholder="ID machine"
+               disabled={!isAdmin} />
           </div>
           <div>
             <label className="db-form-label">Poste</label>
             <input type="text" className="db-form-input" name="poste"
-              value={formData.poste} onChange={handleChange} placeholder="Ex: Matin" />
+              value={formData.poste} onChange={handleChange} placeholder="Ex: Matin"
+               disabled={!isAdmin} />
           </div>
 
         
@@ -361,6 +379,7 @@ const TD = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
               name="etat_machine"
               value={formData.etat_machine}
               onChange={handleChange}
+               disabled={!isAdmin}
             >
               <option value="En marche">En marche</option>
               <option value="En arrêt">En arrêt</option>
@@ -375,17 +394,20 @@ const TD = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
                 <div>
                   <label className="db-form-label" style={{ color: "#92400e" }}>Nature d'arrêt</label>
                   <input type="text" className="db-form-input" name="type_arret"
-                    value={formData.type_arret} onChange={handleChange} placeholder="Cause technique..." />
+                    value={formData.type_arret} onChange={handleChange} placeholder="Cause technique..."
+                     disabled={!isAdmin} />
                 </div>
                 <div>
                   <label className="db-form-label" style={{ color: "#92400e" }}>Heure Début Arrêt</label>
                   <input type="time" className="db-form-input" name="heureDebutArret"
-                    value={formData.heureDebutArret} onChange={handleChange} />
+                    value={formData.heureDebutArret} onChange={handleChange}
+                     disabled={!isAdmin} />
                 </div>
                 <div>
                   <label className="db-form-label" style={{ color: "#92400e" }}>Heure Fin Arrêt</label>
                   <input type="time" className="db-form-input" name="heureFinArret"
-                    value={formData.heureFinArret} onChange={handleChange} />
+                    value={formData.heureFinArret} onChange={handleChange} 
+                     disabled={!isAdmin}/>
                 </div>
               </div>
             </div>
@@ -404,7 +426,7 @@ const TD = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
                   {eq}
                 </div>
               ))}
-              <button type="button" className="db-equip-add" onClick={addEquipement}>+ Ajouter</button>
+               {isAdmin && (<button type="button" className="db-equip-add" onClick={addEquipement}>+ Ajouter</button>)}
             </div>
           </div>
 
@@ -444,12 +466,15 @@ const TD = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
                 Annuler
               </button>
             )}
+             {isAdmin && (
             <button type="submit" className="db-btn-submit" disabled={loading}>
               {loading ? "Enregistrement..." : editIndex !== null ? "Mettre à jour" : "Enregistrer"}
             </button>
+             )}
           </div>
 
         </form>
+        
       </div>
 
     </div>

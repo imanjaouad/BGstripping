@@ -38,7 +38,6 @@ Route::put('/poussages/{poussage}', [PoussageController::class , 'update']);
 Route::delete('/poussages/{poussage}', [PoussageController::class , 'destroy']);
 
 // ─── Casements ────────────────────────────────────
-
 // ── Routes statiques (déclarées avant {id}) ──────────────────────────────────
 Route::get('/casements/stats/monthly', [CasementController::class, 'monthly']);
 Route::get('/casements/stats',         [CasementController::class, 'stats']);

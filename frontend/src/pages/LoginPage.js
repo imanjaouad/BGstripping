@@ -5,22 +5,31 @@ import logo from "../images/logo.png";
 
 const modeRoutes = {
 <<<<<<< HEAD
-  poussage: "/poussage",
+    poussage: "/poussage",
   casement: "/operations/casement",
 =======
-<<<<<<< HEAD
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
+
   poussage: "/poussage",
   casement: "/operations/casement",
-=======
+
 <<<<<<< HEAD
+=======
+  poussage: "/poussage",
+  casement: "/operations/casement",
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
   poussage: "/operations/poussage",
   encasement: "/operations/encasement",
-=======
+
   poussage: "/poussage",
   casement: "/operations/casement",
->>>>>>> main
->>>>>>> clean-IMANE
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
   transport: "/operations/transport",
 };
 
@@ -54,17 +63,19 @@ export default function LoginPage() {
         },
 <<<<<<< HEAD
         body: JSON.stringify({ username: email, password, modeOpiration: mode }),
+
 =======
-<<<<<<< HEAD
+
         body: JSON.stringify({ username: email, password, modeOpiration: mode }),
-=======
-<<<<<<< HEAD
+
+        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
+
         body: JSON.stringify({ email, password }),
-=======
+
         body: JSON.stringify({ username: email, password, modeOpiration: mode }),
->>>>>>> main
->>>>>>> clean-IMANE
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
       });
 
       const payload = await response.json();
@@ -137,19 +148,19 @@ export default function LoginPage() {
               <select value={mode} onChange={(event) => setMode(event.target.value)} required>
                 <option value="">Selectionner un mode</option>
                 <option value="poussage">Poussage</option>
-<<<<<<< HEAD
+
                 <option value="casement">Casement</option>
-=======
-<<<<<<< HEAD
+
                 <option value="casement">Casement</option>
-=======
-<<<<<<< HEAD
+
                 <option value="encasement">Encasement</option>
-=======
+
                 <option value="casement">Casement</option>
->>>>>>> main
->>>>>>> clean-IMANE
->>>>>>> d0e94413d47d16dd121cff556781afa4292fd64f
+
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0516b213417e56544de33d5564ce665cdbe4c5b9
                 <option value="transport">Transport</option>
               </select>
             </label>
