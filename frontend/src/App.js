@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route,Navigate } from "react-router-dom";
 
 // Pages publiques
 import Home from "./pages/Home/Home";
@@ -28,12 +28,14 @@ function App() {
 
       {/* ================= PUBLIC ROUTES ================= */}
 
-      {/* Page d'accueil */}
-      <Route path="/" element={<Home />} />
+     {/* Redirect root / to login */}
+  <Route path="/" element={<Navigate to="/login" replace />} />
 
       {/* Page de connexion */}
       <Route path="/login" element={<Login />} />
 
+ {/* Page d'accueil après login */}
+      <Route path="/home" element={<Home />} />
       {/* Page sécurité */}
       <Route path="/securite" element={<Securite />} />
 

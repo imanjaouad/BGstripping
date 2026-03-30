@@ -1,6 +1,6 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
-import { FaArrowLeft, FaTruck, FaChartBar, FaWarehouse, FaShuttleVan } from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaTruck, FaChartBar, FaSignOutAlt } from "react-icons/fa";
 import image from "../../images/image.jpeg";
 import procanLogo from "../../images/procanLogo.png";
 import transwinLogo from "../../images/transwinLogo.jpg";
@@ -141,6 +141,16 @@ const SIDEBAR_CSS = `
 `;
 
 function TransportSidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear any authentication tokens/storage here if needed
+    localStorage.removeItem("token");
+    sessionStorage.clear();
+    // Navigate to login page
+    navigate("/login");
+  };
+
   return (
     <>
       <style>{SIDEBAR_CSS}</style>
@@ -167,13 +177,13 @@ function TransportSidebar() {
         {/* Section: Navigation */}
         <div className="tr-section-label">Navigation</div>
         <ul className="tr-nav">
-          {/* Retour accueil */}
+          {/* Logout Button */}
           <li className="tr-nav-item">
-            <NavLink to="/" className="tr-link">
-              <span className="tr-link-icon"><FaArrowLeft /></span>
-              <span>Retour Accueil</span>
+            <button className="tr-link" onClick={handleLogout}>
+              <span className="tr-link-icon"><FaSignOutAlt /></span>
+              <span>Déconnexion</span>
               <span className="tr-link-indicator" />
-            </NavLink>
+            </button>
           </li>
 
           {/* Dashboard Transport */}

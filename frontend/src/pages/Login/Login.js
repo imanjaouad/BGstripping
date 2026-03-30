@@ -68,7 +68,7 @@ export default function Login() {
 
         // Si admin → dashboard principal
         if (user.role === "admin") {
-          navigate("/");
+          navigate("/home");
         } else {
 
           // Sinon redirection selon type d'opération

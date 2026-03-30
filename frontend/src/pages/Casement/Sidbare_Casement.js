@@ -1,15 +1,20 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-// ── SVG nav icons ─────────────────────────────────────────────────────────────
 import image from "../../images/image.jpeg";
 
+// ✅ Import du contexte d'authentification
+import { useAuth } from "../../components/AuthContext";
+
+// ── SVG nav icons ─────────────────────────────────────────────────────────────
 const IcoHome    = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
 const IcoDash    = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
 const IcoEdit    = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
 const IcoStats   = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>;
 const IcoHistory = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>;
 const IcoMoney   = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
-const IcoBack    = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>;
+
+// ✅ Icône déconnexion
+const IcoLogout  = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
 
 const SIDEBAR_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
@@ -145,25 +150,31 @@ const SIDEBAR_CSS = `
   }
   .sb-csm-link.active .sb-csm-nav-indicator { opacity:1; transform:scale(1); }
 
-  /* ── Back button ── */
-  .sb-csm-back {
+  /* ── Logout button ── */
+  .sb-csm-logout {
     display:flex; align-items:center; gap:10px;
     padding:9px 10px; margin:0 8px 4px;
     border-radius:11px; background:none; border:none; cursor:pointer;
-    color:rgba(255,255,255,0.55); font-family:'Plus Jakarta Sans', sans-serif;
+    color:rgba(255,100,100,0.75); font-family:'Plus Jakarta Sans', sans-serif;
     font-size:13px; font-weight:600;
     transition:all .18s; white-space:nowrap; overflow:hidden;
     text-align:left; width:calc(100% - 16px);
     position:relative; z-index:1;
   }
-  .sb-csm-back:hover { background:rgba(255,255,255,0.09); color:#fff; }
-  .sb-csm-back-icon {
+  .sb-csm-logout:hover {
+    background:rgba(239,68,68,0.12);
+    color:#f87171;
+  }
+  .sb-csm-logout-icon {
     width:30px; height:30px; border-radius:8px;
     display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.6);
+    background:rgba(239,68,68,0.10); color:rgba(255,100,100,0.75);
     font-size:13px; flex-shrink:0; transition:background .18s;
   }
-  .sb-csm-back:hover .sb-csm-back-icon { background:rgba(74,222,128,0.18); color:#4ade80; }
+  .sb-csm-logout:hover .sb-csm-logout-icon {
+    background:rgba(239,68,68,0.22);
+    color:#f87171;
+  }
 
   /* ── Footer ── */
   .sb-csm-footer {
@@ -209,6 +220,15 @@ const NAV_ITEMS = [
 function SidebarCasement({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
 
+  // ✅ Récupération de la fonction logout depuis AuthContext
+  const { logout } = useAuth();
+
+  // ✅ Gestion de la déconnexion
+  const handleLogout = () => {
+    logout();           // Vide le contexte + sessionStorage/localStorage
+    navigate("/login"); // Redirige vers la page de connexion
+  };
+
   return (
     <>
       <style>{SIDEBAR_CSS}</style>
@@ -229,7 +249,6 @@ function SidebarCasement({ isOpen, toggleSidebar }) {
           </div>
           {isOpen && (
             <>
-             
               <div className="sb-csm-brand-sub">Casement</div>
             </>
           )}
@@ -242,7 +261,7 @@ function SidebarCasement({ isOpen, toggleSidebar }) {
 
         {/* Navigation */}
         <ul className="sb-csm-nav">
-          {NAV_ITEMS.map(({ to, end, icon, label, badge }) => (
+          {NAV_ITEMS.map(({ to, end, icon, label }) => (
             <li key={label} className="sb-csm-nav-item">
               <NavLink
                 to={to}
@@ -261,12 +280,12 @@ function SidebarCasement({ isOpen, toggleSidebar }) {
 
         <div className="sb-csm-divider" />
 
-        {/* Back to home */}
-        <button className="sb-csm-back" onClick={() => navigate("/")}>
-          <span className="sb-csm-back-icon">
-            <IcoBack />
+        {/* ✅ Bouton Déconnexion */}
+        <button className="sb-csm-logout" onClick={handleLogout}>
+          <span className="sb-csm-logout-icon">
+            <IcoLogout />
           </span>
-          {isOpen && "Retour Accueil"}
+          {isOpen && "Déconnexion"}
         </button>
 
         {/* Footer */}

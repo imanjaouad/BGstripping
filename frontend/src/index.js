@@ -5,6 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import { AuthProvider } from "./components/AuthContext"; // ← add this
+import Login from "./pages/Login/Login";
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -14,6 +16,7 @@ root.render(
       <AuthProvider>
         {" "}
         {/* ← add this */}
+        <Login/>
         <App />
       </AuthProvider>
     </Provider>
