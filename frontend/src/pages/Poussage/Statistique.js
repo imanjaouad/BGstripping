@@ -24,6 +24,35 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import image from "../../images/image3.webp";
 
+// ─── Professional SVG Icons ───────────────────────────────────────────────────
+const Ico = {
+  volume:   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+  clock:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+  trend:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>,
+  pause:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>,
+  check:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+  gauge:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 0 1 7.38 16.75"/><path d="M12 2a10 10 0 0 0-7.38 16.75"/><line x1="12" y1="12" x2="12" y2="8"/><circle cx="12" cy="12" r="1"/></svg>,
+  activity: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  alert:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+  stop:     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6"/></svg>,
+  money:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+  trendUp:  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"/></svg>,
+  trendDn:  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
+  equal:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/></svg>,
+  edit:     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+  trash:    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
+  save:     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
+  excel:    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
+  palette:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>,
+  bulb:     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>,
+  arrowUp:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>,
+  arrowDn:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>,
+  minus:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  ref:      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
+  warning:  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+};
+
+
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend, Filler, ArcElement
@@ -527,7 +556,7 @@ useEffect(() => {
     diffPct  = prev.total > 0 ? ((diffAbs / prev.total) * 100) : 0;
     trendDir = diffAbs > 0 ? "up" : diffAbs < 0 ? "down" : "same";
   }
-  const trendIcon      = trendDir === "up" ? "📈" : trendDir === "down" ? "📉" : "➡️";
+  const trendIcon      = trendDir === "up" ? Ico.trendUp : trendDir === "down" ? Ico.trendDn : Ico.equal;
   const trendDiffClass = trendDir === "up" ? "db-cost-diff-pos" : trendDir === "down" ? "db-cost-diff-neg" : "db-cost-diff-neu";
 
   if (history.length === 0) {
@@ -535,12 +564,12 @@ useEffect(() => {
       <div className="db-cost-evo-card" style={{ animationDelay:"0.44s" }}>
         <div className="db-card-header" style={{ marginBottom:8 }}>
           <div>
-            <p className="db-card-title">💰 Répartition du Budget Annuel & Comparaison Mensuelle</p>
+            <p className="db-card-title">Répartition du Budget Annuel & Comparaison Mensuelle</p>
             <p className="db-card-sub">Données depuis Gestion des Coûts</p>
           </div>
         </div>
         <div className="db-cost-evo-empty">
-          📊 Aucun calcul enregistré — rendez-vous dans <strong>Gestion des Coûts</strong> pour saisir les paramètres
+          Aucun calcul enregistré — rendez-vous dans <strong>Gestion des Coûts</strong> pour saisir les paramètres
         </div>
       </div>
     );
@@ -552,7 +581,7 @@ useEffect(() => {
       {/* ── Titre ── */}
       <div className="db-card-header" style={{ marginBottom:16 }}>
         <div>
-          <p className="db-card-title">💰 Répartition du Budget Annuel & Comparaison Mensuelle</p>
+          <p className="db-card-title">Répartition du Budget Annuel & Comparaison Mensuelle</p>
           <p className="db-card-sub">% consommé par mois · évolution des coûts · hausse / baisse</p>
         </div>
         <span className="db-pill">{monthSummary.length} mois</span>
@@ -592,7 +621,7 @@ useEffect(() => {
             borderRadius:20, padding:"6px 16px",
             fontWeight:700, fontSize:13, whiteSpace:"nowrap",
           }}>
-            {trendDir === "up" ? "⬆ Hausse" : trendDir === "down" ? "⬇ Baisse" : "— Stable"}
+            {trendDir === "up" ? "↑ Hausse" : trendDir === "down" ? "↓ Baisse" : "— Stable"}
           </div>
         </div>
       )}
@@ -614,7 +643,7 @@ useEffect(() => {
           const prevMs  = idx > 0 ? monthSummary[idx - 1] : null;
           const mDiff   = prevMs ? ms.total - prevMs.total : 0;
           const mTrend  = prevMs ? (mDiff > 0 ? "up" : mDiff < 0 ? "down" : "same") : "ref";
-          const mIcon   = mTrend === "up" ? "▲" : mTrend === "down" ? "▼" : mTrend === "ref" ? "◎" : "—";
+          const mIcon   = mTrend === "up" ? Ico.arrowUp : mTrend === "down" ? Ico.arrowDn : mTrend === "ref" ? Ico.ref : Ico.minus;
           const mColor  = mTrend === "up" ? "#ef4444" : mTrend === "down" ? "#16a34a" : "#9ca3af";
 
           return (
@@ -718,10 +747,10 @@ useEffect(() => {
                         : <span style={{ color:"#9ca3af", fontWeight:400 }}>Référence</span>}
                     </td>
                     <td>
-                      {mTrend === "up"   && <span style={{ background:"#fef2f2", color:"#dc2626", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>⬆ Hausse</span>}
-                      {mTrend === "down" && <span style={{ background:"#f0fdf4", color:"#16a34a", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>⬇ Baisse</span>}
+                      {mTrend === "up"   && <span style={{ background:"#fef2f2", color:"#dc2626", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>{Ico.arrowUp} Hausse</span>}
+                      {mTrend === "down" && <span style={{ background:"#f0fdf4", color:"#16a34a", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>{Ico.arrowDn} Baisse</span>}
                       {mTrend === "same" && <span style={{ background:"#f3f4f6", color:"#6b7280", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>— Stable</span>}
-                      {mTrend === "ref"  && <span style={{ background:"#eff6ff", color:"#3b82f6", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>◎ Réf.</span>}
+                      {mTrend === "ref"  && <span style={{ background:"#eff6ff", color:"#3b82f6", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700 }}>Réf.</span>}
                     </td>
                   </tr>
                 );
@@ -735,12 +764,12 @@ useEffect(() => {
       <div style={{ marginTop:14, display:"flex", flexWrap:"wrap", gap:10,
         padding:"10px 14px", background:"#f8fffe",
         borderRadius:10, border:"1px solid #e6faf0", fontSize:11, color:"#9ca3af" }}>
-        <span>🎨 Couleurs % budget :</span>
+        <span>Légende couleurs :</span>
         <span style={{ color:"#16a34a", fontWeight:700 }}>● vert ≤ 20%</span>
         <span style={{ color:"#f59e0b", fontWeight:700 }}>● ambre 20–40%</span>
         <span style={{ color:"#ef4444", fontWeight:700 }}>● rouge &gt; 40%</span>
         <span style={{ marginLeft:"auto" }}>
-          💡 Données depuis <strong style={{ color:"#16a34a" }}>Gestion des Coûts</strong>
+          Données depuis <strong style={{ color:"#16a34a" }}>Gestion des Coûts</strong>
         </span>
       </div>
 
@@ -1090,13 +1119,9 @@ const tdV = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
                 {showActions && (
                   <td>
                     <button className="db-btn-edit"
-                      onClick={() => handleEdit(p, poussages.indexOf(p))}>
-                      ✏️ Modifier
-                    </button>
+                      onClick={() => handleEdit(p, poussages.indexOf(p))}>{Ico.edit} Modifier</button>
                     <button className="db-btn-del"
-                      onClick={() => handleDelete(poussages.indexOf(p))}>
-                      🗑️ Supprimer
-                    </button>
+                      onClick={() => handleDelete(poussages.indexOf(p))}>{Ico.trash} Supprimer</button>
                   </td>
                 )}
               </tr>
@@ -1146,15 +1171,15 @@ const tdV = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
             {/* KPI Cards */}
             <div className="db-grid3" style={{ marginBottom:24 }}>
               {[
-                { icon:"⛏️", label:"Volume Total",    value:totalVolume,           unit:"t",   accent:"#16a34a", delay:"0.08s" },
-                { icon:"⏱️", label:"Temps Total",     value:totalTemps,            unit:"h",   accent:"#15803d", delay:"0.16s" },
-                { icon:"📈", label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", delay:"0.24s" },
-                { icon:"🔢", label:"En arret",      value:enArret,              unit:"op",  accent:"#4ade80", delay:"0.32s" },
-                { icon:"✅", label:"En Marche",       value:enMarcheCnt,           unit:"",    accent:"#86efac", delay:"0.40s" },
-                { icon:"⚙️", label:"OEE",              value: parseFloat(avgOEE), unit:"%", accent:"#3b82f6", delay:"0.48s" },
-                { icon:"📊", label:"TU",               value: parseFloat(avgTU),  unit:"%", accent:"#16a34a", delay:"0.56s" },
-                { icon:"⏸️", label:"TD Arrêt",         value: parseFloat(avgTD),  unit:"%", accent:"#f59e0b", delay:"0.64s" },
-                { icon:"🛑", label:"H. Arrêt Total",   value: Math.round(totalHeuresArret * 10) / 10,   unit:"h", accent:"#ef4444", delay:"0.72s" },
+                { icon: Ico.volume,   label:"Volume Total",    value:totalVolume,           unit:"t",   accent:"#16a34a", delay:"0.08s" },
+                { icon: Ico.clock,    label:"Temps Total",     value:totalTemps,            unit:"h",   accent:"#15803d", delay:"0.16s" },
+                { icon: Ico.trend,   label:"Rendement Moyen", value:parseFloat(rendMoyen), unit:"t/h", accent:"#22c55e", delay:"0.24s" },
+                { icon: Ico.pause,   label:"En arret",      value:enArret,              unit:"op",  accent:"#4ade80", delay:"0.32s" },
+                { icon: Ico.check,   label:"En Marche",       value:enMarcheCnt,           unit:"",    accent:"#86efac", delay:"0.40s" },
+                { icon: Ico.gauge,   label:"OEE",              value: parseFloat(avgOEE), unit:"%", accent:"#3b82f6", delay:"0.48s" },
+                { icon: Ico.activity,label:"TU",               value: parseFloat(avgTU),  unit:"%", accent:"#16a34a", delay:"0.56s" },
+                { icon: Ico.alert,   label:"TD Arrêt",         value: parseFloat(avgTD),  unit:"%", accent:"#f59e0b", delay:"0.64s" },
+                { icon: Ico.stop,    label:"H. Arrêt Total",   value: Math.round(totalHeuresArret * 10) / 10,   unit:"h", accent:"#ef4444", delay:"0.72s" },
               ].map(({ icon, label, value, unit, accent, delay }) => (
                 <div key={label} className="db-kpi" style={{ animationDelay:delay }}>
                   <div className="db-kpi-shimmer"/>
@@ -1214,10 +1239,10 @@ const tdV = htp > 0 ?((tempsFonctionnement / 24) * 100) .toFixed(1) :0;
             {/* KPI Cards OEE */}
             <div className="db-oee-grid" style={{ marginBottom:20 }}>
               {[
-                { cls:"oee",   icon:"⚙️", label:"OEE — Efficacité Globale",   value: avgOEE, unit:"%", gauge: parseFloat(avgOEE), delay:"0.08s" },
-                { cls:"tu",    icon:"✅", label:"TU — Taux d'Utilisation",     value: avgTU,  unit:"%", gauge: parseFloat(avgTU),  delay:"0.16s" },
-                { cls:"td",    icon:"⚠️", label:"TD — Taux de Disponibilité",  value: (100 - parseFloat(avgTD)).toFixed(1), unit:"%", gauge: 100 - parseFloat(avgTD), delay:"0.24s" },
-                { cls:"arret", icon:"🛑", label:"Heures d'Arrêt Total",        value: totalHeuresArret.toFixed(1), unit:"h", gauge: totalHTP > 0 ? Math.min((totalHeuresArret / totalHTP) * 100, 100) : 0, delay:"0.32s" },
+                { cls:"oee",   icon:Ico.gauge, label:"OEE — Efficacité Globale",   value: avgOEE, unit:"%", gauge: parseFloat(avgOEE), delay:"0.08s" },
+                { cls:"tu",    icon:Ico.check, label:"TU — Taux d'Utilisation",     value: avgTU,  unit:"%", gauge: parseFloat(avgTU),  delay:"0.16s" },
+                { cls:"td",    icon:Ico.alert, label:"TD — Taux de Disponibilité",  value: (100 - parseFloat(avgTD)).toFixed(1), unit:"%", gauge: 100 - parseFloat(avgTD), delay:"0.24s" },
+                { cls:"arret", icon:Ico.stop,  label:"Heures d'Arrêt Total",        value: totalHeuresArret.toFixed(1), unit:"h", gauge: totalHTP > 0 ? Math.min((totalHeuresArret / totalHTP) * 100, 100) : 0, delay:"0.32s" },
               ].map(({ cls, icon, label, value, unit, gauge, delay }) => (
                 <div key={label} className={`db-oee-card ${cls}`} style={{ animationDelay: delay }}>
                   <div className={`db-oee-icon ${cls}`}>{icon}</div>
