@@ -3,27 +3,10 @@ import { useNavigate } from "react-router-dom";
 import heroImage from "../images/hero-phosphate-kweqZRh2w4LhFWCPyyzPjt.png";
 import logo from "../images/logo.png";
 
+// ✅ Clés uniques, routes cohérentes
 const modeRoutes = {
-
-    poussage: "/poussage",
-  casement: "/operations/casement",
-
-
-  poussage: "/poussage",
-  casement: "/operations/casement",
-
-
-  poussage: "/poussage",
-  casement: "/operations/casement",
-
-
   poussage: "/operations/poussage",
-  encasement: "/operations/encasement",
-
-  poussage: "/poussage",
   casement: "/operations/casement",
-
-
   transport: "/operations/transport",
 };
 
@@ -55,21 +38,8 @@ export default function LoginPage() {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-
-        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
-
-
-
-        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
-
-        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
-
-        body: JSON.stringify({ email, password }),
-
-        body: JSON.stringify({ username: email, password, modeOpiration: mode }),
-
-
-
+        // ✅ Un seul body, champs cohérents avec le backend
+        body: JSON.stringify({ username: email, password, mode_operation: mode }),
       });
 
       const payload = await response.json();
@@ -82,9 +52,12 @@ export default function LoginPage() {
         localStorage.setItem("auth_user", JSON.stringify(payload.data));
       }
 
+      // ✅ Redirection vers la route correspondant au mode choisi
       const targetRoute = modeRoutes[mode];
       if (targetRoute) {
         navigate(targetRoute, { state: { email, rememberMe } });
+      } else {
+        setError("Mode d'opération non reconnu.");
       }
     } catch (requestError) {
       setError(requestError.message || "Erreur reseau.");
@@ -137,21 +110,13 @@ export default function LoginPage() {
               />
             </label>
 
+            {/* ✅ Options uniques et cohérentes avec modeRoutes */}
             <label className="login-field">
               <span>Mode operation</span>
               <select value={mode} onChange={(event) => setMode(event.target.value)} required>
                 <option value="">Selectionner un mode</option>
                 <option value="poussage">Poussage</option>
-
                 <option value="casement">Casement</option>
-
-                <option value="casement">Casement</option>
-
-                <option value="encasement">Encasement</option>
-
-                <option value="casement">Casement</option>
-
-
                 <option value="transport">Transport</option>
               </select>
             </label>
