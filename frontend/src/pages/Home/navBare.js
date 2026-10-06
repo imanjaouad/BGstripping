@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 
 const Navbar = ({ closeMenu }) => {
 
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  // ✅ Lit depuis sessionStorage ET localStorage
+  // (selon si "Se souvenir de moi" était coché ou non lors du login)
+  const user =
+    JSON.parse(sessionStorage.getItem("user")) ||
+    JSON.parse(localStorage.getItem("user"));
+
   const isAdmin = user?.role === "admin";
 
   return (
@@ -16,7 +21,7 @@ const Navbar = ({ closeMenu }) => {
         Casement
       </Link>
 
-      <Link to="/transport" className="nav-link" onClick={closeMenu}>
+      <Link to="/operations/transport" className="nav-link" onClick={closeMenu}>
         Transport
       </Link>
 
@@ -24,7 +29,8 @@ const Navbar = ({ closeMenu }) => {
         Sécurité
       </Link>
 
-      {/* 👇 غير للـ admin */}
+      {/* ✅ Affiché uniquement pour l'admin */}
+      {/* ✅ Route corrigée : /admin/users → /users (cohérent avec UserManagement) */}
       {isAdmin && (
         <Link to="/admin/users" className="nav-link" onClick={closeMenu}>
           Gestion des utilisateurs
